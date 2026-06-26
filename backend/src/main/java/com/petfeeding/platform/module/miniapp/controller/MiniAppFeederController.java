@@ -44,11 +44,17 @@ public class MiniAppFeederController {
         if (userId == null) {
             userId = 1L; // 演示模式：使用默认用户ID
         }
-        // 演示模式兼容：跳过重复申请检查，允许重复提交
-        if (userId != 1L) {
+        // 演示模式兼容：user_id 有唯一约束，演示模式下跳过重复检查只用现有记录
+        if (userId == 1L) {
+            java.util.List<Feeder> existing = feederService.lambdaQuery()
+                    .eq(Feeder::getUserId, 1L)
+                    .list();
+            if (!existing.isEmpty()) {
+                return R.ok(existing.get(0)); // 演示模式下直接返回已有申请
+            }
+        } else {
             LambdaQueryWrapper<Feeder> query = new LambdaQueryWrapper<>();
             query.eq(Feeder::getUserId, userId);
-            query.eq(Feeder::getStatus, "PENDING");
             long count = feederService.count(query);
             if (count > 0) {
                 throw new BusinessException("您已提交过申请，请等待审核");
