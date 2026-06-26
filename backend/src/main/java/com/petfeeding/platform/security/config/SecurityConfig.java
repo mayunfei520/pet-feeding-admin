@@ -35,17 +35,16 @@ public class SecurityConfig {
             .and()
             // 请求权限配置
             .authorizeRequests()
-            // 放行登录、注册、小程序认证、API 文档
+            // 放行登录、注册、小程序所有API、API 文档
             .antMatchers(
                     "/api/user/login",
                     "/api/user/register",
-                    "/api/miniapp/auth/login",
+                    "/api/miniapp/**",            // 小程序全部接口放行（Token 校验在 Controller 层处理）
                     "/doc.html",
                     "/webjars/**",
                     "/v3/api-docs/**",
                     "/swagger-resources/**"
             ).permitAll()
-            .antMatchers(HttpMethod.GET, "/api/miniapp/**").permitAll()
             // 其余接口需要认证
             .anyRequest().authenticated()
             .and()
