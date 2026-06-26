@@ -1,0 +1,63 @@
+package com.petfeeding.platform.module.feeder.controller;
+
+import com.petfeeding.platform.common.result.R;
+import com.petfeeding.platform.module.feeder.entity.Feeder;
+import com.petfeeding.platform.module.feeder.service.FeederService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+/**
+ * 喂养员控制器
+ */
+@RestController
+@RequestMapping("/api/feeder")
+@RequiredArgsConstructor
+@Tag(name = "喂养员管理", description = "喂养员注册、审核、信息管理")
+public class FeederController {
+
+    private final FeederService feederService;
+
+    @GetMapping
+    @Operation(summary = "喂养员列表（已通过审核）")
+    public R<List<Feeder>> list() {
+        List<Feeder> list = feederService.lambdaQuery()
+                .eq(Feeder::getStatus, "APPROVED")
+                .list();
+        return R.ok(list);
+    }
+
+    @GetMapping("/pending")
+    @Operation(summary = "待审核喂养员列表")
+    public R<List<Feeder>> pending() {
+        List<Feeder> list = feederService.lambdaQuery()
+                .eq(Feeder::getStatus, "PENDING")
+                .list();
+        return R.ok(list);
+    }
+
+    @PutMapping("/{id}/approve")
+    @Operation(summary = "审核通过喂养员")
+    public R<?> approve(@PathVariable Long id) {
+        Feeder feeder = feederService.getById(id);
+        if (feeder != null) {
+            feeder.setStatus("APPROVED");
+            feederService.updateById(feeder);
+        }
+        return R.ok("审核通过");
+    }
+
+    @PutMapping("/{id}/reject")
+    @Operation(summary = "拒绝喂养员申请")
+    public R<?> reject(@PathVariable Long id) {
+        Feeder feeder = feederService.getById(id);
+        if (feeder != null) {
+            feeder.setStatus("REJECTED");
+            feederService.updateById(feeder);
+        }
+        return R.ok("已拒绝");
+    }
+}

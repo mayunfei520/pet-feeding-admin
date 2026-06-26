@@ -1,0 +1,20 @@
+# ========== 服务器配置 ==========
+server:
+  port: 8080
+
+# ========== Spring 配置 ==========
+spring:
+  profiles:
+    active: dev
+  application:
+    name: pet-feeding-platform
+
+# ========== Knife4j API 文档配置 ==========
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+
+# springdoc:
+#   swagger-ui:
+#     path: /swagger-ui.html

@@ -1,0 +1,24 @@
+# ========== 开发环境配置 ==========
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:file:./data/pet_feeding;DB_CLOSE_DELAY=-1;MODE=MySQL
+    username: sa
+    password:
+
+# ========== JWT 配置 ==========
+jwt:
+  secret: pet-feeding-platform-secret-key-2024
+  expiration: 86400
+
+# ========== H2 控制台 ==========
+spring.h2.console.enabled: true
+
+# ========== MyBatis-Plus 日志 ==========
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      id-type: auto

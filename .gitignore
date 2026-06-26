@@ -1,0 +1,41 @@
+# Java / Maven
+*.class
+*.jar
+*.war
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Node / Frontend
+node_modules/
+.vite/
+.vite-temp/
+
+# IDE
+.idea/
+*.iml
+.settings/
+.project
+.classpath
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Database (H2)
+*.mv.db
+*.trace.db
+data/
+
+# Claude
+.claude/
+
+# Environment
+.env
+.env.local
+*.local.*
