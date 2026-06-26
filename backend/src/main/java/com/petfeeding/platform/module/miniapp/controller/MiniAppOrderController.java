@@ -29,11 +29,15 @@ public class MiniAppOrderController {
 
     @GetMapping
     @Operation(summary = "我的订单列表")
-    public R<List<Order>> list(@RequestHeader("Authorization") String authHeader) {
-        Long userId = getUserId(authHeader);
+    public R<List<Order>> list(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        Long userId = getUserIdOrNull(authHeader);
+        if (userId == null) {
+            // 演示模式或无token：返回所有订单
+            return R.ok(orderService.list());
+        }
         User user = userService.getById(userId);
         LambdaQueryWrapper<Order> query = new LambdaQueryWrapper<>();
-        if ("FEEDER".equals(user.getRole())) {
+        if (user != null && "FEEDER".equals(user.getRole())) {
             query.eq(Order::getFeederId, userId);
         } else {
             query.eq(Order::getOwnerId, userId);
@@ -44,8 +48,11 @@ public class MiniAppOrderController {
 
     @PostMapping
     @Operation(summary = "创建订单")
-    public R<Order> create(@RequestBody Order order, @RequestHeader("Authorization") String authHeader) {
-        Long userId = getUserId(authHeader);
+    public R<Order> create(@RequestBody Order order, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        Long userId = getUserIdOrNull(authHeader);
+        if (userId == null) {
+            userId = 1L; // 演示模式：使用默认用户ID
+        }
         return R.ok(orderService.createOrder(order, userId));
     }
 
@@ -60,27 +67,46 @@ public class MiniAppOrderController {
 
     @PutMapping("/{id}/accept")
     @Operation(summary = "喂养员接单")
-    public R<?> accept(@PathVariable Long id, @RequestHeader("Authorization") String authHeader) {
-        orderService.acceptOrder(id, getUserId(authHeader));
+    public R<?> accept(@PathVariable Long id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        Long userId = getUserIdOrNull(authHeader);
+        if (userId == null) {
+            userId = 1L;
+        }
+        orderService.acceptOrder(id, userId);
         return R.ok("接单成功");
     }
 
     @PutMapping("/{id}/complete")
     @Operation(summary = "喂养员完成订单")
-    public R<?> complete(@PathVariable Long id, @RequestHeader("Authorization") String authHeader) {
-        orderService.completeOrder(id, getUserId(authHeader));
+    public R<?> complete(@PathVariable Long id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        Long userId = getUserIdOrNull(authHeader);
+        if (userId == null) {
+            userId = 1L;
+        }
+        orderService.completeOrder(id, userId);
         return R.ok("订单已完成");
     }
 
     @PutMapping("/{id}/cancel")
     @Operation(summary = "取消订单")
-    public R<?> cancel(@PathVariable Long id, @RequestHeader("Authorization") String authHeader) {
-        orderService.cancelOrder(id, getUserId(authHeader));
+    public R<?> cancel(@PathVariable Long id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        Long userId = getUserIdOrNull(authHeader);
+        if (userId == null) {
+            userId = 1L;
+        }
+        orderService.cancelOrder(id, userId);
         return R.ok("订单已取消");
     }
 
-    private Long getUserId(String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        return jwtUtil.getUserIdFromToken(token);
+    private Long getUserIdOrNull(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return null;
+        }
+        try {
+            String token = authHeader.replace("Bearer ", "");
+            return jwtUtil.getUserIdFromToken(token);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

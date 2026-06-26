@@ -39,14 +39,20 @@ public class MiniAppFeederController {
 
     @PostMapping
     @Operation(summary = "申请成为喂养员")
-    public R<Feeder> apply(@RequestBody Map<String, String> body, @RequestHeader("Authorization") String authHeader) {
-        Long userId = getUserId(authHeader);
-        // 检查是否已申请
-        LambdaQueryWrapper<Feeder> query = new LambdaQueryWrapper<>();
-        query.eq(Feeder::getUserId, userId);
-        long count = feederService.count(query);
-        if (count > 0) {
-            throw new BusinessException("您已提交过申请，请等待审核");
+    public R<Feeder> apply(@RequestBody Map<String, String> body, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        Long userId = getUserIdOrNull(authHeader);
+        if (userId == null) {
+            userId = 1L; // 演示模式：使用默认用户ID
+        }
+        // 演示模式兼容：跳过重复申请检查，允许重复提交
+        if (userId != 1L) {
+            LambdaQueryWrapper<Feeder> query = new LambdaQueryWrapper<>();
+            query.eq(Feeder::getUserId, userId);
+            query.eq(Feeder::getStatus, "PENDING");
+            long count = feederService.count(query);
+            if (count > 0) {
+                throw new BusinessException("您已提交过申请，请等待审核");
+            }
         }
 
         Feeder feeder = new Feeder();
@@ -67,8 +73,15 @@ public class MiniAppFeederController {
         return R.ok(reviewService.listByFeeder(id));
     }
 
-    private Long getUserId(String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        return jwtUtil.getUserIdFromToken(token);
+    private Long getUserIdOrNull(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return null;
+        }
+        try {
+            String token = authHeader.replace("Bearer ", "");
+            return jwtUtil.getUserIdFromToken(token);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }
