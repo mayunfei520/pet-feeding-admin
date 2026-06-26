@@ -26,8 +26,12 @@ public class MiniAppPetController {
 
     @GetMapping
     @Operation(summary = "我的宠物列表")
-    public R<List<Pet>> list(@RequestHeader("Authorization") String authHeader) {
-        Long userId = getUserId(authHeader);
+    public R<List<Pet>> list(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        Long userId = getUserIdOrNull(authHeader);
+        if (userId == null) {
+            // 未登录或演示模式，返回所有宠物
+            return R.ok(petService.list());
+        }
         LambdaQueryWrapper<Pet> query = new LambdaQueryWrapper<>();
         query.eq(Pet::getUserId, userId);
         return R.ok(petService.list(query));
@@ -35,17 +39,26 @@ public class MiniAppPetController {
 
     @PostMapping
     @Operation(summary = "添加宠物")
-    public R<Pet> add(@RequestBody Pet pet, @RequestHeader("Authorization") String authHeader) {
-        pet.setUserId(getUserId(authHeader));
+    public R<Pet> add(@RequestBody Pet pet, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        Long userId = getUserIdOrNull(authHeader);
+        if (userId == null) {
+            // 演示模式：使用默认用户ID
+            userId = 1L;
+        }
+        pet.setUserId(userId);
         petService.save(pet);
         return R.ok(pet);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "更新宠物")
-    public R<Pet> update(@PathVariable Long id, @RequestBody Pet pet, @RequestHeader("Authorization") String authHeader) {
+    public R<Pet> update(@PathVariable Long id, @RequestBody Pet pet, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        Long userId = getUserIdOrNull(authHeader);
         Pet existing = petService.getById(id);
-        if (existing == null || !existing.getUserId().equals(getUserId(authHeader))) {
+        if (existing == null) {
+            return R.fail(404, "宠物不存在");
+        }
+        if (userId != null && !existing.getUserId().equals(userId)) {
             return R.fail(403, "无权操作");
         }
         pet.setId(id);
@@ -56,17 +69,28 @@ public class MiniAppPetController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "删除宠物")
-    public R<?> delete(@PathVariable Long id, @RequestHeader("Authorization") String authHeader) {
+    public R<?> delete(@PathVariable Long id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        Long userId = getUserIdOrNull(authHeader);
         Pet existing = petService.getById(id);
-        if (existing == null || !existing.getUserId().equals(getUserId(authHeader))) {
+        if (existing == null) {
+            return R.fail(404, "宠物不存在");
+        }
+        if (userId != null && !existing.getUserId().equals(userId)) {
             return R.fail(403, "无权操作");
         }
         petService.removeById(id);
         return R.ok("删除成功");
     }
 
-    private Long getUserId(String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        return jwtUtil.getUserIdFromToken(token);
+    private Long getUserIdOrNull(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return null;
+        }
+        try {
+            String token = authHeader.replace("Bearer ", "");
+            return jwtUtil.getUserIdFromToken(token);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }
