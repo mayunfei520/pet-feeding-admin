@@ -1,41 +1,24 @@
-# Java / Maven
+# Maven
+backend/target/
 *.class
 *.jar
 *.war
-target/
-!.mvn/wrapper/maven-wrapper.jar
 
-# Node / Frontend
-node_modules/
-.vite/
-.vite-temp/
+# Node
+frontend/node_modules/
+frontend/dist/
 
 # IDE
 .idea/
 *.iml
-.settings/
-.project
-.classpath
+.vscode/
 *.swp
-*.swo
 
 # OS
 .DS_Store
 Thumbs.db
-
-# Logs
 *.log
-logs/
-
-# Database (H2)
-*.mv.db
-*.trace.db
-data/
-
-# Claude
-.claude/
 
 # Environment
-.env
-.env.local
-*.local.*
+backend/data/
+*.env
