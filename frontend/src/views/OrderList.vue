@@ -7,6 +7,7 @@
         <option value="">全部状态</option>
         <option value="PENDING">待接单</option>
         <option value="ACCEPTED">已接单</option>
+        <option value="IN_PROGRESS">进行中</option>
         <option value="COMPLETED">已完成</option>
         <option value="CANCELLED">已取消</option>
       </select>
@@ -160,6 +161,7 @@ h3 { margin: 0 0 12px; color: #111827; font-size: 18px; }
 .tag { padding: 2px 10px; border-radius: 3px; font-size: 13px; white-space: nowrap; }
 .tag.PENDING { background: #e0e7ff; color: #3730a3; }
 .tag.ACCEPTED { background: #fef3c7; color: #92400e; }
+.tag.IN_PROGRESS { background: #dbeafe; color: #1d4ed8; }
 .tag.COMPLETED { background: #d1fae5; color: #065f46; }
 .tag.CANCELLED { background: #fee2e2; color: #991b1b; }
 .btn-sm { padding: 4px 12px; border: 1px solid #d1d5db; border-radius: 4px; background: #fff; cursor: pointer; font-size: 13px; margin-right: 4px; }

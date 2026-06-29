@@ -44,4 +44,12 @@ public class User {
     /** 更新时间 */
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updatedAt;
+
+    /** 宠物数量，仅用于后台列表展示 */
+    @TableField(exist = false)
+    private Long petCount;
+
+    /** 消费次数，仅用于后台列表展示 */
+    @TableField(exist = false)
+    private Long orderCount;
 }

@@ -18,7 +18,8 @@ export const feederApi = {
   list: () => request.get('/feeder'),
   pending: () => request.get('/feeder/pending'),
   approve: (id) => request.put(`/feeder/${id}/approve`),
-  reject: (id) => request.put(`/feeder/${id}/reject`)
+  reject: (id) => request.put(`/feeder/${id}/reject`),
+  remove: (id) => request.delete(`/feeder/${id}`)
 }
 
 export const orderApi = {

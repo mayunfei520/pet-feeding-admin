@@ -1,6 +1,10 @@
 package com.petfeeding.platform.module.pet.entity;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -36,6 +40,9 @@ public class Pet {
 
     /** 医疗备注 */
     private String medicalNotes;
+
+    /** 是否已打疫苗 */
+    private Boolean vaccinated;
 
     /** 宠物照片 URL */
     private String image;

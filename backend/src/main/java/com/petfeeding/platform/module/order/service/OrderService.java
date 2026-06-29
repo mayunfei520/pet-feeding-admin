@@ -24,6 +24,11 @@ public interface OrderService extends IService<Order> {
     void completeOrder(Long orderId, Long userId);
 
     /**
+     * 开始服务
+     */
+    void startOrder(Long orderId, Long feederId);
+
+    /**
      * 取消订单
      */
     void cancelOrder(Long orderId, Long userId);

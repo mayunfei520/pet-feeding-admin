@@ -58,13 +58,30 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         if (order == null) {
             throw new BusinessException("订单不存在");
         }
-        if (!order.getFeederId().equals(userId)) {
-            throw new BusinessException("只有接单的喂养员才能完成订单");
+        if (!order.getOwnerId().equals(userId)) {
+            throw new BusinessException("只有下单用户才能确认完成订单");
         }
         if (!"ACCEPTED".equals(order.getStatus())) {
-            throw new BusinessException("只有已接单的订单才能标记完成");
+            throw new BusinessException("只有已接单的订单才能确认完成");
         }
         order.setStatus("COMPLETED");
+        this.updateById(order);
+    }
+
+    @Override
+    @Transactional
+    public void startOrder(Long orderId, Long feederId) {
+        Order order = this.getById(orderId);
+        if (order == null) {
+            throw new BusinessException("订单不存在");
+        }
+        if (order.getFeederId() == null || !order.getFeederId().equals(feederId)) {
+            throw new BusinessException("只有当前接单喂养员才能开始服务");
+        }
+        if (!"ACCEPTED".equals(order.getStatus())) {
+            throw new BusinessException("只有已接单的订单才能开始服务");
+        }
+        order.setStatus("IN_PROGRESS");
         this.updateById(order);
     }
 
@@ -104,8 +121,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             throw new BusinessException("该喂养员尚未通过审核");
         }
 
-        // 分配喂养员
-        order.setFeederId(feederId);
+        // 订单统一存储喂养员对应的用户 ID，和小程序接单逻辑保持一致
+        order.setFeederId(feeder.getUserId());
         order.setStatus("ACCEPTED");
         this.updateById(order);
 

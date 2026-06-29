@@ -3,6 +3,10 @@ package com.petfeeding.platform.module.user.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.petfeeding.platform.common.exception.BusinessException;
+import com.petfeeding.platform.module.order.entity.Order;
+import com.petfeeding.platform.module.order.mapper.OrderMapper;
+import com.petfeeding.platform.module.pet.entity.Pet;
+import com.petfeeding.platform.module.pet.mapper.PetMapper;
 import com.petfeeding.platform.module.user.dto.LoginDTO;
 import com.petfeeding.platform.module.user.dto.LoginResultDTO;
 import com.petfeeding.platform.module.user.dto.RegisterDTO;
@@ -26,6 +30,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final PetMapper petMapper;
+    private final OrderMapper orderMapper;
 
     @Override
     @Transactional
@@ -77,11 +83,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public List<User> listByRole(String role) {
+        List<User> users;
         if (role == null || role.isEmpty()) {
-            return this.list();
+            users = this.list();
+        } else {
+            LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(User::getRole, role);
+            users = this.list(queryWrapper);
         }
-        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(User::getRole, role);
-        return this.list(queryWrapper);
+
+        users.forEach(user -> {
+            LambdaQueryWrapper<Pet> petQuery = new LambdaQueryWrapper<>();
+            petQuery.eq(Pet::getUserId, user.getId());
+            user.setPetCount(petMapper.selectCount(petQuery));
+
+            LambdaQueryWrapper<Order> orderQuery = new LambdaQueryWrapper<>();
+            orderQuery.eq(Order::getOwnerId, user.getId());
+            user.setOrderCount(orderMapper.selectCount(orderQuery));
+        });
+
+        return users;
     }
 }

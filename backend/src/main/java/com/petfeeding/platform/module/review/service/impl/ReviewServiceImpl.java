@@ -38,12 +38,10 @@ public class ReviewServiceImpl extends ServiceImpl<ReviewMapper, Review> impleme
         if (order == null) {
             throw new BusinessException("订单不存在");
         }
-        // 演示模式兼容：放宽状态检查
-        // 允许对 COMPLETED / CONFIRMED / ACCEPTED 状态的订单评价
-        if (!java.util.Arrays.asList("COMPLETED", "CONFIRMED", "ACCEPTED").contains(order.getStatus())) {
-            throw new BusinessException("只能评价已完成或已确认的订单");
+        if (!"COMPLETED".equals(order.getStatus())) {
+            throw new BusinessException("只能评价已完成的订单");
         }
-        if (!order.getOwnerId().equals(ownerId) && ownerId != 1L) {
+        if (!order.getOwnerId().equals(ownerId)) {
             throw new BusinessException("只能评价自己的订单");
         }
 

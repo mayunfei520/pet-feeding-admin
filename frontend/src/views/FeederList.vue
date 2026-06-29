@@ -7,7 +7,7 @@
       <div class="table-wrap">
         <table class="table">
           <thead>
-            <tr><th>ID</th><th>用户ID</th><th>姓名</th><th>身份证</th><th>服务区域</th><th>经验</th><th>自我介绍</th><th style="width:120px">操作</th></tr>
+            <tr><th>ID</th><th>用户ID</th><th>姓名</th><th>身份证</th><th>服务区域</th><th>经验</th><th>自我介绍</th><th style="width:180px">操作</th></tr>
           </thead>
           <tbody>
             <tr v-for="f in pending" :key="f.id">
@@ -21,6 +21,7 @@
               <td>
                 <button class="btn-sm primary" @click="handleApprove(f.id)">通过</button>
                 <button class="btn-sm danger" @click="handleReject(f.id)">拒绝</button>
+                <button class="btn-sm danger delete" @click="handleDelete(f)">删除</button>
               </td>
             </tr>
           </tbody>
@@ -45,6 +46,7 @@
               <td>⭐ {{ f.rating || '5.0' }}</td>
               <td>
                 <button class="btn-sm" @click="$router.push(`/feeders/${f.id}/reviews`)">查看评价</button>
+                <button class="btn-sm danger delete" @click="handleDelete(f)">删除</button>
               </td>
             </tr>
           </tbody>
@@ -78,6 +80,11 @@ async function handleReject(id) {
   if (!confirm('确定拒绝该申请吗？')) return
   try { await feederApi.reject(id); fetchData() } catch (e) { /* */ }
 }
+
+async function handleDelete(feeder) {
+  if (!confirm(`确定删除喂养员「${feeder.realName}」吗？删除后不可恢复。`)) return
+  try { await feederApi.remove(feeder.id); fetchData() } catch (e) { /* */ }
+}
 </script>
 
 <style scoped>
@@ -94,4 +101,5 @@ h3 { margin: 0 0 12px; color: #111827; font-size: 18px; }
 .btn-sm:hover { background: #f0f2f5; }
 .btn-sm.primary { color: #3b82f6; border-color: #93c5fd; }
 .btn-sm.danger { color: #ef4444; border-color: #fca5a5; }
+.btn-sm.delete { color: #dc2626; border-color: #fca5a5; }
 </style>

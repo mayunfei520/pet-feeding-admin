@@ -3,6 +3,8 @@ package com.petfeeding.platform.module.feeder.controller;
 import com.petfeeding.platform.common.result.R;
 import com.petfeeding.platform.module.feeder.entity.Feeder;
 import com.petfeeding.platform.module.feeder.service.FeederService;
+import com.petfeeding.platform.module.user.entity.User;
+import com.petfeeding.platform.module.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import java.util.List;
 public class FeederController {
 
     private final FeederService feederService;
+    private final UserService userService;
 
     @GetMapping
     @Operation(summary = "喂养员列表（已通过审核）")
@@ -59,5 +62,20 @@ public class FeederController {
             feederService.updateById(feeder);
         }
         return R.ok("已拒绝");
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "删除喂养员")
+    public R<?> remove(@PathVariable Long id) {
+        Feeder feeder = feederService.getById(id);
+        if (feeder != null) {
+            feederService.removeById(id);
+            User user = userService.getById(feeder.getUserId());
+            if (user != null && "FEEDER".equals(user.getRole())) {
+                user.setRole("OWNER");
+                userService.updateById(user);
+            }
+        }
+        return R.ok("删除成功");
     }
 }

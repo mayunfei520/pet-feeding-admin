@@ -4,6 +4,7 @@ import com.petfeeding.platform.common.result.R;
 import com.petfeeding.platform.module.feeder.service.FeederService;
 import com.petfeeding.platform.module.order.service.OrderService;
 import com.petfeeding.platform.module.pet.service.PetService;
+import com.petfeeding.platform.module.user.entity.User;
 import com.petfeeding.platform.module.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,7 +35,8 @@ public class DashboardController {
     @Operation(summary = "获取统计数据")
     public R<Map<String, Object>> stats() {
         Map<String, Object> data = new HashMap<>();
-        data.put("users", userService.count());
+        data.put("owners", userService.lambdaQuery().eq(User::getRole, "OWNER").count());
+        data.put("admins", userService.lambdaQuery().eq(User::getRole, "ADMIN").count());
         data.put("pets", petService.count());
         data.put("feeders", feederService.lambdaQuery().eq(
                 com.petfeeding.platform.module.feeder.entity.Feeder::getStatus, "APPROVED").count());

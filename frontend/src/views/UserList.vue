@@ -6,7 +6,7 @@
       <table class="table">
         <thead>
           <tr>
-            <th>ID</th><th>用户名</th><th>手机号</th><th>邮箱</th><th>状态</th><th>注册时间</th><th>宠物数量</th><th>消费次数</th><th style="width:100px">操作</th>
+            <th>ID</th><th>用户名</th><th>手机号</th><th>邮箱</th><th>状态</th><th>注册时间</th><th>宠物数量</th><th>消费次数</th><th style="width:160px">操作</th>
           </tr>
         </thead>
         <tbody>
@@ -26,6 +26,7 @@
             <td>
               <button v-if="u.status === 'ACTIVE'" class="btn-sm danger" @click="toggleStatus(u)">禁用</button>
               <button v-else class="btn-sm primary" @click="toggleStatus(u)">启用</button>
+              <button class="btn-sm danger delete" @click="handleDelete(u)">删除</button>
             </td>
           </tr>
         </tbody>
@@ -57,6 +58,14 @@ async function toggleStatus(u) {
     u.status = newStatus
   } catch (e) { /* */ }
 }
+
+async function handleDelete(u) {
+  if (!confirm(`确定删除客户「${u.username}」吗？删除后不可恢复。`)) return
+  try {
+    await userApi.remove(u.id)
+    users.value = users.value.filter(item => item.id !== u.id)
+  } catch (e) { /* */ }
+}
 </script>
 
 <style scoped>
@@ -73,4 +82,5 @@ h3 { margin: 0 0 12px; color: #111827; font-size: 18px; }
 .btn-sm:hover { background: #f0f2f5; }
 .btn-sm.danger { color: #ef4444; border-color: #fca5a5; }
 .btn-sm.primary { color: #3b82f6; border-color: #93c5fd; }
+.btn-sm.delete { color: #dc2626; border-color: #fca5a5; margin-left: 6px; }
 </style>

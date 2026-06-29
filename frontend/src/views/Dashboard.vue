@@ -4,8 +4,12 @@
 
     <div class="stats">
       <div class="stat-card">
-        <div class="stat-num">{{ stats.users }}</div>
-        <div class="stat-label">用户总数</div>
+        <div class="stat-num">{{ stats.owners }}</div>
+        <div class="stat-label">客户总数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">{{ stats.admins }}</div>
+        <div class="stat-label">管理员总数</div>
       </div>
       <div class="stat-card">
         <div class="stat-num">{{ stats.pets }}</div>
@@ -50,7 +54,7 @@
 import { ref, onMounted } from 'vue'
 import { dashboardApi } from '@/utils/api'
 
-const stats = ref({ users: 0, pets: 0, feeders: 0, orders: 0, pendingOrders: 0, revenue: 0 })
+const stats = ref({ owners: 0, admins: 0, pets: 0, feeders: 0, orders: 0, pendingOrders: 0, revenue: 0 })
 
 onMounted(async () => {
   try {

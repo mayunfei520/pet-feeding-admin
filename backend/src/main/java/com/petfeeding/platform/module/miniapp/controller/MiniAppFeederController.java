@@ -7,6 +7,8 @@ import com.petfeeding.platform.module.feeder.entity.Feeder;
 import com.petfeeding.platform.module.feeder.service.FeederService;
 import com.petfeeding.platform.module.review.entity.Review;
 import com.petfeeding.platform.module.review.service.ReviewService;
+import com.petfeeding.platform.module.user.entity.User;
+import com.petfeeding.platform.module.user.service.UserService;
 import com.petfeeding.platform.security.util.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,6 +29,7 @@ public class MiniAppFeederController {
 
     private final FeederService feederService;
     private final ReviewService reviewService;
+    private final UserService userService;
     private final JwtUtil jwtUtil;
 
     @GetMapping
@@ -40,29 +43,23 @@ public class MiniAppFeederController {
     @PostMapping
     @Operation(summary = "申请成为喂养员")
     public R<Feeder> apply(@RequestBody Map<String, String> body, @RequestHeader(value = "Authorization", required = false) String authHeader) {
-        Long userId = getUserIdOrNull(authHeader);
-        if (userId == null) {
-            userId = 1L; // 演示模式：使用默认用户ID
+        User user = getCurrentUser(authHeader);
+        if (user == null) {
+            return R.fail(401, "请先登录");
         }
-        // 演示模式兼容：user_id 有唯一约束，演示模式下跳过重复检查只用现有记录
-        if (userId == 1L) {
-            java.util.List<Feeder> existing = feederService.lambdaQuery()
-                    .eq(Feeder::getUserId, 1L)
-                    .list();
-            if (!existing.isEmpty()) {
-                return R.ok(existing.get(0)); // 演示模式下直接返回已有申请
-            }
-        } else {
-            LambdaQueryWrapper<Feeder> query = new LambdaQueryWrapper<>();
-            query.eq(Feeder::getUserId, userId);
-            long count = feederService.count(query);
-            if (count > 0) {
-                throw new BusinessException("您已提交过申请，请等待审核");
-            }
+        if ("ADMIN".equals(user.getRole())) {
+            return R.fail(403, "管理员不能提交喂养员申请");
+        }
+
+        LambdaQueryWrapper<Feeder> query = new LambdaQueryWrapper<>();
+        query.eq(Feeder::getUserId, user.getId());
+        long count = feederService.count(query);
+        if (count > 0) {
+            throw new BusinessException("您已提交过申请，请等待审核");
         }
 
         Feeder feeder = new Feeder();
-        feeder.setUserId(userId);
+        feeder.setUserId(user.getId());
         feeder.setRealName(body.get("realName"));
         feeder.setIdCard(body.get("idCard"));
         feeder.setServiceArea(body.get("serviceArea"));
@@ -89,5 +86,10 @@ public class MiniAppFeederController {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private User getCurrentUser(String authHeader) {
+        Long userId = getUserIdOrNull(authHeader);
+        return userId == null ? null : userService.getById(userId);
     }
 }
