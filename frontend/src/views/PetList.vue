@@ -10,7 +10,7 @@
       <span class="species-badge">{{ speciesEmoji[item.species] }}</span>
       <span>{{ speciesLabel[item.species] || item.species }}</span>
     </template>
-    <template #actions="{ item }">
+    <template #row-actions="{ item }">
       <button class="btn btn-sm btn-danger-outline" @click="handleDelete(item.id)">删除</button>
     </template>
   </PageTable>
@@ -29,13 +29,13 @@ const speciesEmoji = { CAT: '🐱', DOG: '🐶', OTHER: '🐹' }
 const speciesLabel = { CAT: '猫', DOG: '狗', OTHER: '其他' }
 
 const columns = [
-  { key: 'id', label: 'ID', style: 'width:50px' },
+  { key: 'id', label: '编号', style: 'width:50px' },
   { key: 'name', label: '名字' },
-  { key: 'userId', label: '主人ID', style: 'width:70px' },
+  { key: 'userId', label: '主人编号', style: 'width:70px' },
   { key: 'species', label: '种类' },
   { key: 'breed', label: '品种' },
   { key: 'age', label: '年龄', format: v => v != null ? `${v}岁` : '-' },
-  { key: 'weight', label: '体重', format: v => v != null ? `${v}kg` : '-' },
+  { key: 'weight', label: '体重', format: v => v != null ? `${v}千克` : '-' },
   { key: 'medicalNotes', label: '医疗备注' },
   { key: 'createdAt', label: '创建时间', format: v => v ? v.split('T')[0] : '-' },
 ]

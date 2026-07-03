@@ -73,4 +73,11 @@ public class OrderController {
         orderService.assignOrder(id, feederId);
         return R.ok("分配成功，短信已通知喂养员");
     }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "删除订单")
+    public R<?> remove(@PathVariable Long id) {
+        orderService.removeById(id);
+        return R.ok("删除成功");
+    }
 }

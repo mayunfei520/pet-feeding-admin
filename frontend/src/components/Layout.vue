@@ -9,7 +9,7 @@
           </svg>
         </div>
         <div class="logo-text">
-          <span class="logo-title">PetFeeding</span>
+          <span class="logo-title">宠物喂养</span>
           <span class="logo-sub">管理平台</span>
         </div>
       </div>
@@ -25,7 +25,7 @@
               class="nav-item"
               :class="{ active: isActive(item.path) }"
             >
-              <span class="nav-icon">{{ item.icon }}</span>
+              <span class="nav-icon" v-html="iconMap[item.icon]"></span>
               <span class="nav-label">{{ item.label }}</span>
             </router-link>
           </div>

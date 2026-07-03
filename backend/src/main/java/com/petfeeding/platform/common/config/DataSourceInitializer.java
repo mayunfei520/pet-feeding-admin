@@ -44,6 +44,7 @@ public class DataSourceInitializer implements CommandLineRunner {
             "age INT," +
             "weight DECIMAL(5,2)," +
             "medical_notes VARCHAR(500)," +
+            "vaccinated TINYINT," +
             "image VARCHAR(500)," +
             "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
             ")");
@@ -137,8 +138,8 @@ public class DataSourceInitializer implements CommandLineRunner {
             jdbcTemplate.update("INSERT INTO reviews (id, order_id, owner_id, feeder_id, rating, content) VALUES " +
                 "(1, 1, 2, 1, 5, '非常专业，花花被照顾得很好！')");
 
-            jdbcTemplate.update("INSERT INTO payments (id, order_id, user_id, amount, pay_method, pay_status) VALUES " +
-                "(1, 1, 2, 80.00, 'WECHAT', 'PAID')");
+            jdbcTemplate.update("INSERT INTO payments (id, order_id, user_id, amount, pay_method, pay_status, transaction_id) VALUES " +
+                "(1, 1, 2, 80.00, 'WECHAT', 'PAID', 'WX2024010112345678')");
 
             log.info("种子数据插入完成");
         }

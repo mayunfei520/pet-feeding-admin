@@ -7,7 +7,7 @@
     :loading="loading"
   >
     <template #filters>
-      <select class="select" v-model="filterStatus" style="width:130px">
+      <select class="select select-filter" v-model="filterStatus">
         <option value="">全部状态</option>
         <option v-for="(label, key) in statusLabels" :key="key" :value="key">{{ label }}</option>
       </select>
@@ -28,7 +28,7 @@
     <template #status="{ item }">
       <span class="tag" :class="statusTagClass[item.status]">{{ statusLabels[item.status] }}</span>
     </template>
-    <template #actions="{ item }">
+    <template #row-actions="{ item }">
       <button v-if="item.status === 'PENDING'" class="btn btn-sm btn-primary" @click="showAssign(item)">分配</button>
       <button v-if="item.status === 'PENDING'" class="btn btn-sm btn-danger-outline" @click="handleCancel(item.id)" style="margin-left:4px">取消</button>
       <button class="btn btn-sm btn-danger-outline" @click="handleDelete(item)" style="margin-left:4px">删除</button>
@@ -104,9 +104,9 @@ const statusTagClass = {
 
 const columns = [
   { key: 'orderNo', label: '订单编号' },
-  { key: 'ownerId', label: '主人ID', style: 'width:70px' },
-  { key: 'feederId', label: '喂养员ID', format: v => v || '-' },
-  { key: 'petId', label: '宠物ID', style: 'width:70px' },
+  { key: 'ownerId', label: '主人编号', style: 'width:70px' },
+  { key: 'feederId', label: '喂养员编号', format: v => v || '-' },
+  { key: 'petId', label: '宠物编号', style: 'width:70px' },
   { key: 'serviceDate', label: '服务日期' },
   { key: 'servicePeriod', label: '时段' },
   { key: 'address', label: '地址' },
@@ -175,15 +175,17 @@ async function handleAssign() {
 .mono { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; color: var(--brand-primary); font-weight: 500; }
 .price { font-weight: 600; color: var(--neutral-800); }
 
+/* Select filter — uses global .select styles */
+.select-filter { width: 130px; }
+
 /* Info Grid */
 .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
 .info-item { display: flex; flex-direction: column; gap: 2px; }
 .info-label { font-size: 11px; color: var(--neutral-400); text-transform: uppercase; letter-spacing: 0.5px; }
 .info-val { font-size: 14px; color: var(--neutral-800); font-weight: 500; }
-.info-val.mono { font-family: 'SF Mono', monospace; font-size: 12px; color: var(--brand-primary); }
 
 /* SMS Box */
-.sms-box { margin-top: 16px; background: var(--brand-gradient-subtle); border: 1px solid rgba(99,102,241,0.15); border-radius: 8px; padding: 12px; }
+.sms-box { margin-top: 16px; background: var(--brand-gradient-subtle); border: 1px solid rgba(99,102,241,0.15); border-radius: var(--radius-sm); padding: 12px; }
 .sms-label { font-size: 12px; color: var(--brand-primary); font-weight: 500; margin-bottom: 6px; }
 .sms-content { font-size: 13px; line-height: 1.7; color: var(--neutral-700); }
 
@@ -212,7 +214,4 @@ async function handleAssign() {
 .form-group label { display: block; margin-bottom: 5px; font-size: 13px; color: var(--neutral-600); font-weight: 500; }
 .req { color: var(--color-danger); }
 .error { color: var(--color-danger); font-size: 13px; margin-top: 12px; padding: 8px 12px; background: var(--color-danger-bg); border-radius: 6px; }
-
-/* Table overrides */
-.table th, .table td { padding: 10px 12px; font-size: 13px; }
 </style>

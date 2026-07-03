@@ -6,7 +6,7 @@
         <p class="page-desc">{{ desc }}</p>
       </div>
       <div class="header-actions">
-        <slot name="actions" />
+        <slot name="header-actions" />
       </div>
     </div>
 
@@ -17,7 +17,8 @@
 
     <!-- Table -->
     <div class="table-card">
-      <table class="table">
+      <slot name="table-content" v-if="$slots['table-content']" />
+      <table v-else class="table">
         <thead>
           <tr>
             <th v-for="col in columns" :key="col.key" :style="col.style">
@@ -47,7 +48,7 @@
               <slot :name="col.slot || col.key" :item="item">{{ renderCell(col, item) }}</slot>
             </td>
             <td v-if="showActions">
-              <slot name="actions" :item="item" />
+              <slot name="row-actions" :item="item" />
             </td>
           </tr>
         </tbody>
@@ -187,74 +188,4 @@ function renderCell(col, item) {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ===== Reusable Components ===== */
-
-/* Tags */
-.tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.4;
-}
-.tag-active { background: var(--color-success-bg); color: #059669; }
-.tag-disabled { background: var(--color-danger-bg); color: #dc2626; }
-.tag-pending { background: var(--color-warning-bg); color: #d97706; }
-.tag-info { background: var(--color-info-bg); color: #2563eb; }
-.tag-purple { background: rgba(139,92,246,0.08); color: #7c3aed; }
-
-/* Buttons */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 14px;
-  border-radius: 7px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  border: 1px solid transparent;
-  white-space: nowrap;
-}
-.btn-primary {
-  background: var(--brand-primary);
-  color: #fff;
-  box-shadow: 0 1px 3px rgba(99,102,241,0.2);
-}
-.btn-primary:hover { background: var(--brand-primary-dark); transform: translateY(-1px); box-shadow: var(--shadow-brand); }
-.btn-outline {
-  background: #fff;
-  color: var(--neutral-600);
-  border-color: var(--neutral-200);
-}
-.btn-outline:hover { background: var(--neutral-50); color: var(--neutral-800); }
-.btn-danger-outline {
-  background: #fff;
-  color: var(--color-danger);
-  border-color: #fecaca;
-}
-.btn-danger-outline:hover { background: var(--color-danger-bg); }
-.btn-sm { padding: 4px 10px; font-size: 12px; border-radius: 6px; }
-
-/* Select / Input */
-.select, .input {
-  padding: 7px 12px;
-  border: 1px solid var(--neutral-200);
-  border-radius: 8px;
-  font-size: 13px;
-  color: var(--neutral-700);
-  background: #fff;
-  outline: none;
-  transition: all var(--transition-fast);
-}
-.select:focus, .input:focus {
-  border-color: var(--brand-primary);
-  box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
-}
-
-/* Badge for stars */
-.stars { color: #f59e0b; letter-spacing: 1px; }
 </style>

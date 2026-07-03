@@ -6,7 +6,8 @@ export const userApi = {
   list: () => request.get('/user/list'),
   listByRole: (role) => request.get('/user/list', { params: { role } }),
   updateStatus: (id, status) => request.put(`/user/${id}/status`, { status }),
-  remove: (id) => request.delete(`/user/${id}`)
+  remove: (id) => request.delete(`/user/${id}`),
+  resetPassword: (id) => request.post(`/user/${id}/reset-password`)
 }
 
 export const petApi = {
@@ -25,7 +26,8 @@ export const feederApi = {
 export const orderApi = {
   list: () => request.get('/order/all'),
   cancel: (id) => request.put(`/order/${id}/cancel`),
-  assign: (id, feederId) => request.put(`/order/${id}/assign?feederId=${feederId}`)
+  assign: (id, feederId) => request.put(`/order/${id}/assign?feederId=${feederId}`),
+  remove: (id) => request.delete(`/order/${id}`)
 }
 
 export const reviewApi = {

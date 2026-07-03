@@ -19,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
 import java.util.List;
 
 /**
@@ -27,6 +28,8 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
+    private static final String PASSWORD_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
@@ -103,5 +106,31 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         });
 
         return users;
+    }
+
+    @Override
+    @Transactional
+    public String resetPassword(Long id) {
+        User user = this.getById(id);
+        if (user == null) {
+            throw new BusinessException("用户不存在");
+        }
+        if (!"ADMIN".equals(user.getRole())) {
+            throw new BusinessException("仅支持重置管理员密码");
+        }
+
+        String newPassword = generatePassword(8);
+        user.setPassword(passwordEncoder.encode(newPassword));
+        this.updateById(user);
+        return newPassword;
+    }
+
+    private String generatePassword(int length) {
+        StringBuilder builder = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            int index = RANDOM.nextInt(PASSWORD_CHARS.length());
+            builder.append(PASSWORD_CHARS.charAt(index));
+        }
+        return builder.toString();
     }
 }

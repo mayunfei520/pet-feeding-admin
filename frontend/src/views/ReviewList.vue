@@ -14,7 +14,7 @@
             <span class="stars">{{ renderStars(r.rating) }}</span>
             <span class="date">{{ r.createdAt?.split('T')[0] }}</span>
           </div>
-          <span class="order-ref">订单 #{{ r.orderId }}</span>
+          <span class="order-ref">订单编号 {{ r.orderId }}</span>
         </div>
         <div class="review-content">{{ r.content }}</div>
       </div>

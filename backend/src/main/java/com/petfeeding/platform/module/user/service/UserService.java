@@ -27,4 +27,9 @@ public interface UserService extends IService<User> {
      * 按角色过滤用户列表
      */
     List<User> listByRole(String role);
+
+    /**
+     * 重置用户密码
+     */
+    String resetPassword(Long id);
 }

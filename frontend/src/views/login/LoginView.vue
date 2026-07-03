@@ -14,7 +14,7 @@
             <path d="M10 5.172C10 3.782 8.423 2.679 6.5 3c-2.823.47-4.113 6.006-4 7 .08.703 4.134 5.47 6 8 2.19 3.042 6 3 6 3s3.81.042 6-3c1.87-2.53 5.92-7.297 6-8 .088-.993-1.177-6.584-4-7-1.923-.321-3.5 1.782-3.5 3.172v.172"/>
           </svg>
         </div>
-        <h1>PetFeeding</h1>
+        <h1>宠物喂养平台</h1>
         <p class="card-subtitle">宠物上门喂养管理平台</p>
       </div>
 
@@ -48,9 +48,6 @@
         </button>
       </form>
 
-      <div class="card-footer">
-        <span>默认账号: <strong>admin</strong> / <strong>123456</strong></span>
-      </div>
     </div>
   </div>
 </template>
@@ -265,14 +262,4 @@ async function handleLogin() {
 .spin { animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Footer */
-.card-footer {
-  text-align: center;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.3);
-}
-.card-footer strong {
-  color: rgba(255, 255, 255, 0.6);
-  font-weight: 600;
-}
 </style>

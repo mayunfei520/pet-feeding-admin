@@ -62,4 +62,10 @@ public class UserController {
         userService.removeById(id);
         return R.ok("删除成功");
     }
+
+    @PostMapping("/{id}/reset-password")
+    @Operation(summary = "重置用户密码")
+    public R<?> resetPassword(@PathVariable Long id) {
+        return R.ok(userService.resetPassword(id));
+    }
 }

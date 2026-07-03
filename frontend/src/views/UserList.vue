@@ -17,7 +17,7 @@
         {{ item.status === 'ACTIVE' ? '正常' : '禁用' }}
       </span>
     </template>
-    <template #actions="{ item }">
+    <template #row-actions="{ item }">
       <button class="btn btn-sm btn-outline" @click="toggleStatus(item)">
         {{ item.status === 'ACTIVE' ? '禁用' : '启用' }}
       </button>
@@ -36,7 +36,7 @@ const users = ref([])
 const loading = ref(false)
 
 const columns = [
-  { key: 'id', label: 'ID', style: 'width:60px' },
+  { key: 'id', label: '编号', style: 'width:60px' },
   { key: 'username', label: '用户名' },
   { key: 'phone', label: '手机号' },
   { key: 'email', label: '邮箱' },

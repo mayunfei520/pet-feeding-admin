@@ -12,7 +12,7 @@
     <template #content="{ item }">
       <span class="truncate">{{ item.content || '-' }}</span>
     </template>
-    <template #actions="{ item }">
+    <template #row-actions="{ item }">
       <button class="btn btn-sm btn-danger-outline" @click="handleDelete(item.id)">删除</button>
     </template>
   </PageTable>
@@ -28,10 +28,10 @@ const reviews = ref([])
 const loading = ref(false)
 
 const columns = [
-  { key: 'id', label: 'ID', style: 'width:50px' },
-  { key: 'orderId', label: '订单ID', style: 'width:80px' },
-  { key: 'ownerId', label: '主人ID', style: 'width:70px' },
-  { key: 'feederId', label: '喂养员ID', style: 'width:80px' },
+  { key: 'id', label: '编号', style: 'width:50px' },
+  { key: 'orderId', label: '订单编号', style: 'width:80px' },
+  { key: 'ownerId', label: '主人编号', style: 'width:70px' },
+  { key: 'feederId', label: '喂养员编号', style: 'width:80px' },
   { key: 'rating', label: '评分' },
   { key: 'content', label: '内容' },
   { key: 'createdAt', label: '时间', format: v => v ? v.replace('T', ' ') : '-' },
