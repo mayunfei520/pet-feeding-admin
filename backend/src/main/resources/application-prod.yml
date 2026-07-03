@@ -4,9 +4,9 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://101.42.24.114:3306/pet_feeding_platform?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8
-    username: root
-    password: ${MYSQL_PASSWORD:}  # 通过环境变量传入，避免写入配置文件
+    url: jdbc:mysql://101.42.24.114:3306/pet_feeding?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8
+    username: petfeeder
+    password: PetFeeding2024!
   h2:
     console:
       enabled: false

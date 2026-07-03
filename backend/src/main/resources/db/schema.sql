@@ -2,11 +2,11 @@
 -- 宠物喂养服务平台 - 数据库建表脚本
 -- =====================================================
 
-CREATE DATABASE IF NOT EXISTS `pet_feeding_platform`
+CREATE DATABASE IF NOT EXISTS `pet_feeding`
     DEFAULT CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
 
-USE `pet_feeding_platform`;
+USE `pet_feeding`;
 
 -- =====================================================
 -- 用户表
