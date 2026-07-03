@@ -1,8 +1,13 @@
 package com.petfeeding.platform.module.dashboard.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.petfeeding.platform.common.result.R;
+import com.petfeeding.platform.module.feeder.entity.Feeder;
 import com.petfeeding.platform.module.feeder.service.FeederService;
+import com.petfeeding.platform.module.order.entity.Order;
 import com.petfeeding.platform.module.order.service.OrderService;
+import com.petfeeding.platform.module.payment.entity.Payment;
+import com.petfeeding.platform.module.payment.service.PaymentService;
 import com.petfeeding.platform.module.pet.service.PetService;
 import com.petfeeding.platform.module.user.entity.User;
 import com.petfeeding.platform.module.user.service.UserService;
@@ -14,8 +19,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 仪表盘控制器
@@ -30,20 +37,88 @@ public class DashboardController {
     private final PetService petService;
     private final FeederService feederService;
     private final OrderService orderService;
+    private final PaymentService paymentService;
 
     @GetMapping("/stats")
     @Operation(summary = "获取统计数据")
     public R<Map<String, Object>> stats() {
         Map<String, Object> data = new HashMap<>();
+
+        // ---- 基础统计 ----
         data.put("owners", userService.lambdaQuery().eq(User::getRole, "OWNER").count());
         data.put("admins", userService.lambdaQuery().eq(User::getRole, "ADMIN").count());
         data.put("pets", petService.count());
-        data.put("feeders", feederService.lambdaQuery().eq(
-                com.petfeeding.platform.module.feeder.entity.Feeder::getStatus, "APPROVED").count());
+        data.put("feeders", feederService.lambdaQuery()
+                .eq(Feeder::getStatus, "APPROVED").count());
         data.put("orders", orderService.count());
-        data.put("pendingOrders", orderService.lambdaQuery().eq(
-                com.petfeeding.platform.module.order.entity.Order::getStatus, "PENDING").count());
-        data.put("revenue", BigDecimal.ZERO); // 后续可实现统计
+        data.put("pendingOrders", orderService.lambdaQuery()
+                .eq(Order::getStatus, "PENDING").count());
+
+        // ---- 真实营收（已支付订单金额总和） ----
+        List<Payment> paidPayments = paymentService.lambdaQuery()
+                .eq(Payment::getPayStatus, "PAID").list();
+        BigDecimal revenue = paidPayments.stream()
+                .map(Payment::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        data.put("revenue", revenue);
+
+        // ---- 订单状态分布 ----
+        Map<String, Long> orderStatusBreakdown = new LinkedHashMap<>();
+        String[] statuses = {"PENDING", "ACCEPTED", "IN_PROGRESS", "COMPLETED", "CANCELLED"};
+        for (String status : statuses) {
+            long count = orderService.lambdaQuery().eq(Order::getStatus, status).count();
+            orderStatusBreakdown.put(status, count);
+        }
+        data.put("orderStatusBreakdown", orderStatusBreakdown);
+
+        // ---- 近7天每日订单趋势 ----
+        List<Map<String, Object>> orderTrend = new ArrayList<>();
+        for (int i = 6; i >= 0; i--) {
+            LocalDate day = LocalDate.now().minusDays(i);
+            LocalDateTime startOfDay = day.atStartOfDay();
+            LocalDateTime endOfDay = day.plusDays(1).atStartOfDay();
+            long count = orderService.lambdaQuery()
+                    .ge(Order::getCreatedAt, startOfDay)
+                    .lt(Order::getCreatedAt, endOfDay)
+                    .count();
+            Map<String, Object> point = new HashMap<>();
+            point.put("date", day.toString());
+            point.put("count", count);
+            orderTrend.add(point);
+        }
+        data.put("orderTrend", orderTrend);
+
+        // ---- 近期订单（最新 5 条） ----
+        List<Order> recentOrders = orderService.lambdaQuery()
+                .orderByDesc(Order::getCreatedAt)
+                .last("LIMIT 5")
+                .list();
+        data.put("recentOrders", recentOrders.stream().map(o -> {
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("id", o.getId());
+            m.put("orderNo", o.getOrderNo());
+            m.put("status", o.getStatus());
+            m.put("price", o.getPrice());
+            m.put("createdAt", o.getCreatedAt());
+            return m;
+        }).collect(Collectors.toList()));
+
+        // ---- 近期注册用户（最新 5 条） ----
+        List<User> recentUsers = userService.lambdaQuery()
+                .orderByDesc(User::getCreatedAt)
+                .last("LIMIT 5")
+                .list();
+        data.put("recentUsers", recentUsers.stream().map(u -> {
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("id", u.getId());
+            m.put("username", u.getUsername());
+            m.put("nickname", u.getUsername());
+            m.put("role", u.getRole());
+            m.put("avatar", u.getAvatar());
+            m.put("createdAt", u.getCreatedAt());
+            return m;
+        }).collect(Collectors.toList()));
+
         return R.ok(data);
     }
 }

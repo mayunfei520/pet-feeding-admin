@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "axios": "^1.18.1",
+    "chart.js": "^4.5.1",
     "element-plus": "^2.14.2",
     "playwright": "^1.61.1",
     "vue": "^3.5.38",
