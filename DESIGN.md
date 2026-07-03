@@ -1,7 +1,7 @@
 # 宠物喂养管理平台 — 设计文档
 
-> **版本**: v1.0.0
-> **日期**: 2026-07-02
+> **版本**: v1.0.1
+> **日期**: 2026-07-03
 > **作者**: PetFeeding Team
 
 ---
@@ -32,9 +32,18 @@
 │         Spring Boot 后端 :8080           │
 │  - /api/*         → 管理后台接口          │
 │  - /api/miniapp/* → 小程序接口            │
-│  H2 数据库 | JWT | Spring Security       │
+│  JWT | Spring Security | 多数据源支持    │
+│  开发: H2  |  生产: MySQL 8.0            │
 └─────────────────────────────────────────┘
 ```
+
+#### 生产服务器
+| 服务 | 地址/配置 |
+|------|----------|
+| 后端 | 101.42.24.114:8080 |
+| MySQL | 101.42.24.114:3306 (Docker, mysql:8.0) |
+| 数据库 | pet_feeding |
+| 业务账号 | petfeeder |
 
 ---
 
@@ -49,6 +58,8 @@
 | JWT (jjwt) | 0.9.1 | Token 认证 |
 | Knife4j | 4.1.0 | API 文档 |
 | H2 Database | — | 开发数据库 |
+| MySQL | 8.0 | 生产数据库 |
+| mysql-connector-java | 8.0+ | MySQL 驱动 |
 | Lombok | — | 代码简化 |
 
 ### 2.2 前端 — 管理后台
@@ -402,13 +413,25 @@ cd backend && mvn spring-boot:run -Dfile.encoding=UTF-8
 cd frontend && npm run dev
 ```
 
-### 7.2 生产环境（规划）
+### 7.2 生产部署（已完成）
 | 服务 | 方案 |
 |------|------|
-| 后端 | Spring Boot Jar + systemd / Docker |
-| 前端 | Vite build → Nginx 静态托管 |
-| 数据库 | 迁移至 MySQL / PostgreSQL |
-| 小程序 | Mock 登录 → 微信官方 API |
+| 后端 | Spring Boot Jar + 命令行启动 |
+| 前端 | Vite build → Nginx / 本地静态托管 |
+| 数据库 | MySQL 8.0 (Docker, 容器 pet-feeding-mysql) |
+| 小程序 | Mock 登录 → 微信官方 API（规划中） |
+
+#### 服务器信息
+- **MySQL**: 101.42.24.114:3306, 数据库 `pet_feeding`
+- **业务账号**: petfeeder (仅限后端使用), root (Navicat 等客户端)
+- **启动命令**:
+  ```bash
+  # 后端 (生产)
+  java -jar pet-feeding-platform-1.0.0-SNAPSHOT.jar --spring.profiles.active=prod
+
+  # 前端打包
+  npm run build && npx serve dist -l 5173
+  ```
 
 ---
 
@@ -416,4 +439,5 @@ cd frontend && npm run dev
 
 | 版本 | 日期 | 说明 |
 |------|------|------|
+| v1.0.1 | 2026-07-03 | MySQL 生产配置上线；FeederList 接入 PageTable 统一 UI；PaymentList 修复状态标签渲染；移除登录页默认密码提示；修复 schema.sql vaccinated 字段 |
 | v1.0.0 | 2026-07-02 | 初始版本：完整 CRUD、双端架构、现代 UI 设计 |
