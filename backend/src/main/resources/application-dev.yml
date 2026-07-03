@@ -11,6 +11,12 @@ jwt:
   secret: pet-feeding-platform-secret-key-2024
   expiration: 86400
 
+# ========== 微信小程序配置 ==========
+wx:
+  miniapp:
+    app-id: wxf385de0f1540fcc6
+    app-secret: your-app-secret-here
+
 # ========== H2 控制台 ==========
 spring.h2.console.enabled: true
 

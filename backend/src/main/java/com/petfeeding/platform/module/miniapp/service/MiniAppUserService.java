@@ -1,6 +1,8 @@
 package com.petfeeding.platform.module.miniapp.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petfeeding.platform.common.exception.BusinessException;
 import com.petfeeding.platform.module.user.dto.LoginResultDTO;
 import com.petfeeding.platform.module.user.entity.User;
@@ -8,9 +10,12 @@ import com.petfeeding.platform.module.user.mapper.UserMapper;
 import com.petfeeding.platform.security.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +25,19 @@ public class MiniAppUserService {
     private final UserMapper userMapper;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
+    private final ObjectMapper objectMapper;
+
+    @Value("${wx.miniapp.app-id:}")
+    private String wxAppId;
+
+    @Value("${wx.miniapp.app-secret:}")
+    private String wxAppSecret;
+
+    private static final String WX_ACCESS_TOKEN_URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s";
+    private static final String WX_PHONE_URL = "https://api.weixin.qq.com/wxa/business/getuserphonenumber?access_token=%s";
+
+    private volatile String cachedAccessToken;
+    private volatile long accessTokenExpiresAt;
 
     @Transactional
     public LoginResultDTO loginByWechat(String code, String role) {
@@ -94,6 +112,119 @@ public class MiniAppUserService {
             user.getId(), user.getUsername(), user.getRole());
         String token = jwtUtil.generateToken(user.getId(), user.getUsername());
         return new LoginResultDTO(token, user.getId(), user.getUsername(), user.getRole());
+    }
+
+    @Transactional
+    public LoginResultDTO loginByPhone(String code) {
+        // 1. 调用微信接口解密手机号
+        String phone;
+        try {
+            phone = getPhoneNumberFromWx(code);
+        } catch (Exception e) {
+            log.error("微信手机号解密失败: code={}, error={}", code != null ? code.hashCode() : 0, e.getMessage(), e);
+            throw new BusinessException("微信授权失败，请重新授权");
+        }
+        if (phone == null || phone.trim().isEmpty()) {
+            log.warn("微信手机号解密返回空手机号: code={}", code != null ? code.hashCode() : 0);
+            throw new BusinessException("未获取到手机号，请重新授权");
+        }
+        phone = phone.trim();
+        log.info("微信手机号解密成功: phone={}", maskPhone(phone));
+
+        // 2. 按手机号查找或创建用户
+        LambdaQueryWrapper<User> query = new LambdaQueryWrapper<>();
+        query.eq(User::getPhone, phone);
+        User user = userMapper.selectOne(query);
+        if (user == null) {
+            user = new User();
+            user.setPhone(phone);
+            user.setUsername("wx_" + phone.substring(phone.length() - 4));
+            user.setPassword(passwordEncoder.encode("wx_" + System.currentTimeMillis()));
+            user.setRole("OWNER");
+            user.setStatus("ACTIVE");
+            userMapper.insert(user);
+            log.info("微信手机号登录-创建新用户: userId={}, phone={}, role={}",
+                user.getId(), maskPhone(phone), user.getRole());
+        } else {
+            log.info("微信手机号登录-已有用户: userId={}, phone={}, role={}",
+                user.getId(), maskPhone(phone), user.getRole());
+        }
+        String token = jwtUtil.generateToken(user.getId(), user.getUsername());
+        return new LoginResultDTO(token, user.getId(), user.getUsername(), user.getRole());
+    }
+
+    /**
+     * 调用微信 getuserphonenumber 接口获取手机号
+     */
+    private String getPhoneNumberFromWx(String code) {
+        String accessToken = getWxAccessToken();
+        String url = String.format(WX_PHONE_URL, accessToken);
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        String requestBody = "{\"code\":\"" + code + "\"}";
+        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+        if (response.getStatusCode() != HttpStatus.OK || response.getBody() == null) {
+            log.error("微信getuserphonenumber响应异常: status={}", response.getStatusCode());
+            throw new BusinessException("微信服务异常");
+        }
+
+        try {
+            JsonNode root = objectMapper.readTree(response.getBody());
+            // 检查微信业务错误码
+            int errcode = root.path("errcode").asInt();
+            if (errcode != 0) {
+                String errmsg = root.path("errmsg").asText();
+                log.error("微信getuserphonenumber业务失败: errcode={}, errmsg={}", errcode, errmsg);
+                throw new BusinessException("获取手机号失败: " + errmsg);
+            }
+            return root.path("phone_info").path("purePhoneNumber").asText();
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("微信getuserphonenumber响应解析失败: body={}", response.getBody(), e);
+            throw new BusinessException("微信服务响应异常");
+        }
+    }
+
+    /**
+     * 获取微信 access_token（带简单的内存缓存）
+     */
+    private synchronized String getWxAccessToken() {
+        long now = System.currentTimeMillis();
+        if (cachedAccessToken != null && now < accessTokenExpiresAt) {
+            return cachedAccessToken;
+        }
+        String url = String.format(WX_ACCESS_TOKEN_URL, wxAppId, wxAppSecret);
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+        if (response.getStatusCode() != HttpStatus.OK || response.getBody() == null) {
+            log.error("获取微信access_token失败: status={}", response.getStatusCode());
+            throw new BusinessException("微信服务连接失败");
+        }
+        try {
+            JsonNode root = objectMapper.readTree(response.getBody());
+            String token = root.path("access_token").asText();
+            int expiresIn = root.path("expires_in").asInt(7200);
+            if (token == null || token.isEmpty()) {
+                int errcode = root.path("errcode").asInt();
+                String errmsg = root.path("errmsg").asText();
+                log.error("获取微信access_token失败: errcode={}, errmsg={}", errcode, errmsg);
+                throw new BusinessException("微信鉴权失败，请检查AppID/AppSecret配置");
+            }
+            this.cachedAccessToken = token;
+            this.accessTokenExpiresAt = now + (expiresIn - 300) * 1000L; // 提前5分钟刷新
+            log.info("微信access_token刷新成功, 有效期{}秒", expiresIn);
+            return token;
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("微信access_token响应解析失败: body={}", response.getBody(), e);
+            throw new BusinessException("微信服务响应异常");
+        }
     }
 
     private String buildUsername(String phone, String nickname) {

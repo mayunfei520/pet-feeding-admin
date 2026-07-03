@@ -67,6 +67,22 @@ public class MiniAppAuthController {
         return R.ok(result);
     }
 
+    @PostMapping("/phone-login")
+    @Operation(summary = "微信手机号一键登录/注册")
+    public R<LoginResultDTO> phoneLogin(HttpServletRequest request) {
+        Map<String, String> body = normalizeBody(request);
+        String code = body.get("code");
+        if (code == null || code.trim().isEmpty()) {
+            log.warn("小程序手机号登录失败: code为空, ip={}", getClientIp(request));
+            return R.fail("授权信息缺失，请重新授权");
+        }
+        log.info("小程序手机号登录请求: ip={}", getClientIp(request));
+        LoginResultDTO result = miniAppUserService.loginByPhone(code);
+        log.info("小程序手机号登录成功: userId={}, username={}, role={}",
+            result.getUserId(), result.getUsername(), result.getRole());
+        return R.ok(result);
+    }
+
     private Map<String, String> normalizeBody(HttpServletRequest request) {
         Map<String, String> result = new HashMap<>();
 

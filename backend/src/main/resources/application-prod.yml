@@ -22,3 +22,9 @@ mybatis-plus:
 jwt:
   secret: pet-feeding-platform-secret-key-2024
   expiration: 86400000
+
+# ========== 微信小程序配置 ==========
+wx:
+  miniapp:
+    app-id: wxf385de0f1540fcc6
+    app-secret: your-app-secret-here
