@@ -37,8 +37,8 @@ CREATE TABLE IF NOT EXISTS `pets` (
     `breed`         VARCHAR(50)   DEFAULT NULL            COMMENT '具体品种（如：英短、金毛）',
     `age`           INT           DEFAULT NULL            COMMENT '年龄（岁）',
     `weight`        DECIMAL(5,2)  DEFAULT NULL            COMMENT '体重（kg）',
-    medical_notes VARCHAR(500) DEFAULT NULL COMMENT '医疗备注',
-      accinated TINYINT(1) DEFAULT NULL COMMENT '是否已打疫苗'  DEFAULT NULL            COMMENT '医疗备注',
+    `medical_notes` VARCHAR(500)  DEFAULT NULL            COMMENT '医疗备注',
+    `vaccinated`    TINYINT(1)    DEFAULT NULL            COMMENT '是否已打疫苗',
     `image`         VARCHAR(500)  DEFAULT NULL            COMMENT '宠物照片URL',
     `created_at`    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     PRIMARY KEY (`id`),
