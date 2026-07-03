@@ -1,65 +1,70 @@
 <template>
-  <div>
-    <h3>🐱 宠物管理</h3>
-
-    <div class="table-wrap">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>ID</th><th>名字</th><th>主人ID</th><th>种类</th><th>品种</th><th>年龄</th><th>体重</th><th>医疗备注</th><th>创建时间</th><th style="width:80px">操作</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="p in pets" :key="p.id">
-            <td>{{ p.id }}</td>
-            <td>{{ p.name }}</td>
-            <td>{{ p.userId }}</td>
-            <td>{{ speciesMap[p.species] || p.species }}</td>
-            <td>{{ p.breed || '-' }}</td>
-            <td>{{ p.age != null ? p.age + '岁' : '-' }}</td>
-            <td>{{ p.weight != null ? p.weight + 'kg' : '-' }}</td>
-            <td class="memo">{{ p.medicalNotes || '-' }}</td>
-            <td>{{ p.createdAt?.replace('T', ' ') }}</td>
-            <td><button class="btn-sm danger" @click="handleDelete(p.id)">删除</button></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+  <PageTable
+    title="宠物管理"
+    desc="管理所有宠物的档案信息"
+    :data="pets"
+    :columns="columns"
+    :loading="loading"
+  >
+    <template #species="{ item }">
+      <span class="species-badge">{{ speciesEmoji[item.species] }}</span>
+      <span>{{ speciesLabel[item.species] || item.species }}</span>
+    </template>
+    <template #actions="{ item }">
+      <button class="btn btn-sm btn-danger-outline" @click="handleDelete(item.id)">删除</button>
+    </template>
+  </PageTable>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { petApi } from '@/utils/api'
+import PageTable from '@/components/PageTable.vue'
+import { ElMessage } from 'element-plus'
 
 const pets = ref([])
-const speciesMap = { CAT: '🐱 猫', DOG: '🐶 狗', OTHER: '🐹 其他' }
+const loading = ref(false)
 
-onMounted(async () => {
+const speciesEmoji = { CAT: '🐱', DOG: '🐶', OTHER: '🐹' }
+const speciesLabel = { CAT: '猫', DOG: '狗', OTHER: '其他' }
+
+const columns = [
+  { key: 'id', label: 'ID', style: 'width:50px' },
+  { key: 'name', label: '名字' },
+  { key: 'userId', label: '主人ID', style: 'width:70px' },
+  { key: 'species', label: '种类' },
+  { key: 'breed', label: '品种' },
+  { key: 'age', label: '年龄', format: v => v != null ? `${v}岁` : '-' },
+  { key: 'weight', label: '体重', format: v => v != null ? `${v}kg` : '-' },
+  { key: 'medicalNotes', label: '医疗备注' },
+  { key: 'createdAt', label: '创建时间', format: v => v ? v.split('T')[0] : '-' },
+]
+
+onMounted(() => fetchPets())
+
+async function fetchPets() {
+  loading.value = true
   try {
     const res = await petApi.list()
     pets.value = res.data || []
   } catch (e) { /* */ }
-})
+  finally { loading.value = false }
+}
 
 async function handleDelete(id) {
   if (!confirm('确定删除该宠物吗？')) return
   try {
     await petApi.remove(id)
     pets.value = pets.value.filter(p => p.id !== id)
+    ElMessage.success('删除成功')
   } catch (e) { /* */ }
 }
 </script>
 
 <style scoped>
-h3 { margin: 0 0 12px; color: #111827; font-size: 18px; }
-.table-wrap { background: #fff; border: 1px solid #e5e7eb; border-radius: 6px; overflow: auto; }
-.table { width: 100%; border-collapse: collapse; font-size: 14px; }
-.table th, .table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #f3f4f6; white-space: nowrap; }
-.table th { background: #f9fafb; color: #6b7280; font-weight: 600; font-size: 13px; }
-.table tbody tr:hover { background: #f9fafb; }
-.memo { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.btn-sm { padding: 4px 12px; border: 1px solid #d1d5db; border-radius: 4px; background: #fff; cursor: pointer; font-size: 13px; }
-.btn-sm:hover { background: #f0f2f5; }
-.btn-sm.danger { color: #ef4444; border-color: #fca5a5; }
+.species-badge {
+  display: inline-block;
+  margin-right: 4px;
+  font-size: 15px;
+}
 </style>

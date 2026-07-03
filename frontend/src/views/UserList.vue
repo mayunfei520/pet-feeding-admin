@@ -1,61 +1,67 @@
 <template>
-  <div>
-    <h3>👥 客户管理</h3>
-
-    <div class="table-wrap">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>ID</th><th>用户名</th><th>手机号</th><th>邮箱</th><th>状态</th><th>注册时间</th><th>宠物数量</th><th>消费次数</th><th style="width:160px">操作</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="u in users" :key="u.id">
-            <td>{{ u.id }}</td>
-            <td>{{ u.username }}</td>
-            <td>{{ u.phone || '-' }}</td>
-            <td>{{ u.email || '-' }}</td>
-            <td>
-              <span class="tag" :class="u.status === 'ACTIVE' ? 'active' : 'disabled'">
-                {{ u.status === 'ACTIVE' ? '正常' : '禁用' }}
-              </span>
-            </td>
-            <td>{{ u.createdAt?.replace('T', ' ') }}</td>
-            <td>{{ u.petCount ?? '-' }}</td>
-            <td>{{ u.orderCount ?? '-' }}</td>
-            <td>
-              <button v-if="u.status === 'ACTIVE'" class="btn-sm danger" @click="toggleStatus(u)">禁用</button>
-              <button v-else class="btn-sm primary" @click="toggleStatus(u)">启用</button>
-              <button class="btn-sm danger delete" @click="handleDelete(u)">删除</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+  <PageTable
+    title="客户管理"
+    desc="管理平台上的宠物主人账户"
+    :data="users"
+    :columns="columns"
+    :loading="loading"
+  >
+    <template #username="{ item }">
+      <div class="user-cell">
+        <div class="user-avatar-sm">{{ item.username.charAt(0).toUpperCase() }}</div>
+        <span>{{ item.username }}</span>
+      </div>
+    </template>
+    <template #status="{ item }">
+      <span class="tag" :class="item.status === 'ACTIVE' ? 'tag-active' : 'tag-disabled'">
+        {{ item.status === 'ACTIVE' ? '正常' : '禁用' }}
+      </span>
+    </template>
+    <template #actions="{ item }">
+      <button class="btn btn-sm btn-outline" @click="toggleStatus(item)">
+        {{ item.status === 'ACTIVE' ? '禁用' : '启用' }}
+      </button>
+      <button class="btn btn-sm btn-danger-outline" @click="handleDelete(item)" style="margin-left:4px">删除</button>
+    </template>
+  </PageTable>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { userApi } from '@/utils/api'
+import PageTable from '@/components/PageTable.vue'
+import { ElMessage } from 'element-plus'
 
 const users = ref([])
+const loading = ref(false)
+
+const columns = [
+  { key: 'id', label: 'ID', style: 'width:60px' },
+  { key: 'username', label: '用户名' },
+  { key: 'phone', label: '手机号' },
+  { key: 'email', label: '邮箱' },
+  { key: 'status', label: '状态' },
+  { key: 'createdAt', label: '注册时间', format: v => v ? v.replace('T', ' ') : '-' },
+]
 
 onMounted(() => fetchUsers())
 
 async function fetchUsers() {
+  loading.value = true
   try {
     const res = await userApi.listByRole('OWNER')
     users.value = res.data || []
   } catch (e) { /* */ }
+  finally { loading.value = false }
 }
 
 async function toggleStatus(u) {
-  const newStatus = u.status === 'ACTIVE' ? 'DISABLED' : 'ACTIVE'
-  if (!confirm(`确定${newStatus === 'DISABLED' ? '禁用' : '启用'}该客户吗？`)) return
+  const action = u.status === 'ACTIVE' ? '禁用' : '启用'
+  if (!confirm(`确定${action}客户「${u.username}」吗？`)) return
   try {
-    await userApi.updateStatus(u.id, newStatus)
-    u.status = newStatus
+    await userApi.updateStatus(u.id, u.status === 'ACTIVE' ? 'DISABLED' : 'ACTIVE')
+    u.status = u.status === 'ACTIVE' ? 'DISABLED' : 'ACTIVE'
+    ElMessage.success(`${action}成功`)
   } catch (e) { /* */ }
 }
 
@@ -64,23 +70,17 @@ async function handleDelete(u) {
   try {
     await userApi.remove(u.id)
     users.value = users.value.filter(item => item.id !== u.id)
+    ElMessage.success('删除成功')
   } catch (e) { /* */ }
 }
 </script>
 
 <style scoped>
-h3 { margin: 0 0 12px; color: #111827; font-size: 18px; }
-.table-wrap { background: #fff; border: 1px solid #e5e7eb; border-radius: 6px; overflow: auto; }
-.table { width: 100%; border-collapse: collapse; font-size: 14px; }
-.table th, .table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #f3f4f6; white-space: nowrap; }
-.table th { background: #f9fafb; color: #6b7280; font-weight: 600; font-size: 13px; }
-.table tbody tr:hover { background: #f9fafb; }
-.tag { padding: 2px 10px; border-radius: 3px; font-size: 13px; }
-.tag.active { background: #d1fae5; color: #065f46; }
-.tag.disabled { background: #fee2e2; color: #991b1b; }
-.btn-sm { padding: 4px 12px; border: 1px solid #d1d5db; border-radius: 4px; background: #fff; cursor: pointer; font-size: 13px; }
-.btn-sm:hover { background: #f0f2f5; }
-.btn-sm.danger { color: #ef4444; border-color: #fca5a5; }
-.btn-sm.primary { color: #3b82f6; border-color: #93c5fd; }
-.btn-sm.delete { color: #dc2626; border-color: #fca5a5; margin-left: 6px; }
+.user-cell { display: flex; align-items: center; gap: 8px; }
+.user-avatar-sm {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff; display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; flex-shrink: 0;
+}
 </style>

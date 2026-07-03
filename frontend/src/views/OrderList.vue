@@ -1,85 +1,75 @@
 <template>
-  <div>
-    <h3>📋 订单管理</h3>
-
-    <div class="filter-bar">
-      <select v-model="filterStatus" @change="applyFilter">
+  <PageTable
+    title="订单管理"
+    desc="管理所有上门喂养订单"
+    :data="filteredOrders"
+    :columns="columns"
+    :loading="loading"
+  >
+    <template #filters>
+      <select class="select" v-model="filterStatus" style="width:130px">
         <option value="">全部状态</option>
-        <option value="PENDING">待接单</option>
-        <option value="ACCEPTED">已接单</option>
-        <option value="IN_PROGRESS">进行中</option>
-        <option value="COMPLETED">已完成</option>
-        <option value="CANCELLED">已取消</option>
+        <option v-for="(label, key) in statusLabels" :key="key" :value="key">{{ label }}</option>
       </select>
-    </div>
+    </template>
 
-    <div class="table-wrap">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>订单编号</th><th>主人ID</th><th>喂养员ID</th><th>宠物ID</th><th>服务日期</th><th>时段</th><th>地址</th><th>金额</th><th>状态</th><th>创建时间</th><th style="width:120px">操作</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="o in filteredOrders" :key="o.id">
-            <td>{{ o.orderNo }}</td>
-            <td>{{ o.ownerId }}</td>
-            <td>{{ o.feederId || '-' }}</td>
-            <td>{{ o.petId }}</td>
-            <td>{{ o.serviceDate }}</td>
-            <td>{{ periodMap[o.servicePeriod] }}</td>
-            <td class="memo">{{ o.address }}</td>
-            <td>¥{{ o.price }}</td>
-            <td><span class="tag" :class="o.status">{{ statusMap[o.status] }}</span></td>
-            <td>{{ o.createdAt?.replace('T', ' ') }}</td>
-            <td>
-              <button v-if="o.status === 'PENDING'" class="btn-sm primary" @click="showAssign(o)">分配</button>
-              <button v-if="o.status === 'PENDING'" class="btn-sm danger" @click="handleCancel(o.id)">取消</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <template #orderNo="{ item }">
+      <span class="mono">{{ item.orderNo }}</span>
+    </template>
+    <template #serviceDate="{ item }">
+      <span>{{ item.serviceDate }}</span>
+    </template>
+    <template #servicePeriod="{ item }">
+      {{ periodLabels[item.servicePeriod] }}
+    </template>
+    <template #price="{ item }">
+      <span class="price">¥{{ item.price }}</span>
+    </template>
+    <template #status="{ item }">
+      <span class="tag" :class="statusTagClass[item.status]">{{ statusLabels[item.status] }}</span>
+    </template>
+    <template #actions="{ item }">
+      <button v-if="item.status === 'PENDING'" class="btn btn-sm btn-primary" @click="showAssign(item)">分配</button>
+      <button v-if="item.status === 'PENDING'" class="btn btn-sm btn-danger-outline" @click="handleCancel(item.id)" style="margin-left:4px">取消</button>
+      <button class="btn btn-sm btn-danger-outline" @click="handleDelete(item)" style="margin-left:4px">删除</button>
+    </template>
+  </PageTable>
 
-    <!-- 分配弹窗 -->
-    <div class="modal" v-if="assignShow" @click.self="assignShow = false">
-      <div class="modal-box">
-        <h4>📨 分配喂养员并发送短信</h4>
-        <div class="order-info">
-          <p>订单编号：<strong>{{ assignOrder?.orderNo }}</strong></p>
-          <p>服务日期：<strong>{{ assignOrder?.serviceDate }}</strong> {{ periodMap[assignOrder?.servicePeriod] }}</p>
-          <p>服务地址：<strong>{{ assignOrder?.address }}</strong></p>
+  <!-- Assign Modal -->
+  <div class="modal-overlay" v-if="assignShow" @click.self="assignShow = false">
+    <div class="modal animate-fade-in-up">
+      <div class="modal-header">
+        <span class="modal-title">📨 分配喂养员</span>
+        <button class="modal-close" @click="assignShow = false">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="info-grid">
+          <div class="info-item"><span class="info-label">订单编号</span><span class="info-val mono">{{ assignOrder?.orderNo }}</span></div>
+          <div class="info-item"><span class="info-label">服务日期</span><span class="info-val">{{ assignOrder?.serviceDate }} {{ periodLabels[assignOrder?.servicePeriod] }}</span></div>
+          <div class="info-item"><span class="info-label">服务地址</span><span class="info-val">{{ assignOrder?.address }}</span></div>
         </div>
-
-        <div class="form-item">
-          <label>选择喂养员 <span class="required">*</span></label>
-          <select v-model="selectedFeederId">
+        <div class="form-group" style="margin-top:16px">
+          <label>选择喂养员 <span class="req">*</span></label>
+          <select v-model="selectedFeederId" class="input" style="height:38px;width:100%">
             <option value="">请选择喂养员</option>
             <option v-for="f in feeders" :key="f.id" :value="f.id">
               {{ f.realName }} - {{ f.serviceArea }} ⭐{{ f.rating || '5.0' }}
             </option>
           </select>
         </div>
-
-        <div class="sms-preview" v-if="selectedFeeder">
-          <label>📱 短信预览</label>
+        <div v-if="selectedFeeder" class="sms-box">
+          <div class="sms-label">📱 短信预览</div>
           <div class="sms-content">
-            【宠物喂养平台】您好<strong>{{ selectedFeeder.realName }}</strong>，
-            您有一条新的上门喂养订单：
-            服务日期<strong>{{ assignOrder?.serviceDate }}</strong>，
-            时段<strong>{{ periodMap[assignOrder?.servicePeriod] }}</strong>，
-            地址<strong>{{ assignOrder?.address }}</strong>。
-            请登录平台查看详情并联系客户确认。
+            【宠物喂养平台】您好<strong>{{ selectedFeeder.realName }}</strong>，您有一条新的上门喂养订单：服务日期<strong>{{ assignOrder?.serviceDate }}</strong>，时段<strong>{{ periodLabels[assignOrder?.servicePeriod] }}</strong>，地址<strong>{{ assignOrder?.address }}</strong>。请登录平台查看详情。
           </div>
         </div>
-
         <div class="error" v-if="error">{{ error }}</div>
-        <div class="modal-btns">
-          <button class="btn" @click="assignShow = false">取消</button>
-          <button class="btn primary" @click="handleAssign" :disabled="assigning">
-            {{ assigning ? '分配中...' : '确认分配并发送短信' }}
-          </button>
-        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" @click="assignShow = false">取消</button>
+        <button class="btn btn-primary" @click="handleAssign" :disabled="assigning">
+          {{ assigning ? '分配中...' : '确认分配' }}
+        </button>
       </div>
     </div>
   </div>
@@ -88,18 +78,42 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { orderApi, feederApi } from '@/utils/api'
+import PageTable from '@/components/PageTable.vue'
+import { ElMessage } from 'element-plus'
 
 const orders = ref([])
 const feeders = ref([])
 const filterStatus = ref('')
+const loading = ref(false)
 const assignShow = ref(false)
 const assignOrder = ref(null)
 const selectedFeederId = ref('')
 const assigning = ref(false)
 const error = ref('')
 
-const periodMap = { AM: '上午', PM: '下午', EVENING: '晚上' }
-const statusMap = { PENDING: '待接单', ACCEPTED: '已接单', IN_PROGRESS: '进行中', COMPLETED: '已完成', CANCELLED: '已取消' }
+const periodLabels = { AM: '上午', PM: '下午', EVENING: '晚上', MORNING: '上午', AFTERNOON: '下午' }
+const statusLabels = { PENDING: '待接单', ACCEPTED: '已接单', IN_PROGRESS: '进行中', CONFIRMED: '已确认', COMPLETED: '已完成', CANCELLED: '已取消' }
+const statusTagClass = {
+  PENDING: 'tag-pending',
+  ACCEPTED: 'tag-info',
+  IN_PROGRESS: 'tag-purple',
+  CONFIRMED: 'tag-active',
+  COMPLETED: 'tag-active',
+  CANCELLED: 'tag-disabled'
+}
+
+const columns = [
+  { key: 'orderNo', label: '订单编号' },
+  { key: 'ownerId', label: '主人ID', style: 'width:70px' },
+  { key: 'feederId', label: '喂养员ID', format: v => v || '-' },
+  { key: 'petId', label: '宠物ID', style: 'width:70px' },
+  { key: 'serviceDate', label: '服务日期' },
+  { key: 'servicePeriod', label: '时段' },
+  { key: 'address', label: '地址' },
+  { key: 'price', label: '金额' },
+  { key: 'status', label: '状态' },
+  { key: 'createdAt', label: '创建时间', format: v => v ? v.replace('T', ' ') : '-' },
+]
 
 const filteredOrders = computed(() => {
   if (!filterStatus.value) return orders.value
@@ -112,19 +126,28 @@ const selectedFeeder = computed(() => {
 
 onMounted(() => { fetchOrders(); fetchFeeders() })
 
-function applyFilter() { /* computed 自动响应 */ }
-
 async function fetchOrders() {
-  try { const res = await orderApi.list(); orders.value = res.data || [] } catch (e) { /* */ }
+  loading.value = true
+  try { const res = await orderApi.list(); orders.value = res.data || [] }
+  catch (e) { /* */ }
+  finally { loading.value = false }
 }
 
 async function fetchFeeders() {
-  try { const res = await feederApi.list(); feeders.value = res.data || [] } catch (e) { /* */ }
+  try { const res = await feederApi.list(); feeders.value = res.data || [] }
+  catch (e) { /* */ }
 }
 
 async function handleCancel(id) {
   if (!confirm('确定取消该订单吗？')) return
-  try { await orderApi.cancel(id); fetchOrders() } catch (e) { /* */ }
+  try { await orderApi.cancel(id); await fetchOrders(); ElMessage.success('订单已取消') }
+  catch (e) { /* */ }
+}
+
+async function handleDelete(order) {
+  if (!confirm(`确定删除订单「${order.orderNo}」吗？`)) return
+  try { await orderApi.remove(order.id); await fetchOrders(); ElMessage.success('删除成功') }
+  catch (e) { /* */ }
 }
 
 function showAssign(order) {
@@ -141,53 +164,55 @@ async function handleAssign() {
   try {
     await orderApi.assign(assignOrder.value.id, selectedFeederId.value)
     assignShow.value = false
-    alert('分配成功！短信已发送给喂养员（模拟模式，查看后端日志确认）')
-    fetchOrders()
-  } catch (e) { error.value = e.message || '分配失败' }
+    ElMessage.success('分配成功！短信已发送')
+    await fetchOrders()
+  } catch (e) { error.value = e?.message || '分配失败' }
   finally { assigning.value = false }
 }
 </script>
 
 <style scoped>
-h3 { margin: 0 0 12px; color: #111827; font-size: 18px; }
-.filter-bar { margin-bottom: 12px; }
-.filter-bar select { padding: 7px 12px; border: 1px solid #d1d5db; border-radius: 5px; font-size: 14px; }
-.table-wrap { background: #fff; border: 1px solid #e5e7eb; border-radius: 6px; overflow: auto; }
-.table { width: 100%; border-collapse: collapse; font-size: 14px; }
-.table th, .table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #f3f4f6; white-space: nowrap; }
-.table th { background: #f9fafb; color: #6b7280; font-weight: 600; font-size: 13px; }
-.table tbody tr:hover { background: #f9fafb; }
-.memo { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.tag { padding: 2px 10px; border-radius: 3px; font-size: 13px; white-space: nowrap; }
-.tag.PENDING { background: #e0e7ff; color: #3730a3; }
-.tag.ACCEPTED { background: #fef3c7; color: #92400e; }
-.tag.IN_PROGRESS { background: #dbeafe; color: #1d4ed8; }
-.tag.COMPLETED { background: #d1fae5; color: #065f46; }
-.tag.CANCELLED { background: #fee2e2; color: #991b1b; }
-.btn-sm { padding: 4px 12px; border: 1px solid #d1d5db; border-radius: 4px; background: #fff; cursor: pointer; font-size: 13px; margin-right: 4px; }
-.btn-sm:hover { background: #f0f2f5; }
-.btn-sm.danger { color: #ef4444; border-color: #fca5a5; }
-.btn-sm.primary { color: #3b82f6; border-color: #93c5fd; }
-.btn-sm.primary:hover { background: #eff6ff; }
+.mono { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; color: var(--brand-primary); font-weight: 500; }
+.price { font-weight: 600; color: var(--neutral-800); }
 
-/* 弹窗 */
-.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 100; }
-.modal-box { background: #fff; border-radius: 8px; padding: 24px; width: 520px; max-height: 80vh; overflow-y: auto; }
-.modal-box h4 { margin: 0 0 16px; color: #111827; font-size: 17px; }
-.order-info { background: #f9fafb; padding: 12px; border-radius: 6px; margin-bottom: 16px; font-size: 14px; line-height: 1.8; }
-.form-item { margin-bottom: 14px; }
-.form-item label { display: block; margin-bottom: 4px; font-size: 14px; color: #374151; }
-.required { color: #ef4444; }
-.form-item select {
-  width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 5px; font-size: 14px; box-sizing: border-box;
+/* Info Grid */
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+.info-item { display: flex; flex-direction: column; gap: 2px; }
+.info-label { font-size: 11px; color: var(--neutral-400); text-transform: uppercase; letter-spacing: 0.5px; }
+.info-val { font-size: 14px; color: var(--neutral-800); font-weight: 500; }
+.info-val.mono { font-family: 'SF Mono', monospace; font-size: 12px; color: var(--brand-primary); }
+
+/* SMS Box */
+.sms-box { margin-top: 16px; background: var(--brand-gradient-subtle); border: 1px solid rgba(99,102,241,0.15); border-radius: 8px; padding: 12px; }
+.sms-label { font-size: 12px; color: var(--brand-primary); font-weight: 500; margin-bottom: 6px; }
+.sms-content { font-size: 13px; line-height: 1.7; color: var(--neutral-700); }
+
+/* Modal */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center; z-index: 200;
+  backdrop-filter: blur(4px);
 }
-.sms-preview { margin-bottom: 16px; }
-.sms-preview label { display: block; font-size: 14px; color: #374151; margin-bottom: 6px; }
-.sms-content { background: #eff6ff; padding: 12px; border-radius: 5px; font-size: 14px; line-height: 1.8; color: #1e3a5f; }
-.error { color: #ef4444; font-size: 14px; margin-bottom: 10px; }
-.modal-btns { display: flex; justify-content: flex-end; gap: 8px; }
-.btn { padding: 8px 18px; border: 1px solid #d1d5db; border-radius: 5px; background: #fff; cursor: pointer; font-size: 14px; }
-.btn.primary { background: #3b82f6; color: #fff; border-color: #3b82f6; }
-.btn.primary:hover { background: #2563eb; }
-.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.modal {
+  width: 540px; background: #fff; border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl); overflow: hidden;
+}
+.modal-header {
+  padding: 18px 24px; border-bottom: 1px solid var(--neutral-100);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-title { font-size: 16px; font-weight: 600; color: var(--neutral-900); }
+.modal-close { border: none; background: none; font-size: 18px; color: var(--neutral-400); cursor: pointer; }
+.modal-close:hover { color: var(--neutral-700); }
+.modal-body { padding: 20px 24px; max-height: 70vh; overflow-y: auto; }
+.modal-footer {
+  padding: 14px 24px; border-top: 1px solid var(--neutral-100);
+  display: flex; justify-content: flex-end; gap: 8px;
+}
+.form-group label { display: block; margin-bottom: 5px; font-size: 13px; color: var(--neutral-600); font-weight: 500; }
+.req { color: var(--color-danger); }
+.error { color: var(--color-danger); font-size: 13px; margin-top: 12px; padding: 8px 12px; background: var(--color-danger-bg); border-radius: 6px; }
+
+/* Table overrides */
+.table th, .table td { padding: 10px 12px; font-size: 13px; }
 </style>

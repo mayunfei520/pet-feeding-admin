@@ -1,71 +1,59 @@
 <template>
-  <div>
-    <div class="page-header">
-      <h3>🛡️ 管理员管理</h3>
-      <button class="btn-add" @click="showAdd = true">+ 添加管理员</button>
-    </div>
+  <PageTable
+    title="管理员管理"
+    desc="管理平台管理员账户"
+    :data="admins"
+    :columns="columns"
+    :loading="loading"
+  >
+    <template #actions>
+      <button class="btn btn-primary" @click="showAdd = true">+ 添加管理员</button>
+    </template>
+    <template #status="{ item }">
+      <span class="tag" :class="item.status === 'ACTIVE' ? 'tag-active' : 'tag-disabled'">
+        {{ item.status === 'ACTIVE' ? '正常' : '禁用' }}
+      </span>
+    </template>
+    <template #actions-row="{ item }">
+      <button class="btn btn-sm btn-outline" @click="toggleStatus(item)">
+        {{ item.status === 'ACTIVE' ? '禁用' : '启用' }}
+      </button>
+      <button class="btn btn-sm btn-outline" @click="handleReset(item)" style="margin-left:4px">重置密码</button>
+      <button class="btn btn-sm btn-danger-outline" @click="handleDelete(item)" style="margin-left:4px">删除</button>
+    </template>
+  </PageTable>
 
-    <div class="table-wrap">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>ID</th><th>用户名</th><th>手机号</th><th>邮箱</th><th>状态</th><th>注册时间</th><th style="width:160px">操作</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="u in admins" :key="u.id">
-            <td>{{ u.id }}</td>
-            <td>{{ u.username }}</td>
-            <td>{{ u.phone || '-' }}</td>
-            <td>{{ u.email || '-' }}</td>
-            <td>
-              <span class="tag" :class="u.status === 'ACTIVE' ? 'active' : 'disabled'">
-                {{ u.status === 'ACTIVE' ? '正常' : '禁用' }}
-              </span>
-            </td>
-            <td>{{ u.createdAt?.replace('T', ' ') }}</td>
-            <td>
-              <button v-if="u.status === 'ACTIVE'" class="btn-sm danger" @click="toggleStatus(u)">禁用</button>
-              <button v-else class="btn-sm primary" @click="toggleStatus(u)">启用</button>
-              <button class="btn-sm danger delete" @click="handleDelete(u)">删除</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- 添加管理员弹窗 -->
-    <div class="modal-overlay" v-if="showAdd" @click.self="showAdd = false">
-      <div class="modal">
-        <div class="modal-header">
-          <span>添加管理员</span>
-          <button class="modal-close" @click="showAdd = false">✕</button>
+  <!-- Add Modal -->
+  <div class="modal-overlay" v-if="showAdd" @click.self="showAdd = false">
+    <div class="modal animate-fade-in-up">
+      <div class="modal-header">
+        <span class="modal-title">添加管理员</span>
+        <button class="modal-close" @click="showAdd = false">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>用户名 <span class="req">*</span></label>
+          <input v-model="form.username" type="text" placeholder="至少3个字符" maxlength="20" class="input" />
         </div>
-        <div class="modal-body">
-          <div class="form-item">
-            <label>用户名 <span class="required">*</span></label>
-            <input v-model="form.username" type="text" placeholder="3-20个字符" maxlength="20" />
-          </div>
-          <div class="form-item">
-            <label>密码 <span class="required">*</span></label>
-            <input v-model="form.password" type="password" placeholder="6-20个字符" maxlength="20" />
-          </div>
-          <div class="form-item">
-            <label>手机号</label>
-            <input v-model="form.phone" type="text" placeholder="选填" />
-          </div>
-          <div class="form-item">
-            <label>邮箱</label>
-            <input v-model="form.email" type="text" placeholder="选填" />
-          </div>
-          <div class="error" v-if="error">{{ error }}</div>
+        <div class="form-group">
+          <label>密码 <span class="req">*</span></label>
+          <input v-model="form.password" type="password" placeholder="至少6个字符" maxlength="20" class="input" />
         </div>
-        <div class="modal-footer">
-          <button class="btn-cancel" @click="showAdd = false">取消</button>
-          <button class="btn-confirm" @click="handleAdd" :disabled="adding">
-            {{ adding ? '添加中...' : '确认添加' }}
-          </button>
+        <div class="form-group">
+          <label>手机号</label>
+          <input v-model="form.phone" type="text" placeholder="选填" class="input" />
         </div>
+        <div class="form-group">
+          <label>邮箱</label>
+          <input v-model="form.email" type="text" placeholder="选填" class="input" />
+        </div>
+        <div class="error" v-if="error">{{ error }}</div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" @click="showAdd = false">取消</button>
+        <button class="btn btn-primary" @click="handleAdd" :disabled="adding">
+          {{ adding ? '添加中...' : '确认添加' }}
+        </button>
       </div>
     </div>
   </div>
@@ -74,47 +62,53 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { userApi } from '@/utils/api'
+import PageTable from '@/components/PageTable.vue'
+import { ElMessage } from 'element-plus'
 
 const admins = ref([])
+const loading = ref(false)
 const showAdd = ref(false)
 const adding = ref(false)
 const error = ref('')
 const form = reactive({ username: '', password: '', phone: '', email: '' })
 
+const columns = [
+  { key: 'id', label: 'ID', style: 'width:60px' },
+  { key: 'username', label: '用户名' },
+  { key: 'phone', label: '手机号' },
+  { key: 'email', label: '邮箱' },
+  { key: 'status', label: '状态' },
+  { key: 'createdAt', label: '注册时间', format: v => v ? v.replace('T', ' ') : '-' },
+]
+
 onMounted(() => fetchAdmins())
 
 async function fetchAdmins() {
+  loading.value = true
   try {
     const res = await userApi.listByRole('ADMIN')
     admins.value = res.data || []
   } catch (e) { /* */ }
+  finally { loading.value = false }
 }
 
 async function handleAdd() {
   error.value = ''
-  if (!form.username || !form.password) {
-    error.value = '用户名和密码为必填项'
-    return
-  }
-  if (form.username.length < 3) {
-    error.value = '用户名长度至少3个字符'
-    return
-  }
-  if (form.password.length < 6) {
-    error.value = '密码长度至少6个字符'
-    return
-  }
+  if (!form.username || !form.password) { error.value = '用户名和密码为必填项'; return }
+  if (form.username.length < 3) { error.value = '用户名长度至少3个字符'; return }
+  if (form.password.length < 6) { error.value = '密码长度至少6个字符'; return }
   adding.value = true
   try {
+    const uname = form.username
+    const pwd = form.password
     await userApi.register({ ...form, role: 'ADMIN' })
     showAdd.value = false
     Object.assign(form, { username: '', password: '', phone: '', email: '' })
-    fetchAdmins()
+    await fetchAdmins()
+    ElMessage.success(`管理员创建成功\n账号：${uname}  密码：${pwd}`)
   } catch (e) {
     error.value = e?.response?.data?.message || e?.message || '添加失败'
-  } finally {
-    adding.value = false
-  }
+  } finally { adding.value = false }
 }
 
 async function handleDelete(u) {
@@ -122,82 +116,58 @@ async function handleDelete(u) {
   try {
     await userApi.remove(u.id)
     admins.value = admins.value.filter(a => a.id !== u.id)
+    ElMessage.success('删除成功')
   } catch (e) { /* */ }
+}
+
+async function handleReset(u) {
+  if (!confirm(`确定重置管理员「${u.username}」的密码吗？`)) return
+  try {
+    const res = await userApi.resetPassword(u.id)
+    ElMessage.success(`密码已重置\n账号：${u.username}\n新密码：${res.data}`)
+  } catch (e) {
+    ElMessage.error(e?.response?.data?.message || '重置失败')
+  }
 }
 
 async function toggleStatus(u) {
   const newStatus = u.status === 'ACTIVE' ? 'DISABLED' : 'ACTIVE'
-  if (!confirm(`确定${newStatus === 'DISABLED' ? '禁用' : '启用'}该管理员吗？`)) return
+  const action = newStatus === 'DISABLED' ? '禁用' : '启用'
+  if (!confirm(`确定${action}该管理员吗？`)) return
   try {
     await userApi.updateStatus(u.id, newStatus)
     u.status = newStatus
+    ElMessage.success(`${action}成功`)
   } catch (e) { /* */ }
 }
 </script>
 
 <style scoped>
-h3 { margin: 0; color: #111827; font-size: 18px; }
+.req { color: var(--color-danger); }
+.error { color: var(--color-danger); font-size: 13px; margin-top: 4px; padding: 8px 12px; background: var(--color-danger-bg); border-radius: 6px; border: 1px solid rgba(239,68,68,0.15); }
 
-.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-
-.btn-add {
-  padding: 8px 20px; border: none; border-radius: 6px;
-  background: #3b82f6; color: #fff; font-size: 14px; cursor: pointer;
-}
-.btn-add:hover { background: #2563eb; }
-
-.table-wrap { background: #fff; border: 1px solid #e5e7eb; border-radius: 6px; overflow: auto; }
-.table { width: 100%; border-collapse: collapse; font-size: 14px; }
-.table th, .table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #f3f4f6; white-space: nowrap; }
-.table th { background: #f9fafb; color: #6b7280; font-weight: 600; font-size: 13px; }
-.table tbody tr:hover { background: #f9fafb; }
-.tag { padding: 2px 10px; border-radius: 3px; font-size: 13px; }
-.tag.active { background: #d1fae5; color: #065f46; }
-.tag.disabled { background: #fee2e2; color: #991b1b; }
-.btn-sm { padding: 4px 12px; border: 1px solid #d1d5db; border-radius: 4px; background: #fff; cursor: pointer; font-size: 13px; margin-right: 6px; }
-.btn-sm:hover { background: #f0f2f5; }
-.btn-sm.danger { color: #ef4444; border-color: #fca5a5; }
-.btn-sm.primary { color: #3b82f6; border-color: #93c5fd; }
-.btn-sm.delete { color: #dc2626; border-color: #fca5a5; }
-
-/* Modal */
 .modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.45);
-  display: flex; align-items: center; justify-content: center; z-index: 100;
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center; z-index: 200;
+  backdrop-filter: blur(4px);
 }
 .modal {
-  width: 420px; background: #fff; border-radius: 8px; box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+  width: 420px; background: #fff; border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl); overflow: hidden;
 }
 .modal-header {
-  padding: 16px 20px; border-bottom: 1px solid #e5e7eb;
-  display: flex; align-items: center; justify-content: space-between; font-size: 16px; font-weight: 600; color: #111827;
+  padding: 18px 24px; border-bottom: 1px solid var(--neutral-100);
+  display: flex; align-items: center; justify-content: space-between;
 }
-.modal-close { border: none; background: none; font-size: 18px; color: #9ca3af; cursor: pointer; }
-.modal-close:hover { color: #374151; }
-.modal-body { padding: 20px; }
+.modal-title { font-size: 16px; font-weight: 600; color: var(--neutral-900); }
+.modal-close { border: none; background: none; font-size: 18px; color: var(--neutral-400); cursor: pointer; padding: 4px; }
+.modal-close:hover { color: var(--neutral-700); }
+.modal-body { padding: 20px 24px; }
 .modal-footer {
-  padding: 12px 20px; border-top: 1px solid #e5e7eb;
-  display: flex; justify-content: flex-end; gap: 10px;
+  padding: 14px 24px; border-top: 1px solid var(--neutral-100);
+  display: flex; justify-content: flex-end; gap: 8px;
 }
-.form-item { margin-bottom: 14px; }
-.form-item label { display: block; margin-bottom: 4px; font-size: 13px; color: #374151; }
-.form-item input {
-  width: 100%; height: 38px; padding: 0 12px; border: 1px solid #d1d5db; border-radius: 6px;
-  font-size: 14px; outline: none; box-sizing: border-box;
-}
-.form-item input:focus { border-color: #3b82f6; }
-.required { color: #ef4444; }
-.error { color: #ef4444; font-size: 13px; margin-top: 4px; }
-
-.btn-cancel {
-  padding: 8px 20px; border: 1px solid #d1d5db; border-radius: 6px;
-  background: #fff; color: #374151; font-size: 14px; cursor: pointer;
-}
-.btn-cancel:hover { background: #f3f4f6; }
-.btn-confirm {
-  padding: 8px 20px; border: none; border-radius: 6px;
-  background: #3b82f6; color: #fff; font-size: 14px; cursor: pointer;
-}
-.btn-confirm:hover { background: #2563eb; }
-.btn-confirm:disabled { opacity: 0.6; cursor: not-allowed; }
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; margin-bottom: 5px; font-size: 13px; color: var(--neutral-600); font-weight: 500; }
+.form-group .input { width: 100%; height: 38px; padding: 0 12px; }
 </style>

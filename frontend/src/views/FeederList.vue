@@ -1,105 +1,151 @@
 <template>
-  <div>
-    <h3>👤 喂养员管理</h3>
+  <PageTable
+    title="喂养员管理"
+    desc="管理喂养员的审核与评价"
+    :data="[]"
+    :columns="[]"
+    :loading="loading"
+    :show-actions="false"
+  >
+    <template #actions>
+      <div class="tabs">
+        <button class="tab" :class="{ active: activeTab === 'pending' }" @click="activeTab = 'pending'">
+          ⏳ 待审核 ({{ pending.length }})
+        </button>
+        <button class="tab" :class="{ active: activeTab === 'approved' }" @click="activeTab = 'approved'">
+          ✅ 已通过 ({{ approved.length }})
+        </button>
+      </div>
+    </template>
 
-    <div class="section">
-      <div class="section-title">⏳ 待审核</div>
-      <div class="table-wrap">
+    <template #table-content>
+      <!-- Pending Table -->
+      <div v-if="activeTab === 'pending' && pending.length > 0" class="sub-table">
         <table class="table">
           <thead>
-            <tr><th>ID</th><th>用户ID</th><th>姓名</th><th>身份证</th><th>服务区域</th><th>经验</th><th>自我介绍</th><th style="width:180px">操作</th></tr>
+            <tr>
+              <th style="width:50px">ID</th>
+              <th>姓名</th>
+              <th>用户ID</th>
+              <th>服务区域</th>
+              <th>经验</th>
+              <th>自我介绍</th>
+              <th>操作</th>
+            </tr>
           </thead>
           <tbody>
             <tr v-for="f in pending" :key="f.id">
               <td>{{ f.id }}</td>
+              <td><strong>{{ f.realName }}</strong></td>
               <td>{{ f.userId }}</td>
-              <td>{{ f.realName }}</td>
-              <td>{{ f.idCard }}</td>
               <td>{{ f.serviceArea }}</td>
-              <td class="memo">{{ f.experience || '-' }}</td>
-              <td class="memo">{{ f.description || '-' }}</td>
+              <td class="truncate">{{ f.experience || '-' }}</td>
+              <td class="truncate">{{ f.description || '-' }}</td>
               <td>
-                <button class="btn-sm primary" @click="handleApprove(f.id)">通过</button>
-                <button class="btn-sm danger" @click="handleReject(f.id)">拒绝</button>
-                <button class="btn-sm danger delete" @click="handleDelete(f)">删除</button>
+                <button class="btn btn-sm btn-primary" @click="handleApprove(f.id)">通过</button>
+                <button class="btn btn-sm btn-danger-outline" @click="handleReject(f.id)" style="margin-left:4px">拒绝</button>
+                <button class="btn btn-sm btn-danger-outline" @click="handleDelete(f)" style="margin-left:4px">删除</button>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
-    </div>
+      <div v-else-if="activeTab === 'pending'" class="empty-state">暂无待审核的喂养员</div>
 
-    <div class="section">
-      <div class="section-title">✅ 已通过</div>
-      <div class="table-wrap">
+      <!-- Approved Table -->
+      <div v-else-if="activeTab === 'approved' && approved.length > 0" class="sub-table">
         <table class="table">
           <thead>
-            <tr><th>ID</th><th>姓名</th><th>服务区域</th><th>经验</th><th>自我介绍</th><th>评分</th><th>操作</th></tr>
+            <tr>
+              <th style="width:50px">ID</th>
+              <th>姓名</th>
+              <th>服务区域</th>
+              <th>经验</th>
+              <th>评分</th>
+              <th>操作</th>
+            </tr>
           </thead>
           <tbody>
             <tr v-for="f in approved" :key="f.id">
               <td>{{ f.id }}</td>
-              <td>{{ f.realName }}</td>
+              <td><strong>{{ f.realName }}</strong></td>
               <td>{{ f.serviceArea }}</td>
-              <td class="memo">{{ f.experience || '-' }}</td>
-              <td class="memo">{{ f.description || '-' }}</td>
-              <td>⭐ {{ f.rating || '5.0' }}</td>
+              <td class="truncate">{{ f.experience || '-' }}</td>
+              <td><span class="stars">⭐ {{ f.rating || '5.0' }}</span></td>
               <td>
-                <button class="btn-sm" @click="$router.push(`/feeders/${f.id}/reviews`)">查看评价</button>
-                <button class="btn-sm danger delete" @click="handleDelete(f)">删除</button>
+                <router-link :to="`/feeders/${f.id}/reviews`" class="btn btn-sm btn-outline">查看评价</router-link>
+                <button class="btn btn-sm btn-danger-outline" @click="handleDelete(f)" style="margin-left:4px">删除</button>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
-    </div>
-  </div>
+      <div v-else-if="activeTab === 'approved'" class="empty-state">暂无已通过的喂养员</div>
+    </template>
+  </PageTable>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { feederApi } from '@/utils/api'
+import PageTable from '@/components/PageTable.vue'
+import { ElMessage } from 'element-plus'
 
+const loading = ref(false)
+const activeTab = ref('pending')
 const pending = ref([])
 const approved = ref([])
 
 onMounted(() => fetchData())
 
 async function fetchData() {
+  loading.value = true
   try {
     const [pr, ar] = await Promise.all([feederApi.pending(), feederApi.list()])
     pending.value = pr.data || []
     approved.value = (ar.data || []).filter(f => f.status === 'APPROVED')
   } catch (e) { /* */ }
+  finally { loading.value = false }
 }
 
 async function handleApprove(id) {
-  try { await feederApi.approve(id); fetchData() } catch (e) { /* */ }
-}
-async function handleReject(id) {
-  if (!confirm('确定拒绝该申请吗？')) return
-  try { await feederApi.reject(id); fetchData() } catch (e) { /* */ }
+  try {
+    await feederApi.approve(id)
+    ElMessage.success('审核通过')
+    await fetchData()
+  } catch (e) { /* */ }
 }
 
-async function handleDelete(feeder) {
-  if (!confirm(`确定删除喂养员「${feeder.realName}」吗？删除后不可恢复。`)) return
-  try { await feederApi.remove(feeder.id); fetchData() } catch (e) { /* */ }
+async function handleReject(id) {
+  if (!confirm('确定拒绝该申请吗？')) return
+  try {
+    await feederApi.reject(id)
+    ElMessage.success('已拒绝')
+    await fetchData()
+  } catch (e) { /* */ }
+}
+
+async function handleDelete(f) {
+  if (!confirm(`确定删除喂养员「${f.realName}」吗？删除后不可恢复。`)) return
+  try {
+    await feederApi.remove(f.id)
+    ElMessage.success('删除成功')
+    await fetchData()
+  } catch (e) { /* */ }
 }
 </script>
 
 <style scoped>
-h3 { margin: 0 0 12px; color: #111827; font-size: 18px; }
-.section { margin-bottom: 24px; }
-.section-title { font-size: 16px; font-weight: 600; color: #374151; margin-bottom: 8px; }
-.table-wrap { background: #fff; border: 1px solid #e5e7eb; border-radius: 6px; overflow: auto; }
-.table { width: 100%; border-collapse: collapse; font-size: 14px; }
-.table th, .table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #f3f4f6; white-space: nowrap; }
-.table th { background: #f9fafb; color: #6b7280; font-weight: 600; font-size: 13px; }
-.table tbody tr:hover { background: #f9fafb; }
-.memo { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.btn-sm { padding: 4px 12px; border: 1px solid #d1d5db; border-radius: 4px; background: #fff; cursor: pointer; font-size: 13px; margin-right: 4px; }
-.btn-sm:hover { background: #f0f2f5; }
-.btn-sm.primary { color: #3b82f6; border-color: #93c5fd; }
-.btn-sm.danger { color: #ef4444; border-color: #fca5a5; }
-.btn-sm.delete { color: #dc2626; border-color: #fca5a5; }
+.tabs { display: flex; gap: 4px; }
+.tab {
+  padding: 7px 16px; border: 1px solid var(--neutral-200); border-radius: 8px;
+  background: #fff; font-size: 13px; color: var(--neutral-600); cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.tab:hover { background: var(--neutral-50); }
+.tab.active { background: var(--brand-primary); color: #fff; border-color: var(--brand-primary); }
+
+.sub-table { margin-top: 4px; }
+.truncate { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.empty-state { text-align: center; padding: 40px; color: var(--neutral-400); font-size: 14px; }
 </style>
