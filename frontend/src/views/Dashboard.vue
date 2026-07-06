@@ -1,7 +1,7 @@
-<template>
+﻿<template>
   <div class="dashboard">
     <!-- ========== 加载骨架屏 ========== -->
-    <template v-if="loading">
+    <template v-if="loading && !hasLoadedOnce">
       <div class="kpi-grid">
         <div v-for="n in 6" :key="'sk'+n" class="kpi-card skeleton">
           <div class="kpi-icon-sk shimmer"></div>
@@ -18,7 +18,7 @@
     </template>
 
     <!-- ========== 错误状态 ========== -->
-    <div v-else-if="loadError" class="error-block">
+    <div v-else-if="loadError && !hasData" class="error-block">
       <div class="error-icon">
         <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       </div>
@@ -28,6 +28,11 @@
 
     <!-- ========== 主内容 ========== -->
     <template v-else>
+      <div v-if="loadError && hasData" class="soft-alert">
+        数据刷新失败，当前展示上一次成功加载的数据
+        <button class="soft-link" @click="fetchData">重试</button>
+      </div>
+
       <!-- KPI 指标卡 -->
       <div class="kpi-grid">
         <div
@@ -52,7 +57,6 @@
         </div>
       </div>
 
-      <!-- 图表区 -->
       <div class="charts-row animate-fade-in-up" :style="{ animationDelay: '0.4s' }">
         <div class="chart-card">
           <div class="chart-header">
@@ -87,7 +91,6 @@
         </div>
       </div>
 
-      <!-- 动态信息流 -->
       <div class="feeds-row animate-fade-in-up" :style="{ animationDelay: '0.5s' }">
         <div class="feed-card">
           <div class="chart-header">
@@ -132,7 +135,6 @@
         </div>
       </div>
 
-      <!-- 快捷入口 -->
       <div class="quick-bar animate-fade-in-up" :style="{ animationDelay: '0.55s' }">
         <router-link v-for="act in quickActions" :key="act.to" :to="act.to" class="quick-card">
           <div class="quick-icon" :class="act.color">
@@ -149,14 +151,14 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, nextTick, computed } from 'vue'
 import { dashboardApi } from '@/utils/api'
 import { Chart, registerables } from 'chart.js'
 Chart.register(...registerables)
 
-// --- 状态 ---
 const loading = ref(true)
 const loadError = ref(false)
+const hasLoadedOnce = ref(false)
 const kpiRaw = reactive({
   owners: 0, admins: 0, pets: 0, feeders: 0,
   orders: 0, pendingOrders: 0, revenue: 0
@@ -166,7 +168,14 @@ const orderStatusBreakdown = ref({})
 const recentOrders = ref([])
 const recentUsers = ref([])
 
-// ---- 图标库 ----
+const hasData = computed(() => {
+  return Boolean(
+    kpiRaw.owners || kpiRaw.admins || kpiRaw.pets || kpiRaw.feeders ||
+    kpiRaw.orders || kpiRaw.pendingOrders || kpiRaw.revenue ||
+    recentOrders.value.length || recentUsers.value.length || orderTrend.value.length
+  )
+})
+
 const icons = {
   people: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
   heart: '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>',
@@ -179,7 +188,6 @@ const icons = {
   users: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
 }
 
-// ---- KPI 卡配置 ----
 const kpiCards = [
   { key: 'owners', label: '客户总数', icon: icons.people, accent: 'indigo' },
   { key: 'pets', label: '宠物总数', icon: icons.heart, accent: 'purple' },
@@ -189,21 +197,34 @@ const kpiCards = [
   { key: 'revenue', label: '总营收', icon: icons.trending, accent: 'emerald', prefix: '¥' },
 ]
 
-// ---- 快捷操作 ----
 const quickActions = [
   { to: '/feeders', title: '喂养员审核', desc: '审核喂养员申请', color: 'blue', icon: icons.check },
   { to: '/orders', title: '订单管理', desc: '分配与处理订单', color: 'purple', icon: icons.truck },
   { to: '/users', title: '客户管理', desc: '维护客户信息', color: 'emerald', icon: icons.users },
 ]
 
-// ---- 图表 refs ----
 const trendCanvas = ref(null)
 const statusCanvas = ref(null)
 const countRefs = reactive({})
 let trendChart = null
 let statusChart = null
+let chartTimer = null
 
-// ---- 工具函数 ----
+function destroyCharts() {
+  if (chartTimer) {
+    clearTimeout(chartTimer)
+    chartTimer = null
+  }
+  if (trendChart) {
+    trendChart.destroy()
+    trendChart = null
+  }
+  if (statusChart) {
+    statusChart.destroy()
+    statusChart = null
+  }
+}
+
 function fmtPrice(val) {
   const n = Number(val)
   if (isNaN(n)) return '0.00'
@@ -232,7 +253,6 @@ function statusTagClass(s) {
   return { PENDING: 'tag-amber', ACCEPTED: 'tag-blue', IN_PROGRESS: 'tag-purple', COMPLETED: 'tag-green', CANCELLED: 'tag-red' }[s] || ''
 }
 
-// ---- 数字滚动动画 ----
 function animateNumbers() {
   const targets = {
     owners: kpiRaw.owners || 0,
@@ -248,7 +268,7 @@ function animateNumbers() {
 
   function frame(now) {
     const p = Math.min((now - start) / duration, 1)
-    const ease = 1 - Math.pow(1 - p, 3) // easeOutCubic
+    const ease = 1 - Math.pow(1 - p, 3)
 
     Object.entries(targets).forEach(([key, target]) => {
       const el = countRefs[key]
@@ -264,7 +284,6 @@ function animateNumbers() {
     if (p < 1) {
       requestAnimationFrame(frame)
     } else {
-      // final frame: exact values
       Object.entries(targets).forEach(([key, target]) => {
         const el = countRefs[key]
         if (!el) return
@@ -280,7 +299,6 @@ function animateNumbers() {
   requestAnimationFrame(frame)
 }
 
-// ---- 图表渲染 ----
 function renderTrendChart() {
   if (!trendCanvas.value) return
   const data = orderTrend.value
@@ -323,15 +341,8 @@ function renderTrendChart() {
         displayColors: false,
       }},
       scales: {
-        x: {
-          grid: { display: false },
-          ticks: { font: { size: 11 }, color: '#9ca3af' }
-        },
-        y: {
-          beginAtZero: true,
-          ticks: { stepSize: 1, font: { size: 11 }, color: '#9ca3af' },
-          grid: { color: '#f3f4f6' }
-        }
+        x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#9ca3af' } },
+        y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 }, color: '#9ca3af' }, grid: { color: '#f3f4f6' } }
       }
     }
   })
@@ -388,7 +399,6 @@ function renderStatusChart() {
   })
 }
 
-// ---- 数据加载 ----
 async function fetchData() {
   loading.value = true
   loadError.value = false
@@ -410,11 +420,12 @@ async function fetchData() {
       orderStatusBreakdown.value = d.orderStatusBreakdown || {}
       recentOrders.value = d.recentOrders || []
       recentUsers.value = d.recentUsers || []
+      hasLoadedOnce.value = true
 
       await nextTick()
+      destroyCharts()
       animateNumbers()
-      // 等 DOM 更新后再绘图（用短延迟确保 canvas ref 就位）
-      setTimeout(() => {
+      chartTimer = setTimeout(() => {
         renderTrendChart()
         renderStatusChart()
       }, 100)
@@ -429,17 +440,38 @@ async function fetchData() {
 onMounted(fetchData)
 
 onUnmounted(() => {
-  if (trendChart) trendChart.destroy()
-  if (statusChart) statusChart.destroy()
+  destroyCharts()
 })
 </script>
 
 <style scoped>
 .dashboard {
-  max-width: 1260px;
+  width: 100%;
 }
 
-/* ===== KPI Grid ===== */
+.soft-alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  border: 1px solid rgba(245, 158, 11, 0.18);
+  background: rgba(245, 158, 11, 0.08);
+  color: #b45309;
+  border-radius: 10px;
+  font-size: 13px;
+}
+.soft-link {
+  border: none;
+  background: transparent;
+  color: #92400e;
+  font-weight: 600;
+  cursor: pointer;
+}
+.soft-link:hover {
+  text-decoration: underline;
+}
+
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -513,7 +545,6 @@ onUnmounted(() => {
   margin-top: 2px;
 }
 
-/* 待处理红点 */
 .kpi-alert-dot {
   position: absolute;
   top: 14px;
@@ -530,7 +561,6 @@ onUnmounted(() => {
   50% { box-shadow: 0 0 0 10px rgba(244,63,94,0); }
 }
 
-/* ===== Charts ===== */
 .charts-row {
   display: grid;
   grid-template-columns: 1.6fr 1fr;
@@ -592,7 +622,6 @@ onUnmounted(() => {
   font-size: 13px;
 }
 
-/* ===== Feeds ===== */
 .feeds-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -708,7 +737,6 @@ onUnmounted(() => {
   color: var(--neutral-400);
 }
 
-/* ===== Quick Actions ===== */
 .quick-bar {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -757,7 +785,6 @@ onUnmounted(() => {
   margin-top: 1px;
 }
 
-/* ===== Skeleton ===== */
 .kpi-card.skeleton { pointer-events: none; }
 .kpi-icon-sk {
   width: 48px; height: 48px;
@@ -785,7 +812,6 @@ onUnmounted(() => {
   100% { background-position: -200% 0; }
 }
 
-/* ===== Error ===== */
 .error-block {
   text-align: center;
   padding: 80px 20px;
@@ -801,7 +827,6 @@ onUnmounted(() => {
   color: var(--neutral-500);
 }
 
-/* ===== Responsive ===== */
 @media (max-width: 1024px) {
   .kpi-grid { grid-template-columns: repeat(2, 1fr); }
   .charts-row { grid-template-columns: 1fr; }

@@ -1,8 +1,11 @@
 <template>
   <div class="layout">
+    <!-- ===== Mobile Overlay ===== -->
+    <div v-if="sidebarOpen" class="sidebar-overlay" @click="sidebarOpen = false"></div>
+
     <!-- ===== Sidebar ===== -->
-    <aside class="sidebar animate-fade-in">
-      <div class="sidebar-header" @click="$router.push('/')">
+    <aside class="sidebar animate-fade-in" :class="{ open: sidebarOpen }">
+      <div class="sidebar-header" @click="goHome">
         <div class="logo-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M10 5.172C10 3.782 8.423 2.679 6.5 3c-2.823.47-4.113 6.006-4 7 .08.703 4.134 5.47 6 8 2.19 3.042 6 3 6 3s3.81.042 6-3c1.87-2.53 5.92-7.297 6-8 .088-.993-1.177-6.584-4-7-1.923-.321-3.5 1.782-3.5 3.172v.172"/>
@@ -38,6 +41,11 @@
       <!-- Header -->
       <header class="header">
         <div class="header-left">
+          <button class="hamburger" @click="sidebarOpen = !sidebarOpen" aria-label="菜单">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
           <h1 class="page-title">{{ pageTitle }}</h1>
         </div>
         <div class="header-right">
@@ -69,7 +77,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
@@ -77,6 +85,15 @@ const route = useRoute()
 
 const username = ref(localStorage.getItem('username') || '管理员')
 const role = ref(localStorage.getItem('role') || '')
+const sidebarOpen = ref(false)
+
+// 路由切换时自动关闭移动端侧边栏
+watch(() => route.path, () => { sidebarOpen.value = false })
+
+function goHome() {
+  router.push('/')
+  sidebarOpen.value = false
+}
 
 const roleLabel = computed(() => {
   const map = { ADMIN: '管理员', SUPER_ADMIN: '超级管理员', OWNER: '客户', FEEDER: '喂养员' }
@@ -368,5 +385,88 @@ function logout() {
   flex: 1;
   padding: 24px 28px;
   overflow-y: auto;
+}
+
+/* ===== Hamburger (hidden on desktop) ===== */
+.hamburger {
+  display: none;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: var(--neutral-600);
+  cursor: pointer;
+  border-radius: 8px;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition-fast);
+}
+.hamburger:hover {
+  background: var(--neutral-100);
+}
+
+/* ===== Mobile Overlay ===== */
+.sidebar-overlay {
+  display: none;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 72px;
+  }
+  .sidebar-header {
+    justify-content: center;
+    padding: 0;
+  }
+  .logo-text { display: none; }
+  .nav-group-title { display: none; }
+  .nav-item {
+    justify-content: center;
+    padding: 12px 0;
+    margin: 2px 8px;
+  }
+  .nav-label { display: none; }
+  .main {
+    margin-left: 72px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hamburger {
+    display: flex;
+  }
+  .sidebar {
+    width: 240px;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .sidebar-header {
+    justify-content: flex-start;
+    padding: 0 20px;
+  }
+  .logo-text { display: flex; }
+  .nav-group-title { display: block; }
+  .nav-item {
+    justify-content: flex-start;
+    padding: 10px 20px;
+  }
+  .nav-label { display: inline; }
+  .main {
+    margin-left: 0;
+  }
+  .content {
+    padding: 16px 16px;
+  }
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 99;
+  }
 }
 </style>
