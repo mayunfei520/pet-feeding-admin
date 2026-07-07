@@ -63,18 +63,25 @@ const error = ref('')
 const form = reactive({ username: '', password: '' })
 
 async function handleLogin() {
+  if (loading.value) return
+
   error.value = ''
   if (!form.username || !form.password) {
     error.value = '请输入用户名和密码'
     return
   }
+
   loading.value = true
   try {
     const res = await userApi.login(form)
     localStorage.setItem('token', res.data.token)
     localStorage.setItem('username', res.data.username)
     localStorage.setItem('role', res.data.role || '')
-    router.push('/')
+
+    await router.replace('/')
+    if (router.currentRoute.value.path !== '/') {
+      window.location.replace('/')
+    }
   } catch (e) {
     error.value = e?.response?.data?.message || e?.message || '登录失败，请稍后重试'
   } finally {

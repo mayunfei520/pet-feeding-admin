@@ -3,8 +3,28 @@ import { ElMessage } from 'element-plus'
 
 const request = axios.create({
   baseURL: '/api',
-  timeout: 10000
+  timeout: 15000
 })
+
+const RETRYABLE_METHODS = new Set(['get', 'head', 'options'])
+
+function shouldRetry(error) {
+  const config = error.config || {}
+  const method = String(config.method || 'get').toLowerCase()
+  const status = error.response?.status
+
+  if (!RETRYABLE_METHODS.has(method)) return false
+  if (config.__retried) return false
+
+  if (!error.response) return true
+  return status >= 500 && status < 600
+}
+
+function retryRequest(error) {
+  const config = error.config || {}
+  config.__retried = true
+  return request(config)
+}
 
 // 请求拦截器 - 附加 JWT Token
 request.interceptors.request.use(
@@ -22,14 +42,21 @@ request.interceptors.request.use(
 request.interceptors.response.use(
   response => {
     const data = response.data
-    // 兼容后端的 R 类格式
     if (data.code !== 200) {
       ElMessage.error(data.message || '请求失败')
-      return Promise.reject(new Error(data.message))
+      return Promise.reject(new Error(data.message || '请求失败'))
     }
     return data
   },
-  error => {
+  async error => {
+    if (shouldRetry(error)) {
+      try {
+        return await retryRequest(error)
+      } catch (retryError) {
+        error = retryError
+      }
+    }
+
     if (error.response) {
       const status = error.response.status
       if (status === 401) {

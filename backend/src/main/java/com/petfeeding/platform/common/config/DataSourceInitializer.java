@@ -8,11 +8,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 /**
- * 数据库初始化（自动建表，开发环境用）
+ * 数据库初始化（自动建表，仅开发环境用）
+ * 生产环境由 MySQL 自行维护表结构，不再每次启动都执行建表语句
  */
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@org.springframework.context.annotation.Profile("!prod")
 public class DataSourceInitializer implements CommandLineRunner {
 
     private final JdbcTemplate jdbcTemplate;
