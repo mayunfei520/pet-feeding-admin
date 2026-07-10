@@ -7,6 +7,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
@@ -26,6 +27,14 @@ public class GlobalExceptionHandler {
     /** 参数校验异常 */
     @ExceptionHandler(BindException.class)
     public R<Void> handleBindException(BindException e) {
+        String message = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+        log.warn("参数校验失败：{}", message);
+        return R.fail(400, message);
+    }
+
+    /** 参数校验异常（@RequestBody @Valid 触发） */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public R<Void> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         String message = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
         log.warn("参数校验失败：{}", message);
         return R.fail(400, message);

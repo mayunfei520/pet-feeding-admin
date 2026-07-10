@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 import java.util.List;
 
 /**
@@ -44,7 +46,7 @@ public class MiniAppPetController {
 
     @PostMapping
     @Operation(summary = "添加宠物")
-    public R<Pet> add(@RequestBody Pet pet, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+    public R<Pet> add(@Valid @RequestBody Pet pet, @RequestHeader(value = "Authorization", required = false) String authHeader) {
         User user = getCurrentUser(authHeader);
         if (user == null) {
             return R.fail(401, "请先登录");
@@ -59,7 +61,7 @@ public class MiniAppPetController {
 
     @PutMapping("/{id}")
     @Operation(summary = "更新宠物")
-    public R<Pet> update(@PathVariable Long id, @RequestBody Pet pet, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+    public R<Pet> update(@PathVariable Long id, @Valid @RequestBody Pet pet, @RequestHeader(value = "Authorization", required = false) String authHeader) {
         User user = getCurrentUser(authHeader);
         if (user == null) {
             return R.fail(401, "请先登录");
