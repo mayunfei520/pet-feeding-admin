@@ -36,9 +36,9 @@ public class Pet {
     @Size(max = 20, message = "名字不能超过20个字")
     private String name;
 
-    /** 品种：CAT-猫, DOG-狗, OTHER-其他 */
+    /** 种类：CAT-猫, DOG-狗（仅支持猫和狗） */
     @NotBlank(message = "请选择宠物种类")
-    @Pattern(regexp = "CAT|DOG|OTHER", message = "宠物种类不合法")
+    @Pattern(regexp = "CAT|DOG", message = "宠物种类不合法，仅支持猫或狗")
     private String species;
 
     /** 具体品种（如：英短、金毛） */
