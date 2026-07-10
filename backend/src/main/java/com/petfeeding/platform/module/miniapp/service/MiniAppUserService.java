@@ -71,7 +71,7 @@ public class MiniAppUserService {
     }
 
     @Transactional
-    public LoginResultDTO register(String phone, String password, String nickname, String code) {
+    public LoginResultDTO register(String phone, String password, String nickname, String code, String gender) {
         if (phone == null || phone.trim().isEmpty()) {
             log.warn("小程序注册失败: 手机号为空");
             throw new BusinessException("手机号不能为空");
@@ -97,6 +97,9 @@ public class MiniAppUserService {
         user.setPassword(passwordEncoder.encode(password));
         user.setRole("OWNER");
         user.setStatus("ACTIVE");
+        if (gender != null && !gender.trim().isEmpty()) {
+            user.setGender(gender.trim());
+        }
         userMapper.insert(user);
         log.info("创建小程序注册用户: userId={}, username={}, phone={}, role={}",
             user.getId(), user.getUsername(), maskPhone(phone), user.getRole());

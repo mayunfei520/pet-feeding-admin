@@ -48,8 +48,9 @@ public class MiniAppAuthController {
         String password = body.get("password");
         String nickname = body.getOrDefault("nickname", "");
         String code = body.get("code");
+        String gender = body.get("gender");
         log.info("小程序注册请求: phone={}, nickname={}, ip={}", maskPhone(phone), nickname, getClientIp(request));
-        LoginResultDTO result = miniAppUserService.register(phone, password, nickname, code);
+        LoginResultDTO result = miniAppUserService.register(phone, password, nickname, code, gender);
         log.info("小程序注册成功: userId={}, username={}, phone={}, role={}",
             result.getUserId(), result.getUsername(), maskPhone(phone), result.getRole());
         return R.ok(result);
