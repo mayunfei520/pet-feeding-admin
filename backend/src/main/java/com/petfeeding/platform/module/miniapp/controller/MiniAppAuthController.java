@@ -47,11 +47,22 @@ public class MiniAppAuthController {
         String phone = body.get("phone");
         String password = body.get("password");
         String nickname = body.getOrDefault("nickname", "");
+        String code = body.get("code");
         log.info("小程序注册请求: phone={}, nickname={}, ip={}", maskPhone(phone), nickname, getClientIp(request));
-        LoginResultDTO result = miniAppUserService.register(phone, password, nickname);
+        LoginResultDTO result = miniAppUserService.register(phone, password, nickname, code);
         log.info("小程序注册成功: userId={}, username={}, phone={}, role={}",
             result.getUserId(), result.getUsername(), maskPhone(phone), result.getRole());
         return R.ok(result);
+    }
+
+    @PostMapping("/send-code")
+    @Operation(summary = "发送注册验证码（模拟）")
+    public R<String> sendCode(HttpServletRequest request) {
+        Map<String, String> body = normalizeBody(request);
+        String phone = body.get("phone");
+        log.info("小程序发送验证码请求: phone={}, ip={}", maskPhone(phone), getClientIp(request));
+        String code = miniAppUserService.sendRegisterCode(phone);
+        return R.ok(code);
     }
 
     @PostMapping("/password-login")

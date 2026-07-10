@@ -8,6 +8,9 @@ import com.petfeeding.platform.module.user.dto.LoginResultDTO;
 import com.petfeeding.platform.module.user.entity.User;
 import com.petfeeding.platform.module.user.mapper.UserMapper;
 import com.petfeeding.platform.security.util.JwtUtil;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,6 +42,11 @@ public class MiniAppUserService {
     private volatile String cachedAccessToken;
     private volatile long accessTokenExpiresAt;
 
+    // ===== 短信验证码（模拟模式，后续可替换为真实短信渠道）=====
+    private static final boolean SMS_MOCK = true;
+    private static final long CODE_TTL_MS = 5 * 60 * 1000L;
+    private final Map<String, CodeEntry> codeStore = new ConcurrentHashMap<>();
+
     @Transactional
     public LoginResultDTO loginByWechat(String code, String role) {
         if (role == null || role.isEmpty()) {
@@ -63,12 +71,16 @@ public class MiniAppUserService {
     }
 
     @Transactional
-    public LoginResultDTO register(String phone, String password, String nickname) {
+    public LoginResultDTO register(String phone, String password, String nickname, String code) {
         if (phone == null || phone.trim().isEmpty()) {
             log.warn("小程序注册失败: 手机号为空");
             throw new BusinessException("手机号不能为空");
         }
         phone = phone.trim();
+        if (!verifyCode(phone, code)) {
+            log.warn("小程序注册失败: 手机号={}, 原因=验证码错误", maskPhone(phone));
+            throw new BusinessException("验证码错误或已过期");
+        }
         if (password == null || password.length() < 6) {
             log.warn("小程序注册失败: 手机号={}, 原因=密码长度不足", maskPhone(phone));
             throw new BusinessException("密码至少6位");
@@ -90,6 +102,58 @@ public class MiniAppUserService {
             user.getId(), user.getUsername(), maskPhone(phone), user.getRole());
         String token = jwtUtil.generateToken(user.getId(), user.getUsername());
         return new LoginResultDTO(token, user.getId(), user.getUsername(), user.getRole());
+    }
+
+    /**
+     * 发送注册验证码（模拟模式：生成6位码存入内存，并直接返回给调用方用于测试）
+     * 后续接入真实短信时，将日志发送替换为调用腾讯云/阿里云短信 SDK。
+     */
+    public String sendRegisterCode(String phone) {
+        if (phone == null || !phone.matches("^1\\d{10}$")) {
+            throw new BusinessException("手机号格式不正确");
+        }
+        String code = String.format("%06d", ThreadLocalRandom.current().nextInt(1000000));
+        codeStore.put(phone, new CodeEntry(code, System.currentTimeMillis() + CODE_TTL_MS));
+        if (SMS_MOCK) {
+            log.info("========== 模拟短信发送 ==========");
+            log.info("接收手机: {}", maskPhone(phone));
+            log.info("验证码: {}", code);
+            log.info("====================================");
+            return code;
+        }
+        // TODO: 接入真实短信渠道（腾讯云/阿里云 SMS SDK）
+        return null;
+    }
+
+    /**
+     * 校验验证码（一次性，校验成功后删除）
+     */
+    private boolean verifyCode(String phone, String inputCode) {
+        if (inputCode == null || inputCode.trim().isEmpty()) {
+            return false;
+        }
+        CodeEntry entry = codeStore.get(phone);
+        if (entry == null) {
+            return false;
+        }
+        if (System.currentTimeMillis() > entry.expireAt) {
+            codeStore.remove(phone);
+            return false;
+        }
+        boolean ok = entry.code.equals(inputCode.trim());
+        if (ok) {
+            codeStore.remove(phone);
+        }
+        return ok;
+    }
+
+    private static class CodeEntry {
+        final String code;
+        final long expireAt;
+        CodeEntry(String code, long expireAt) {
+            this.code = code;
+            this.expireAt = expireAt;
+        }
     }
 
     public LoginResultDTO loginByPassword(String phone, String password) {
