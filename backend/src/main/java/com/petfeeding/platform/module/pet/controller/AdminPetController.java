@@ -28,12 +28,6 @@ public class AdminPetController {
     private final UserService userService;
     private final JwtUtil jwtUtil;
 
-    @GetMapping("/_probe")
-    @Operation(summary = "注册探针")
-    public R<String> probe() {
-        return R.ok("admin-pet-controller-alive");
-    }
-
     @GetMapping
     @Operation(summary = "宠物审核队列")
     public R<List<Pet>> reviewQueue(@RequestParam(value = "status", required = false) String status,
