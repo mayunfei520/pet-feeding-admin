@@ -22,3 +22,9 @@ Thumbs.db
 # Environment
 backend/data/
 *.env
+
+# Local work memory (contains server credentials — DO NOT push)
+.workbuddy/
+
+# Local data
+data/
