@@ -40,6 +40,8 @@ CREATE TABLE IF NOT EXISTS `pets` (
     `medical_notes` VARCHAR(500)  DEFAULT NULL            COMMENT '医疗备注',
     `vaccinated`    TINYINT(1)    DEFAULT NULL            COMMENT '是否已打疫苗',
     `image`         VARCHAR(500)  DEFAULT NULL            COMMENT '宠物照片URL',
+    `status`        VARCHAR(20)   NOT NULL DEFAULT 'PENDING' COMMENT '审核状态：PENDING-待审核, APPROVED-已通过, REJECTED-已驳回',
+    `reject_reason` VARCHAR(200)  DEFAULT NULL            COMMENT '驳回原因',
     `created_at`    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     PRIMARY KEY (`id`),
     KEY `idx_user_id` (`user_id`)

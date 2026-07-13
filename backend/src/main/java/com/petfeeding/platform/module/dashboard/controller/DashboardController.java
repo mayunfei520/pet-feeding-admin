@@ -88,6 +88,16 @@ public class DashboardController {
         }
         data.put("orderTrend", orderTrend);
 
+        // ---- 客户（宠物主人）性别分布 ----
+        long ownerTotal = userService.lambdaQuery().eq(User::getRole, "OWNER").count();
+        long maleOwners = userService.lambdaQuery().eq(User::getRole, "OWNER").eq(User::getGender, "男").count();
+        long femaleOwners = userService.lambdaQuery().eq(User::getRole, "OWNER").eq(User::getGender, "女").count();
+        Map<String, Long> ownerGenderBreakdown = new LinkedHashMap<>();
+        ownerGenderBreakdown.put("男", maleOwners);
+        ownerGenderBreakdown.put("女", femaleOwners);
+        ownerGenderBreakdown.put("未填", ownerTotal - maleOwners - femaleOwners);
+        data.put("ownerGenderBreakdown", ownerGenderBreakdown);
+
         // ---- 近期订单（最新 5 条） ----
         List<Order> recentOrders = orderService.lambdaQuery()
                 .orderByDesc(Order::getCreatedAt)

@@ -14,7 +14,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 /**
  * JWT 认证过滤器
@@ -36,14 +39,19 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(token) && jwtUtil.validateToken(token)) {
             String username = jwtUtil.getUsernameFromToken(token);
             Long userId = jwtUtil.getUserIdFromToken(token);
+            String role = jwtUtil.getRoleFromToken(token);
 
-            // 将用户信息存入 SecurityContext
+            // 将用户信息存入 SecurityContext，并正确填充角色权限
+            List<GrantedAuthority> authorities = new ArrayList<>();
+            if (role != null && !role.isEmpty()) {
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
+            }
             UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList());
+                    new UsernamePasswordAuthenticationToken(userId, null, authorities);
             authentication.setDetails(username);
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            log.debug("JWT 认证成功，userId: {}, username: {}", userId, username);
+            log.debug("JWT 认证成功，userId: {}, username: {}, role: {}", userId, username, role);
         }
 
         filterChain.doFilter(request, response);

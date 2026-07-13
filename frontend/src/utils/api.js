@@ -4,9 +4,10 @@ export const userApi = {
   login: (data) => request.post('/user/login', data),
   register: (data) => request.post('/user/register', data),
   list: () => request.get('/user/list'),
-  listByRole: (role) => request.get('/user/list', { params: { role } }),
+  listByRole: (role, gender) => request.get('/user/list', { params: { role, gender } }),
   updateStatus: (id, status) => request.put(`/user/${id}/status`, { status }),
   remove: (id) => request.delete(`/user/${id}`),
+  update: (id, data) => request.put(`/user/${id}`, data),
   resetPassword: (id) => request.post(`/user/${id}/reset-password`)
 }
 

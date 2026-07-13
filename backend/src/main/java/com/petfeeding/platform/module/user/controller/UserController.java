@@ -3,6 +3,7 @@ package com.petfeeding.platform.module.user.controller;
 import com.petfeeding.platform.common.result.R;
 import com.petfeeding.platform.module.user.dto.LoginDTO;
 import com.petfeeding.platform.module.user.dto.RegisterDTO;
+import com.petfeeding.platform.module.user.dto.UpdateProfileDTO;
 import com.petfeeding.platform.module.user.entity.User;
 import com.petfeeding.platform.module.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,9 +40,10 @@ public class UserController {
     }
 
     @GetMapping("/list")
-    @Operation(summary = "用户列表（支持按角色过滤）")
-    public R<List<User>> list(@RequestParam(required = false) String role) {
-        return R.ok(userService.listByRole(role));
+    @Operation(summary = "用户列表（支持按角色、性别过滤）")
+    public R<List<User>> list(@RequestParam(required = false) String role,
+                              @RequestParam(required = false) String gender) {
+        return R.ok(userService.listByRole(role, gender));
     }
 
     @PutMapping("/{id}/status")
@@ -67,5 +69,12 @@ public class UserController {
     @Operation(summary = "重置用户密码")
     public R<?> resetPassword(@PathVariable Long id) {
         return R.ok(userService.resetPassword(id));
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "更新用户资料")
+    public R<?> updateProfile(@PathVariable Long id, @RequestBody UpdateProfileDTO dto) {
+        userService.updateProfile(id, dto);
+        return R.ok("更新成功");
     }
 }

@@ -7,6 +7,8 @@ import com.petfeeding.platform.module.feeder.service.FeederService;
 import com.petfeeding.platform.module.order.entity.Order;
 import com.petfeeding.platform.module.order.mapper.OrderMapper;
 import com.petfeeding.platform.module.order.service.OrderService;
+import com.petfeeding.platform.module.pet.entity.Pet;
+import com.petfeeding.platform.module.pet.service.PetService;
 import com.petfeeding.platform.module.sms.service.SmsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,11 +26,20 @@ import java.util.concurrent.ThreadLocalRandom;
 public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements OrderService {
 
     private final FeederService feederService;
+    private final PetService petService;
     private final SmsService smsService;
 
     @Override
     @Transactional
     public Order createOrder(Order order, Long ownerId) {
+        // 预约防护：被预约的宠物必须已通过平台审核，待审核/已驳回不可被预约
+        Pet pet = petService.getById(order.getPetId());
+        if (pet == null) {
+            throw new BusinessException("宠物不存在");
+        }
+        if (!Pet.STATUS_APPROVED.equals(pet.getStatus())) {
+            throw new BusinessException("该宠物尚未通过平台审核，暂不可预约");
+        }
         order.setOwnerId(ownerId);
         order.setOrderNo(generateOrderNo());
         order.setStatus("PENDING");

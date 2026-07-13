@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(java *)",
+      "Bash(mvn *)",
+      "Bash(npm -v)",
+      "Bash(export LANG=zh_CN.UTF-8)",
+      "Bash(chcp.com 65001)",
+      "Bash(npm run *)",
+      "Bash(netstat -ano)",
+      "Bash(tasklist.exe)",
+      "Bash(curl -s http://localhost:8080/api)",
+      "Bash(curl -s http://localhost:8080/doc.html)",
+      "Bash(curl *)",
+      "Bash(npx playwright *)",
+      "Bash(node *)",
+      "Bash(npm install *)",
+      "Bash(mkdir -p *)",
+      "Bash(where wechatdevtools *)",
+      "Bash(echo *)",
+      "Bash(awk *)",
+      "Bash(taskkill *)",
+      "Bash(python3 -c ' *)",
+      "Read(D:/Workspace/pet-feeding-miniapp/**)",
+      "Glob(D:/Workspace/pet-feeding-miniapp/**)",
+      "Grep(D:/Workspace/pet-feeding-miniapp/**)"
+    ]
+  }
+}

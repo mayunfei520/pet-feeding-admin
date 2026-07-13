@@ -10,6 +10,7 @@ import com.petfeeding.platform.module.pet.mapper.PetMapper;
 import com.petfeeding.platform.module.user.dto.LoginDTO;
 import com.petfeeding.platform.module.user.dto.LoginResultDTO;
 import com.petfeeding.platform.module.user.dto.RegisterDTO;
+import com.petfeeding.platform.module.user.dto.UpdateProfileDTO;
 import com.petfeeding.platform.module.user.entity.User;
 import com.petfeeding.platform.module.user.mapper.UserMapper;
 import com.petfeeding.platform.module.user.service.UserService;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户服务实现
@@ -51,6 +53,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setPhone(dto.getPhone());
         user.setEmail(dto.getEmail());
+        user.setGender(dto.getGender());
         user.setRole(dto.getRole());
         user.setStatus("ACTIVE");
 
@@ -78,22 +81,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException("用户名或密码错误");
         }
 
-        // 生成 JWT Token
-        String token = jwtUtil.generateToken(user.getId(), user.getUsername());
+        // 生成 JWT Token（写入角色，供权限控制使用）
+        String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
 
         return new LoginResultDTO(token, user.getId(), user.getUsername(), user.getRole());
     }
 
     @Override
-    public List<User> listByRole(String role) {
-        List<User> users;
-        if (role == null || role.isEmpty()) {
-            users = this.list();
-        } else {
-            LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+    public List<User> listByRole(String role, String gender) {
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        if (role != null && !role.isEmpty()) {
             queryWrapper.eq(User::getRole, role);
-            users = this.list(queryWrapper);
         }
+        if (gender != null && !gender.isEmpty()) {
+            queryWrapper.eq(User::getGender, gender);
+        }
+        List<User> users = this.list(queryWrapper);
 
         users.forEach(user -> {
             LambdaQueryWrapper<Pet> petQuery = new LambdaQueryWrapper<>();
@@ -123,6 +126,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setPassword(passwordEncoder.encode(newPassword));
         this.updateById(user);
         return newPassword;
+    }
+
+    @Override
+    public void updateProfile(Long id, UpdateProfileDTO dto) {
+        User user = this.getById(id);
+        if (user == null) {
+            throw new BusinessException("用户不存在");
+        }
+        if (dto.getPhone() != null) user.setPhone(dto.getPhone());
+        if (dto.getEmail() != null) user.setEmail(dto.getEmail());
+        if (dto.getGender() != null) user.setGender(dto.getGender());
+        this.updateById(user);
     }
 
     private String generatePassword(int length) {

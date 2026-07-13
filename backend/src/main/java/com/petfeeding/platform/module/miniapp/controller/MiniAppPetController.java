@@ -55,6 +55,8 @@ public class MiniAppPetController {
             return R.fail(403, "只有宠物主人才能添加宠物");
         }
         pet.setUserId(user.getId());
+        // 强制置为待审核，忽略客户端传入的 status，防止伪造绕过审核
+        pet.setStatus(Pet.STATUS_PENDING);
         petService.save(pet);
         return R.ok(pet);
     }

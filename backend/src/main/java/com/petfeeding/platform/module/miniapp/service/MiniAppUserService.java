@@ -66,7 +66,7 @@ public class MiniAppUserService {
             userMapper.insert(user);
             log.info("创建微信登录新用户: userId={}, username={}, role={}", user.getId(), user.getUsername(), user.getRole());
         }
-        String token = jwtUtil.generateToken(user.getId(), user.getUsername());
+        String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
         return new LoginResultDTO(token, user.getId(), user.getUsername(), user.getRole());
     }
 
@@ -103,7 +103,7 @@ public class MiniAppUserService {
         userMapper.insert(user);
         log.info("创建小程序注册用户: userId={}, username={}, phone={}, role={}",
             user.getId(), user.getUsername(), maskPhone(phone), user.getRole());
-        String token = jwtUtil.generateToken(user.getId(), user.getUsername());
+        String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
         return new LoginResultDTO(token, user.getId(), user.getUsername(), user.getRole());
     }
 
@@ -177,7 +177,7 @@ public class MiniAppUserService {
         }
         log.info("小程序密码登录校验通过: userId={}, username={}, role={}",
             user.getId(), user.getUsername(), user.getRole());
-        String token = jwtUtil.generateToken(user.getId(), user.getUsername());
+        String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
         return new LoginResultDTO(token, user.getId(), user.getUsername(), user.getRole());
     }
 
@@ -216,7 +216,7 @@ public class MiniAppUserService {
             log.info("微信手机号登录-已有用户: userId={}, phone={}, role={}",
                 user.getId(), maskPhone(phone), user.getRole());
         }
-        String token = jwtUtil.generateToken(user.getId(), user.getUsername());
+        String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
         return new LoginResultDTO(token, user.getId(), user.getUsername(), user.getRole());
     }
 

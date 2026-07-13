@@ -4,9 +4,9 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://101.42.24.114:3306/pet_feeding?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8
-    username: petfeeder
-    password: PetFeeding2024!
+    url: jdbc:mysql://${MYSQL_HOST:mysql}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:pet_feeding}?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8
+    username: ${MYSQL_USERNAME:petfeeder}
+    password: ${MYSQL_PASSWORD:PetFeeding2024!}
   h2:
     console:
       enabled: false
@@ -21,10 +21,10 @@ mybatis-plus:
 
 jwt:
   secret: pet-feeding-platform-secret-key-2024
-  expiration: 86400000
+  expiration: 86400
 
 # ========== 微信小程序配置 ==========
 wx:
   miniapp:
-    app-id: wxf385de0f1540fcc6
-    app-secret: your-app-secret-here
+    app-id: wx1ad1b47d97fb0e04
+    app-secret: c3b8f0aa9e3206de00e0af6490795a44

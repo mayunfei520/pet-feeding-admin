@@ -14,8 +14,8 @@ jwt:
 # ========== 微信小程序配置 ==========
 wx:
   miniapp:
-    app-id: wxf385de0f1540fcc6
-    app-secret: your-app-secret-here
+    app-id: wx1ad1b47d97fb0e04
+    app-secret: c3b8f0aa9e3206de00e0af6490795a44
 
 # ========== H2 控制台 ==========
 spring.h2.console.enabled: true

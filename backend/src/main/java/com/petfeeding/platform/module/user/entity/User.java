@@ -28,6 +28,9 @@ public class User {
     /** 邮箱 */
     private String email;
 
+    /** 性别：男 / 女（可空） */
+    private String gender;
+
     /** 角色：OWNER-宠物主人, FEEDER-喂养员, ADMIN-管理员 */
     private String role;
 

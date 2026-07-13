@@ -23,6 +23,8 @@ public class RegisterDTO {
 
     private String email;
 
+    private String gender;
+
     @NotBlank(message = "角色不能为空")
     private String role;
 }

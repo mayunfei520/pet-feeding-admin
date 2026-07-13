@@ -43,7 +43,7 @@ public class Pet {
 
     /** 具体品种（如：英短、金毛） */
     @Size(max = 20, message = "品种名称不能超过20个字")
-    private String bre;
+    private String breed;
 
     /** 年龄（岁） */
     @Min(value = 0, message = "年龄需在0-50岁之间")
@@ -64,6 +64,18 @@ public class Pet {
 
     /** 宠物照片 URL */
     private String image;
+
+    /** 审核状态：PENDING-待审核, APPROVED-已通过, REJECTED-已驳回 */
+    private String status;
+
+    /** 驳回原因（驳回时填写，≤200字） */
+    @Size(max = 200, message = "驳回原因不能超过200个字")
+    private String rejectReason;
+
+    /** 审核状态常量 */
+    public static final String STATUS_PENDING = "PENDING";
+    public static final String STATUS_APPROVED = "APPROVED";
+    public static final String STATUS_REJECTED = "REJECTED";
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;

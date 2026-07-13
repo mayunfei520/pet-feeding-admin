@@ -89,6 +89,20 @@
             </div>
           </div>
         </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3 class="chart-title">客户性别分布</h3>
+          </div>
+          <div class="chart-body donut-body">
+            <template v-if="Object.values(ownerGenderBreakdown).some(v => v > 0)">
+              <canvas ref="genderCanvas"></canvas>
+            </template>
+            <div v-else class="chart-empty">
+              <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              <span>暂无客户数据</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="feeds-row animate-fade-in-up" :style="{ animationDelay: '0.5s' }">
@@ -167,6 +181,7 @@ const orderTrend = ref([])
 const orderStatusBreakdown = ref({})
 const recentOrders = ref([])
 const recentUsers = ref([])
+const ownerGenderBreakdown = ref({})
 
 const hasData = computed(() => {
   return Boolean(
@@ -205,9 +220,11 @@ const quickActions = [
 
 const trendCanvas = ref(null)
 const statusCanvas = ref(null)
+const genderCanvas = ref(null)
 const countRefs = reactive({})
 let trendChart = null
 let statusChart = null
+let genderChart = null
 let chartTimer = null
 
 function destroyCharts() {
@@ -222,6 +239,10 @@ function destroyCharts() {
   if (statusChart) {
     statusChart.destroy()
     statusChart = null
+  }
+  if (genderChart) {
+    genderChart.destroy()
+    genderChart = null
   }
 }
 
@@ -399,6 +420,57 @@ function renderStatusChart() {
   })
 }
 
+function renderGenderChart() {
+  if (!genderCanvas.value) return
+  const data = ownerGenderBreakdown.value
+  if (!Object.values(data).some(v => v > 0)) return
+
+  const labelMap = { '男': '男', '女': '女', '未填': '未填' }
+  const colorMap = { '男': '#3b82f6', '女': '#f43f5e', '未填': '#cbd5e1' }
+  const entries = Object.entries(data).filter(([, v]) => v > 0)
+
+  genderChart = new Chart(genderCanvas.value, {
+    type: 'doughnut',
+    data: {
+      labels: entries.map(([k]) => labelMap[k] || k),
+      datasets: [{
+        data: entries.map(([, v]) => v),
+        backgroundColor: entries.map(([k]) => colorMap[k] || '#d1d5db'),
+        borderColor: '#fff',
+        borderWidth: 3,
+        hoverBorderWidth: 4,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '65%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            padding: 20,
+            usePointStyle: true,
+            pointStyleWidth: 10,
+            font: { size: 12 },
+            color: '#6b7280',
+            generateLabels(chart) {
+              const ds = chart.data.datasets[0]
+              return chart.data.labels.map((label, i) => ({
+                text: `${label}  ${ds.data[i]}`,
+                fillStyle: ds.backgroundColor[i],
+                strokeStyle: ds.backgroundColor[i],
+                pointStyle: 'circle',
+                index: i,
+              }))
+            }
+          }
+        }
+      }
+    }
+  })
+}
+
 async function fetchData() {
   loading.value = true
   loadError.value = false
@@ -418,6 +490,7 @@ async function fetchData() {
       })
       orderTrend.value = d.orderTrend || []
       orderStatusBreakdown.value = d.orderStatusBreakdown || {}
+      ownerGenderBreakdown.value = d.ownerGenderBreakdown || {}
       recentOrders.value = d.recentOrders || []
       recentUsers.value = d.recentUsers || []
       hasLoadedOnce.value = true
@@ -428,6 +501,7 @@ async function fetchData() {
       chartTimer = setTimeout(() => {
         renderTrendChart()
         renderStatusChart()
+        renderGenderChart()
       }, 100)
     }
   } catch {
@@ -563,7 +637,7 @@ onUnmounted(() => {
 
 .charts-row {
   display: grid;
-  grid-template-columns: 1.6fr 1fr;
+  grid-template-columns: 1.5fr 1fr 1fr;
   gap: 16px;
   margin-bottom: 24px;
 }

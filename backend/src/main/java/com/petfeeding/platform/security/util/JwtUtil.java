@@ -25,11 +25,22 @@ public class JwtUtil {
     /**
      * 生成 JWT Token
      */
-    public String generateToken(Long userId, String username) {
+    public String generateToken(Long userId, String username, String role) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("username", username);
+        if (role != null && !role.trim().isEmpty()) {
+            claims.put("role", role);
+        }
         return createToken(claims, username);
+    }
+
+    /**
+     * 从 Token 中获取用户角色
+     */
+    public String getRoleFromToken(String token) {
+        Object role = getAllClaimsFromToken(token).get("role");
+        return role == null ? null : role.toString();
     }
 
     private String createToken(Map<String, Object> claims, String subject) {
