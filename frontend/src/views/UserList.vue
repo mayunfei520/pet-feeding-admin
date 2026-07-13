@@ -6,9 +6,6 @@
     :columns="columns"
     :loading="loading"
   >
-    <template #header-actions>
-      <button class="btn btn-sm btn-primary" @click="openAdd">+ 新增客户</button>
-    </template>
     <template #filters>
       <el-select v-model="genderFilter" placeholder="性别筛选" clearable style="width:150px" @change="fetchUsers">
         <el-option label="全部性别" value="" />
@@ -64,40 +61,6 @@
       <el-button type="primary" @click="saveEdit" :loading="saving">保存</el-button>
     </template>
   </el-dialog>
-
-  <el-dialog v-model="addVisible" title="新增客户" width="420px">
-    <el-form :model="addForm" label-width="80px">
-      <el-form-item label="用户名">
-        <el-input v-model="addForm.username" placeholder="登录账号（3-20位）" />
-      </el-form-item>
-      <el-form-item label="密码">
-        <el-input v-model="addForm.password" placeholder="初始密码（6-20位）" />
-      </el-form-item>
-      <el-form-item label="角色">
-        <el-select v-model="addForm.role" style="width:100%">
-          <el-option label="宠物主人" value="OWNER" />
-          <el-option label="喂养员" value="FEEDER" />
-          <el-option label="管理员" value="ADMIN" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="性别">
-        <el-select v-model="addForm.gender" placeholder="请选择" clearable style="width:100%">
-          <el-option label="男" value="男" />
-          <el-option label="女" value="女" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="手机号">
-        <el-input v-model="addForm.phone" placeholder="手机号" />
-      </el-form-item>
-      <el-form-item label="邮箱">
-        <el-input v-model="addForm.email" placeholder="邮箱" />
-      </el-form-item>
-    </el-form>
-    <template #footer>
-      <el-button @click="addVisible = false">取消</el-button>
-      <el-button type="primary" @click="saveAdd" :loading="savingAdd">创建</el-button>
-    </template>
-  </el-dialog>
 </template>
 
 <script setup>
@@ -124,10 +87,6 @@ const editVisible = ref(false)
 const saving = ref(false)
 const form = reactive({ id: null, username: '', gender: '', phone: '', email: '' })
 
-const addVisible = ref(false)
-const savingAdd = ref(false)
-const addForm = reactive({ username: '', password: '123456', phone: '', email: '', gender: '', role: 'OWNER' })
-
 onMounted(() => fetchUsers())
 
 async function fetchUsers() {
@@ -137,38 +96,6 @@ async function fetchUsers() {
     users.value = res.data || []
   } catch (e) { /* */ }
   finally { loading.value = false }
-}
-
-function openAdd() {
-  addForm.username = ''
-  addForm.password = '123456'
-  addForm.phone = ''
-  addForm.email = ''
-  addForm.gender = ''
-  addForm.role = 'OWNER'
-  addVisible.value = true
-}
-
-async function saveAdd() {
-  if (!addForm.username.trim()) {
-    ElMessage.warning('请填写用户名')
-    return
-  }
-  savingAdd.value = true
-  try {
-    await userApi.register({
-      username: addForm.username.trim(),
-      password: addForm.password,
-      phone: addForm.phone,
-      email: addForm.email,
-      gender: addForm.gender || null,
-      role: addForm.role,
-    })
-    ElMessage.success('客户创建成功')
-    addVisible.value = false
-    await fetchUsers()
-  } catch (e) { /* */ }
-  finally { savingAdd.value = false }
 }
 
 function openEdit(u) {
