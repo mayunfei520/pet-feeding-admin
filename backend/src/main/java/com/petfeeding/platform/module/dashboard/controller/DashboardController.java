@@ -71,6 +71,19 @@ public class DashboardController {
         }
         data.put("orderStatusBreakdown", orderStatusBreakdown);
 
+        // ---- 订单支付/完成分布（成功 / 待支付 / 付款 / 取消） ----
+        // 付款相关状态来自 Payment 表，完成/取消来自 Order 表，合并为消费者视角的 4 段
+        long paidCount = paymentService.lambdaQuery().eq(Payment::getPayStatus, "PAID").count();
+        long unpaidCount = paymentService.lambdaQuery().eq(Payment::getPayStatus, "UNPAID").count();
+        long completedOrders = orderService.lambdaQuery().eq(Order::getStatus, "COMPLETED").count();
+        long cancelledOrders = orderService.lambdaQuery().eq(Order::getStatus, "CANCELLED").count();
+        Map<String, Long> payStatusBreakdown = new LinkedHashMap<>();
+        payStatusBreakdown.put("成功", completedOrders);
+        payStatusBreakdown.put("待支付", unpaidCount);
+        payStatusBreakdown.put("付款", paidCount);
+        payStatusBreakdown.put("取消", cancelledOrders);
+        data.put("payStatusBreakdown", payStatusBreakdown);
+
         // ---- 近7天每日订单趋势 ----
         List<Map<String, Object>> orderTrend = new ArrayList<>();
         for (int i = 6; i >= 0; i--) {

@@ -1,9 +1,9 @@
-﻿<template>
+<template>
   <div class="dashboard">
     <!-- ========== 加载骨架屏 ========== -->
     <template v-if="loading && !hasLoadedOnce">
       <div class="kpi-grid">
-        <div v-for="n in 6" :key="'sk'+n" class="kpi-card skeleton">
+        <div v-for="n in 6" :key="'sk'+n" class="kpi-card skeleton glass">
           <div class="kpi-icon-sk shimmer"></div>
           <div class="kpi-body-sk">
             <div class="kpi-value-sk shimmer"></div>
@@ -12,8 +12,9 @@
         </div>
       </div>
       <div class="charts-row">
-        <div class="chart-card skeleton-card"><div class="chart-sk shimmer" style="height:220px"></div></div>
-        <div class="chart-card skeleton-card"><div class="chart-sk shimmer" style="height:220px"></div></div>
+        <div class="chart-card skeleton-card glass"><div class="chart-sk shimmer" style="height:220px"></div></div>
+        <div class="chart-card skeleton-card glass"><div class="chart-sk shimmer" style="height:220px"></div></div>
+        <div class="chart-card skeleton-card glass"><div class="chart-sk shimmer" style="height:220px"></div></div>
       </div>
     </template>
 
@@ -38,9 +39,12 @@
         <div
           v-for="(card, i) in kpiCards"
           :key="card.key"
-          class="kpi-card animate-fade-in-up"
+          class="kpi-card glass animate-fade-in-up"
           :class="card.accent"
           :style="{ animationDelay: `${0.05 + i * 0.06}s` }"
+          :ref="el => { if (el) kpiCardRefs[card.key] = el }"
+          @mousemove="onCardMove($event, card.key)"
+          @mouseleave="onCardLeave(card.key)"
         >
           <div class="kpi-icon" :class="card.accent">
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" v-html="card.icon" />
@@ -58,7 +62,7 @@
       </div>
 
       <div class="charts-row animate-fade-in-up" :style="{ animationDelay: '0.4s' }">
-        <div class="chart-card">
+        <div class="chart-card glass">
           <div class="chart-header">
             <h3 class="chart-title">近 7 天订单趋势</h3>
             <span class="chart-legend">
@@ -75,13 +79,17 @@
             </div>
           </div>
         </div>
-        <div class="chart-card">
+        <div class="chart-card glass">
           <div class="chart-header">
             <h3 class="chart-title">订单状态分布</h3>
           </div>
           <div class="chart-body donut-body">
-            <template v-if="Object.values(orderStatusBreakdown).some(v => v > 0)">
+            <template v-if="orderStatusTotal > 0">
               <canvas ref="statusCanvas"></canvas>
+              <div class="donut-center">
+                <div class="dc-val">{{ orderStatusTotal }}</div>
+                <div class="dc-label">总订单</div>
+              </div>
             </template>
             <div v-else class="chart-empty">
               <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
@@ -89,13 +97,17 @@
             </div>
           </div>
         </div>
-        <div class="chart-card">
+        <div class="chart-card glass">
           <div class="chart-header">
             <h3 class="chart-title">客户性别分布</h3>
           </div>
           <div class="chart-body donut-body">
-            <template v-if="Object.values(ownerGenderBreakdown).some(v => v > 0)">
+            <template v-if="ownerGenderTotal > 0">
               <canvas ref="genderCanvas"></canvas>
+              <div class="donut-center">
+                <div class="dc-val">{{ ownerGenderTotal }}</div>
+                <div class="dc-label">客户数</div>
+              </div>
             </template>
             <div v-else class="chart-empty">
               <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
@@ -106,7 +118,7 @@
       </div>
 
       <div class="feeds-row animate-fade-in-up" :style="{ animationDelay: '0.5s' }">
-        <div class="feed-card">
+        <div class="feed-card glass">
           <div class="chart-header">
             <h3 class="chart-title">最近订单</h3>
             <router-link to="/orders" class="feed-more">查看全部 &rarr;</router-link>
@@ -126,7 +138,7 @@
           </div>
           <div v-else class="feed-empty">暂无订单记录</div>
         </div>
-        <div class="feed-card">
+        <div class="feed-card glass">
           <div class="chart-header">
             <h3 class="chart-title">最近注册</h3>
             <router-link to="/users" class="feed-more">查看全部 &rarr;</router-link>
@@ -150,7 +162,7 @@
       </div>
 
       <div class="quick-bar animate-fade-in-up" :style="{ animationDelay: '0.55s' }">
-        <router-link v-for="act in quickActions" :key="act.to" :to="act.to" class="quick-card">
+        <router-link v-for="act in quickActions" :key="act.to" :to="act.to" class="quick-card glass">
           <div class="quick-icon" :class="act.color">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" v-html="act.icon" />
           </div>
@@ -158,6 +170,7 @@
             <span class="quick-title">{{ act.title }}</span>
             <span class="quick-desc">{{ act.desc }}</span>
           </div>
+          <span class="quick-arrow">&rarr;</span>
         </router-link>
       </div>
     </template>
@@ -178,10 +191,17 @@ const kpiRaw = reactive({
   orders: 0, pendingOrders: 0, revenue: 0
 })
 const orderTrend = ref([])
-const orderStatusBreakdown = ref({})
+const payStatusBreakdown = ref({})
 const recentOrders = ref([])
 const recentUsers = ref([])
 const ownerGenderBreakdown = ref({})
+
+const orderStatusTotal = computed(() =>
+  Object.values(payStatusBreakdown.value).reduce((a, b) => a + (b || 0), 0)
+)
+const ownerGenderTotal = computed(() =>
+  Object.values(ownerGenderBreakdown.value).reduce((a, b) => a + (b || 0), 0)
+)
 
 const hasData = computed(() => {
   return Boolean(
@@ -222,28 +242,31 @@ const trendCanvas = ref(null)
 const statusCanvas = ref(null)
 const genderCanvas = ref(null)
 const countRefs = reactive({})
+const kpiCardRefs = reactive({})
 let trendChart = null
 let statusChart = null
 let genderChart = null
 let chartTimer = null
 
 function destroyCharts() {
-  if (chartTimer) {
-    clearTimeout(chartTimer)
-    chartTimer = null
-  }
-  if (trendChart) {
-    trendChart.destroy()
-    trendChart = null
-  }
-  if (statusChart) {
-    statusChart.destroy()
-    statusChart = null
-  }
-  if (genderChart) {
-    genderChart.destroy()
-    genderChart = null
-  }
+  if (chartTimer) { clearTimeout(chartTimer); chartTimer = null }
+  if (trendChart) { trendChart.destroy(); trendChart = null }
+  if (statusChart) { statusChart.destroy(); statusChart = null }
+  if (genderChart) { genderChart.destroy(); genderChart = null }
+}
+
+/* 3D 倾斜：鼠标跟随 */
+function onCardMove(e, key) {
+  const el = kpiCardRefs[key]
+  if (!el) return
+  const r = el.getBoundingClientRect()
+  const px = (e.clientX - r.left) / r.width - 0.5
+  const py = (e.clientY - r.top) / r.height - 0.5
+  el.style.transform = `perspective(900px) rotateX(${ -py * 9 }deg) rotateY(${ px * 9 }deg) translateY(-6px)`
+}
+function onCardLeave(key) {
+  const el = kpiCardRefs[key]
+  if (el) el.style.transform = ''
 }
 
 function fmtPrice(val) {
@@ -265,11 +288,9 @@ function fmtRelative(iso) {
 function orderStatusLabel(s) {
   return { PENDING: '待接单', ACCEPTED: '已接单', IN_PROGRESS: '进行中', COMPLETED: '已完成', CANCELLED: '已取消' }[s] || s
 }
-
 function statusDotClass(s) {
   return { PENDING: 'dot-amber', ACCEPTED: 'dot-blue', IN_PROGRESS: 'dot-purple', COMPLETED: 'dot-green', CANCELLED: 'dot-red' }[s] || ''
 }
-
 function statusTagClass(s) {
   return { PENDING: 'tag-amber', ACCEPTED: 'tag-blue', IN_PROGRESS: 'tag-purple', COMPLETED: 'tag-green', CANCELLED: 'tag-red' }[s] || ''
 }
@@ -283,40 +304,28 @@ function animateNumbers() {
     pendingOrders: kpiRaw.pendingOrders || 0,
     revenue: Number(kpiRaw.revenue) || 0,
   }
-
   const duration = 1400
   const start = performance.now()
-
   function frame(now) {
     const p = Math.min((now - start) / duration, 1)
     const ease = 1 - Math.pow(1 - p, 3)
-
     Object.entries(targets).forEach(([key, target]) => {
       const el = countRefs[key]
       if (!el) return
       const current = target * ease
-      if (key === 'revenue') {
-        el.textContent = '¥' + Math.floor(current).toLocaleString('zh-CN')
-      } else {
-        el.textContent = Math.floor(current).toLocaleString('zh-CN')
-      }
+      el.textContent = key === 'revenue'
+        ? '¥' + Math.floor(current).toLocaleString('zh-CN')
+        : Math.floor(current).toLocaleString('zh-CN')
     })
-
-    if (p < 1) {
-      requestAnimationFrame(frame)
-    } else {
-      Object.entries(targets).forEach(([key, target]) => {
-        const el = countRefs[key]
-        if (!el) return
-        if (key === 'revenue') {
-          el.textContent = '¥' + target.toLocaleString('zh-CN')
-        } else {
-          el.textContent = target.toLocaleString('zh-CN')
-        }
-      })
-    }
+    if (p < 1) requestAnimationFrame(frame)
+    else Object.entries(targets).forEach(([key, target]) => {
+      const el = countRefs[key]
+      if (!el) return
+      el.textContent = key === 'revenue'
+        ? '¥' + target.toLocaleString('zh-CN')
+        : target.toLocaleString('zh-CN')
+    })
   }
-
   requestAnimationFrame(frame)
 }
 
@@ -324,11 +333,10 @@ function renderTrendChart() {
   if (!trendCanvas.value) return
   const data = orderTrend.value
   if (!data.length || !data.some(d => d.count > 0)) return
-
   const ctx = trendCanvas.value.getContext('2d')
   const gradient = ctx.createLinearGradient(0, 0, 0, 240)
-  gradient.addColorStop(0, 'rgba(99,102,241,0.18)')
-  gradient.addColorStop(1, 'rgba(99,102,241,0)')
+  gradient.addColorStop(0, 'rgba(56,189,248,0.32)')
+  gradient.addColorStop(1, 'rgba(56,189,248,0)')
 
   trendChart = new Chart(trendCanvas.value, {
     type: 'line',
@@ -337,14 +345,14 @@ function renderTrendChart() {
       datasets: [{
         label: '订单数',
         data: data.map(d => d.count),
-        borderColor: '#6366f1',
+        borderColor: '#38bdf8',
         backgroundColor: gradient,
         fill: true,
         tension: 0.4,
         pointRadius: 5,
         pointHoverRadius: 7,
-        pointBackgroundColor: '#6366f1',
-        pointBorderColor: '#fff',
+        pointBackgroundColor: '#7dd3fc',
+        pointBorderColor: '#0f1a2e',
         pointBorderWidth: 2.5,
         borderWidth: 2.5,
       }]
@@ -354,16 +362,20 @@ function renderTrendChart() {
       maintainAspectRatio: false,
       interaction: { intersect: false, mode: 'index' },
       plugins: { legend: { display: false }, tooltip: {
-        backgroundColor: '#1f2937',
+        backgroundColor: '#0f1a2e',
+        titleColor: '#e3ebf5',
+        bodyColor: '#cdd9ec',
+        borderColor: 'rgba(125,211,252,0.25)',
+        borderWidth: 1,
         titleFont: { size: 13 },
         bodyFont: { size: 12 },
         padding: 10,
-        cornerRadius: 8,
+        cornerRadius: 10,
         displayColors: false,
       }},
       scales: {
-        x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#9ca3af' } },
-        y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 }, color: '#9ca3af' }, grid: { color: '#f3f4f6' } }
+        x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#6b7d99' } },
+        y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 }, color: '#6b7d99' }, grid: { color: 'rgba(125,211,252,0.07)' } }
       }
     }
   })
@@ -371,11 +383,10 @@ function renderTrendChart() {
 
 function renderStatusChart() {
   if (!statusCanvas.value) return
-  const data = orderStatusBreakdown.value
+  const data = payStatusBreakdown.value
   if (!Object.values(data).some(v => v > 0)) return
-
-  const labelMap = { PENDING: '待接单', ACCEPTED: '已接单', IN_PROGRESS: '进行中', COMPLETED: '已完成', CANCELLED: '已取消' }
-  const colorMap = { PENDING: '#f59e0b', ACCEPTED: '#3b82f6', IN_PROGRESS: '#8b5cf6', COMPLETED: '#10b981', CANCELLED: '#ef4444' }
+  const labelMap = { '成功': '成功', '待支付': '待支付', '付款': '付款', '取消': '取消' }
+  const colorMap = { '成功': '#38bdf8', '待支付': '#fbbf24', '付款': '#a78bfa', '取消': '#f87171' }
   const entries = Object.entries(data).filter(([, v]) => v > 0)
 
   statusChart = new Chart(statusCanvas.value, {
@@ -384,25 +395,26 @@ function renderStatusChart() {
       labels: entries.map(([k]) => labelMap[k] || k),
       datasets: [{
         data: entries.map(([, v]) => v),
-        backgroundColor: entries.map(([k]) => colorMap[k] || '#d1d5db'),
-        borderColor: '#fff',
+        backgroundColor: entries.map(([k]) => colorMap[k] || '#33455f'),
+        borderColor: '#0f1a2e',
         borderWidth: 3,
         hoverBorderWidth: 4,
+        hoverOffset: 8,
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      cutout: '65%',
+      cutout: '68%',
       plugins: {
         legend: {
           position: 'bottom',
           labels: {
-            padding: 20,
+            padding: 18,
             usePointStyle: true,
             pointStyleWidth: 10,
             font: { size: 12 },
-            color: '#6b7280',
+            color: '#8aa0bd',
             generateLabels(chart) {
               const ds = chart.data.datasets[0]
               return chart.data.labels.map((label, i) => ({
@@ -424,9 +436,8 @@ function renderGenderChart() {
   if (!genderCanvas.value) return
   const data = ownerGenderBreakdown.value
   if (!Object.values(data).some(v => v > 0)) return
-
   const labelMap = { '男': '男', '女': '女', '未填': '未填' }
-  const colorMap = { '男': '#3b82f6', '女': '#f43f5e', '未填': '#cbd5e1' }
+  const colorMap = { '男': '#38bdf8', '女': '#a78bfa', '未填': '#33455f' }
   const entries = Object.entries(data).filter(([, v]) => v > 0)
 
   genderChart = new Chart(genderCanvas.value, {
@@ -435,25 +446,26 @@ function renderGenderChart() {
       labels: entries.map(([k]) => labelMap[k] || k),
       datasets: [{
         data: entries.map(([, v]) => v),
-        backgroundColor: entries.map(([k]) => colorMap[k] || '#d1d5db'),
-        borderColor: '#fff',
+        backgroundColor: entries.map(([k]) => colorMap[k] || '#33455f'),
+        borderColor: '#0f1a2e',
         borderWidth: 3,
         hoverBorderWidth: 4,
+        hoverOffset: 8,
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      cutout: '65%',
+      cutout: '68%',
       plugins: {
         legend: {
           position: 'bottom',
           labels: {
-            padding: 20,
+            padding: 18,
             usePointStyle: true,
             pointStyleWidth: 10,
             font: { size: 12 },
-            color: '#6b7280',
+            color: '#8aa0bd',
             generateLabels(chart) {
               const ds = chart.data.datasets[0]
               return chart.data.labels.map((label, i) => ({
@@ -474,7 +486,6 @@ function renderGenderChart() {
 async function fetchData() {
   loading.value = true
   loadError.value = false
-
   try {
     const res = await dashboardApi.stats()
     const d = res.data
@@ -489,7 +500,7 @@ async function fetchData() {
         revenue: d.revenue ?? 0,
       })
       orderTrend.value = d.orderTrend || []
-      orderStatusBreakdown.value = d.orderStatusBreakdown || {}
+      payStatusBreakdown.value = d.payStatusBreakdown || {}
       ownerGenderBreakdown.value = d.ownerGenderBreakdown || {}
       recentOrders.value = d.recentOrders || []
       recentUsers.value = d.recentUsers || []
@@ -512,15 +523,13 @@ async function fetchData() {
 }
 
 onMounted(fetchData)
-
-onUnmounted(() => {
-  destroyCharts()
-})
+onUnmounted(() => { destroyCharts() })
 </script>
 
 <style scoped>
 .dashboard {
   width: 100%;
+  position: relative;
 }
 
 .soft-alert {
@@ -529,22 +538,20 @@ onUnmounted(() => {
   gap: 10px;
   margin-bottom: 16px;
   padding: 10px 14px;
-  border: 1px solid rgba(245, 158, 11, 0.18);
-  background: rgba(245, 158, 11, 0.08);
-  color: #b45309;
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  background: rgba(251, 191, 36, 0.10);
+  color: #fcd34d;
   border-radius: 10px;
   font-size: 13px;
 }
 .soft-link {
   border: none;
   background: transparent;
-  color: #92400e;
+  color: #fbbf24;
   font-weight: 600;
   cursor: pointer;
 }
-.soft-link:hover {
-  text-decoration: underline;
-}
+.soft-link:hover { text-decoration: underline; }
 
 .kpi-grid {
   display: grid;
@@ -559,17 +566,16 @@ onUnmounted(() => {
   align-items: center;
   gap: 16px;
   padding: 20px 22px;
-  background: var(--surface-card);
-  border: 1px solid var(--neutral-200);
   border-radius: var(--radius-md);
-  transition: all var(--transition-base);
+  transition: transform 0.25s ease, box-shadow var(--transition-base), border-color var(--transition-base);
   cursor: default;
   overflow: hidden;
+  transform-style: preserve-3d;
+  will-change: transform;
 }
 .kpi-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-  border-color: transparent;
+  border-color: var(--glass-border);
+  box-shadow: var(--shadow-glow-ice);
 }
 
 .kpi-icon {
@@ -581,14 +587,14 @@ onUnmounted(() => {
   justify-content: center;
   flex-shrink: 0;
 }
-.kpi-icon.indigo { background: rgba(99,102,241,0.1); color: #6366f1; }
-.kpi-icon.purple { background: rgba(139,92,246,0.1); color: #8b5cf6; }
-.kpi-icon.amber  { background: rgba(245,158,11,0.1); color: #f59e0b; }
-.kpi-icon.blue   { background: rgba(59,130,246,0.1); color: #3b82f6; }
-.kpi-icon.rose   { background: rgba(244,63,94,0.1); color: #f43f5e; }
-.kpi-icon.emerald{ background: rgba(16,185,129,0.1); color: #10b981; }
+.kpi-icon.indigo { background: rgba(56,189,248,0.14); color: #7dd3fc; }
+.kpi-icon.purple { background: rgba(167,139,250,0.16); color: #c4b5fd; }
+.kpi-icon.amber  { background: rgba(251,191,36,0.14); color: #fbbf24; }
+.kpi-icon.blue   { background: rgba(96,165,250,0.14); color: #93c5fd; }
+.kpi-icon.rose   { background: rgba(248,113,113,0.14); color: #fca5a5; }
+.kpi-icon.emerald{ background: rgba(52,211,153,0.14); color: #6ee7b7; }
 
-.kpi-body { min-width: 0; }
+.kpi-body { min-width: 0; transform: translateZ(20px); }
 .kpi-label {
   font-size: 12px;
   font-weight: 500;
@@ -601,10 +607,11 @@ onUnmounted(() => {
   font-family: var(--font-display);
   font-size: 28px;
   font-weight: 700;
-  color: var(--neutral-900);
+  color: var(--neutral-800);
   letter-spacing: -0.5px;
   line-height: 1.15;
   font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 20px rgba(125, 211, 252, 0.18);
 }
 .count-up { display: inline-block; }
 .kpi-suffix {
@@ -626,13 +633,13 @@ onUnmounted(() => {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #f43f5e;
-  box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.2);
+  background: #f87171;
+  box-shadow: 0 0 0 4px rgba(248, 113, 113, 0.2);
   animation: pulse-dot 2s ease-in-out infinite;
 }
 @keyframes pulse-dot {
-  0%, 100% { box-shadow: 0 0 0 4px rgba(244,63,94,0.2); }
-  50% { box-shadow: 0 0 0 10px rgba(244,63,94,0); }
+  0%, 100% { box-shadow: 0 0 0 4px rgba(248, 113, 113, 0.2); }
+  50% { box-shadow: 0 0 0 10px rgba(248, 113, 113, 0); }
 }
 
 .charts-row {
@@ -643,10 +650,25 @@ onUnmounted(() => {
 }
 
 .chart-card {
-  background: var(--surface-card);
-  border: 1px solid var(--neutral-200);
+  position: relative;
   border-radius: var(--radius-md);
   padding: 22px 24px;
+  overflow: hidden;
+}
+/* 顶部流光 */
+.chart-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #7dd3fc, #a78bfa, transparent);
+  background-size: 200% 100%;
+  animation: slideGlow 4.5s linear infinite;
+  opacity: 0.75;
+}
+@keyframes slideGlow {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 .chart-header {
@@ -671,7 +693,7 @@ onUnmounted(() => {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #6366f1;
+  background: #38bdf8;
 }
 
 .chart-body {
@@ -682,6 +704,28 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.dc-val {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--ice-bright);
+  text-shadow: 0 0 18px rgba(56, 189, 248, 0.35);
+  line-height: 1;
+}
+.dc-label {
+  font-size: 12px;
+  color: var(--neutral-400);
+  margin-top: 4px;
 }
 
 .chart-empty {
@@ -704,18 +748,16 @@ onUnmounted(() => {
 }
 
 .feed-card {
-  background: var(--surface-card);
-  border: 1px solid var(--neutral-200);
   border-radius: var(--radius-md);
   padding: 22px 24px;
 }
 .feed-more {
   font-size: 12px;
   font-weight: 500;
-  color: var(--brand-primary);
+  color: var(--ice-bright);
   text-decoration: none;
 }
-.feed-more:hover { color: var(--brand-primary-dark); }
+.feed-more:hover { color: var(--ice); }
 
 .feed-list { display: flex; flex-direction: column; }
 .feed-item {
@@ -723,7 +765,7 @@ onUnmounted(() => {
   align-items: center;
   gap: 12px;
   padding: 12px 0;
-  border-bottom: 1px solid var(--neutral-100);
+  border-bottom: 1px solid rgba(125, 211, 252, 0.08);
 }
 .feed-item:last-child { border-bottom: none; padding-bottom: 0; }
 .feed-item:first-child { padding-top: 0; }
@@ -733,18 +775,19 @@ onUnmounted(() => {
   height: 9px;
   border-radius: 50%;
   flex-shrink: 0;
+  box-shadow: 0 0 10px currentColor;
 }
-.dot-amber  { background: #f59e0b; }
-.dot-blue   { background: #3b82f6; }
-.dot-purple { background: #8b5cf6; }
-.dot-green  { background: #10b981; }
-.dot-red    { background: #ef4444; }
+.dot-amber  { background: #fbbf24; color: #fbbf24; }
+.dot-blue   { background: #60a5fa; color: #60a5fa; }
+.dot-purple { background: #a78bfa; color: #a78bfa; }
+.dot-green  { background: #34d399; color: #34d399; }
+.dot-red    { background: #f87171; color: #f87171; }
 
 .feed-avatar {
   width: 32px; height: 32px;
   border-radius: 50%;
-  background: rgba(99,102,241,0.1);
-  color: #6366f1;
+  background: rgba(56,189,248,0.14);
+  color: #7dd3fc;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -753,8 +796,8 @@ onUnmounted(() => {
   flex-shrink: 0;
 }
 .feed-avatar.avatar-admin {
-  background: rgba(139,92,246,0.1);
-  color: #8b5cf6;
+  background: rgba(167,139,250,0.16);
+  color: #c4b5fd;
 }
 
 .feed-info {
@@ -766,7 +809,7 @@ onUnmounted(() => {
 .feed-name {
   font-size: 13px;
   font-weight: 500;
-  color: var(--neutral-800);
+  color: var(--neutral-700);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -779,13 +822,13 @@ onUnmounted(() => {
   border-radius: 10px;
   font-weight: 500;
 }
-.tag-amber  { background: rgba(245,158,11,0.1); color: #d97706; }
-.tag-blue   { background: rgba(59,130,246,0.1); color: #2563eb; }
-.tag-purple { background: rgba(139,92,246,0.1); color: #7c3aed; }
-.tag-green  { background: rgba(16,185,129,0.1); color: #059669; }
-.tag-red    { background: rgba(239,68,68,0.1); color: #dc2626; }
-.tag-admin  { background: rgba(139,92,246,0.1); color: #7c3aed; }
-.tag-owner  { background: rgba(99,102,241,0.08); color: #4f46e5; }
+.tag-amber  { background: rgba(251,191,36,0.14); color: #fcd34d; }
+.tag-blue   { background: rgba(96,165,250,0.14); color: #93c5fd; }
+.tag-purple { background: rgba(167,139,250,0.16); color: #c4b5fd; }
+.tag-green  { background: rgba(52,211,153,0.14); color: #6ee7b7; }
+.tag-red    { background: rgba(248,113,113,0.14); color: #fca5a5; }
+.tag-admin  { background: rgba(167,139,250,0.16); color: #c4b5fd; }
+.tag-owner  { background: rgba(56,189,248,0.12); color: #7dd3fc; }
 
 .feed-meta {
   display: flex;
@@ -797,7 +840,7 @@ onUnmounted(() => {
 .feed-price {
   font-size: 13px;
   font-weight: 600;
-  color: var(--brand-primary);
+  color: var(--ice-bright);
 }
 .feed-time {
   font-size: 11px;
@@ -817,21 +860,20 @@ onUnmounted(() => {
   gap: 14px;
 }
 .quick-card {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 14px;
   padding: 18px 20px;
-  background: var(--surface-card);
-  border: 1px solid var(--neutral-200);
   border-radius: var(--radius-md);
   text-decoration: none;
   color: inherit;
-  transition: all var(--transition-base);
+  transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
 }
 .quick-card:hover {
-  border-color: transparent;
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
+  border-color: var(--glass-border);
+  box-shadow: var(--shadow-glow-violet);
+  transform: translateY(-2px);
 }
 .quick-icon {
   width: 40px; height: 40px;
@@ -840,11 +882,11 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  color: #fff;
+  color: #061018;
 }
-.quick-icon.blue    { background: linear-gradient(135deg, #3b82f6, #60a5fa); }
-.quick-icon.purple  { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
-.quick-icon.emerald { background: linear-gradient(135deg, #10b981, #34d399); }
+.quick-icon.blue    { background: linear-gradient(135deg, #38bdf8, #60a5fa); }
+.quick-icon.purple  { background: linear-gradient(135deg, #a78bfa, #c4b5fd); }
+.quick-icon.emerald { background: linear-gradient(135deg, #34d399, #6ee7b7); }
 
 .quick-text { min-width: 0; }
 .quick-title {
@@ -858,26 +900,36 @@ onUnmounted(() => {
   color: var(--neutral-400);
   margin-top: 1px;
 }
+.quick-arrow {
+  margin-left: auto;
+  color: var(--ice-bright);
+  font-size: 18px;
+  transition: transform var(--transition-base);
+}
+.quick-card:hover .quick-arrow { transform: translateX(6px); }
 
 .kpi-card.skeleton { pointer-events: none; }
 .kpi-icon-sk {
   width: 48px; height: 48px;
   border-radius: 12px;
+  background: var(--neutral-100);
 }
 .kpi-body-sk { flex: 1; display: flex; flex-direction: column; gap: 10px; }
 .kpi-value-sk {
   height: 28px; width: 80%;
   border-radius: 6px;
+  background: var(--neutral-100);
 }
 .kpi-label-sk {
   height: 14px; width: 50%;
   border-radius: 4px;
+  background: var(--neutral-100);
 }
 .skeleton-card { pointer-events: none; }
-.chart-sk { border-radius: 8px; }
+.chart-sk { border-radius: 8px; background: var(--neutral-100); }
 
 .shimmer {
-  background: linear-gradient(90deg, var(--neutral-100) 25%, var(--neutral-50) 50%, var(--neutral-100) 75%);
+  background: linear-gradient(90deg, var(--neutral-100) 25%, var(--neutral-200) 50%, var(--neutral-100) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
 }

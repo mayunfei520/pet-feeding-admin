@@ -31,6 +31,10 @@
       <strong>{{ item.realName }}</strong>
     </template>
 
+    <template #idCard="{ item }">
+      <span class="mono">{{ maskId(item.idCard) }}</span>
+    </template>
+
     <template #experience="{ item }">
       <span class="truncate">{{ item.experience || '-' }}</span>
     </template>
@@ -72,6 +76,7 @@ const approved = ref([])
 const pendingColumns = [
   { key: 'id', label: '编号', style: 'width:60px' },
   { key: 'realName', label: '姓名' },
+  { key: 'idCard', label: '身份证号' },
   { key: 'userId', label: '用户编号' },
   { key: 'serviceArea', label: '服务区域' },
   { key: 'experience', label: '经验' },
@@ -81,10 +86,18 @@ const pendingColumns = [
 const approvedColumns = [
   { key: 'id', label: '编号', style: 'width:60px' },
   { key: 'realName', label: '姓名' },
+  { key: 'idCard', label: '身份证号' },
   { key: 'serviceArea', label: '服务区域' },
   { key: 'experience', label: '经验' },
   { key: 'rating', label: '评分' },
 ]
+
+function maskId(id) {
+  if (!id) return '-'
+  const s = String(id)
+  if (s.length <= 8) return s
+  return s.slice(0, 4) + '**********' + s.slice(-4)
+}
 
 const tableData = computed(() => activeTab.value === 'pending' ? pending.value : approved.value)
 const tableColumns = computed(() => activeTab.value === 'pending' ? pendingColumns : approvedColumns)
@@ -185,5 +198,12 @@ async function handleDelete(f) {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.mono {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  color: var(--neutral-500);
 }
 </style>

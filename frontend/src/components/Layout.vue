@@ -34,6 +34,11 @@
           </div>
         </template>
       </nav>
+
+      <div class="sidebar-footer">
+        <span class="status-dot"></span>
+        <span class="status-text">系统运行中</span>
+      </div>
     </aside>
 
     <!-- ===== Main ===== -->
@@ -268,10 +273,22 @@ function logout() {
   background: rgba(255, 255, 255, 0.06);
 }
 .nav-item.active {
-  color: #fff;
-  background: var(--brand-primary);
-  font-weight: 500;
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
+  color: #061018;
+  background: var(--brand-gradient);
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(56, 189, 248, 0.35);
+}
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 20px;
+  border-radius: 0 3px 3px 0;
+  background: var(--ice-bright);
+  box-shadow: 0 0 10px var(--ice-bright);
 }
 .nav-icon {
   display: flex;
@@ -286,6 +303,31 @@ function logout() {
 }
 .nav-label {
   white-space: nowrap;
+}
+
+.sidebar-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+}
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 8px #34d399;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+.status-text {
+  letter-spacing: 0.3px;
+}
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.5); }
+  50% { box-shadow: 0 0 0 6px rgba(52, 211, 153, 0); }
 }
 
 /* ===== Main ===== */

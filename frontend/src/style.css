@@ -1,57 +1,77 @@
 /* ============================================
    Pet Feeding Admin — Global Design System
-   Theme: Modern SaaS Dashboard
+   Theme: 深空科技风 (Deep Space Tech)
+   深空底色 + 通透冰蓝 + 淡紫流光
    ============================================ */
 
 /* --- Custom Properties --- */
 :root {
-  /* Brand */
-  --brand-primary: #6366f1;
-  --brand-primary-light: #818cf8;
-  --brand-primary-dark: #4f46e5;
-  --brand-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
-  --brand-gradient-subtle: linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(139,92,246,0.08) 100%);
+  /* 品牌主色：冰蓝 → 淡紫 流光 */
+  --brand-primary: #38bdf8;
+  --brand-primary-light: #7dd3fc;
+  --brand-primary-dark: #0ea5e9;
+  --brand-gradient: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #a78bfa 100%);
+  --brand-gradient-subtle: linear-gradient(135deg, rgba(56,189,248,0.10) 0%, rgba(167,139,250,0.10) 100%);
 
-  /* Neutrals — warm palette */
-  --neutral-50: #fafafa;
-  --neutral-100: #f5f5f5;
-  --neutral-200: #e5e5e5;
-  --neutral-300: #d4d4d4;
-  --neutral-400: #a3a3a3;
-  --neutral-500: #737373;
-  --neutral-600: #525252;
-  --neutral-700: #404040;
-  --neutral-800: #262626;
-  --neutral-900: #171717;
+  /* 冰蓝 / 淡紫 主题色 */
+  --ice: #7dd3fc;
+  --ice-bright: #38bdf8;
+  --violet: #a78bfa;
+  --amber: #fbbf24;
+  --red: #f87171;
+  --green: #34d399;
+
+  /* Neutrals — 暗色反转（数字越大越亮，用于文字/边框） */
+  --neutral-50: #0c1424;
+  --neutral-100: #16223a;
+  --neutral-200: #233349;
+  --neutral-300: #33455f;
+  --neutral-400: #8aa0bd;
+  --neutral-500: #aebfd6;
+  --neutral-600: #cdd9ec;
+  --neutral-700: #e3ebf5;
+  --neutral-800: #eef3fa;
+  --neutral-900: #f8fafc;
 
   /* Semantic */
-  --color-success: #10b981;
-  --color-success-bg: rgba(16, 185, 129, 0.08);
-  --color-warning: #f59e0b;
-  --color-warning-bg: rgba(245, 158, 11, 0.08);
-  --color-danger: #ef4444;
-  --color-danger-bg: rgba(239, 68, 68, 0.08);
-  --color-info: #3b82f6;
-  --color-info-bg: rgba(59, 130, 246, 0.08);
+  --color-success: #34d399;
+  --color-success-bg: rgba(52, 211, 153, 0.12);
+  --color-warning: #fbbf24;
+  --color-warning-bg: rgba(251, 191, 36, 0.12);
+  --color-danger: #f87171;
+  --color-danger-bg: rgba(248, 113, 113, 0.12);
+  --color-info: #60a5fa;
+  --color-info-bg: rgba(96, 165, 250, 0.12);
 
-  /* Surface */
-  --surface-bg: #f8f9fc;
-  --surface-card: #ffffff;
-  --surface-sidebar: var(--neutral-900);
-  --surface-header: rgba(255, 255, 255, 0.85);
+  /* Surface — 深空 */
+  --surface-bg: #070b16;
+  --surface-card: #0f1a2e;
+  --surface-sidebar: #070b16;
+  --surface-header: rgba(7, 11, 22, 0.72);
 
-  /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
-  --shadow-xl: 0 12px 40px rgba(0, 0, 0, 0.12);
-  --shadow-brand: 0 4px 16px rgba(99, 102, 241, 0.25);
+  /* 深空专用 */
+  --space-bg: #070b16;
+  --space-card: #0f1a2e;
+  --space-card-2: #111d33;
+  --border-soft: rgba(125, 211, 252, 0.14);
+  --border-soft-2: rgba(167, 139, 250, 0.16);
+  --glass-bg: rgba(17, 29, 51, 0.55);
+  --glass-border: rgba(125, 211, 252, 0.18);
+
+  /* Shadows — 暗底改用流光辉光 */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.55);
+  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.6);
+  --shadow-glow-ice: 0 8px 32px rgba(56, 189, 248, 0.20);
+  --shadow-glow-violet: 0 8px 32px rgba(167, 139, 250, 0.20);
+  --shadow-brand: 0 6px 22px rgba(56, 189, 248, 0.30);
 
   /* Radius */
   --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 22px;
 
   /* Transitions */
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -80,7 +100,18 @@ body {
   font-family: var(--font-sans);
   font-size: 14px;
   color: var(--neutral-700);
-  background: var(--surface-bg);
+  background-color: var(--space-bg);
+  /* 深空星点 + 冰蓝/淡紫光晕 */
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgba(125,211,252,0.55), transparent),
+    radial-gradient(1px 1px at 80% 20%, rgba(167,139,250,0.45), transparent),
+    radial-gradient(1px 1px at 65% 70%, rgba(125,211,252,0.40), transparent),
+    radial-gradient(1px 1px at 35% 80%, rgba(167,139,250,0.35), transparent),
+    radial-gradient(1px 1px at 50% 50%, rgba(255,255,255,0.30), transparent),
+    radial-gradient(1px 1px at 10% 60%, rgba(125,211,252,0.35), transparent),
+    radial-gradient(900px 500px at 12% -5%, rgba(56,189,248,0.10), transparent),
+    radial-gradient(900px 520px at 95% 105%, rgba(167,139,250,0.10), transparent);
+  background-attachment: fixed;
   line-height: 1.6;
   min-height: 100vh;
 }
@@ -102,10 +133,10 @@ input, select, textarea, button {
 }
 
 /* --- Scrollbar --- */
-::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--neutral-300); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--neutral-400); }
+::-webkit-scrollbar-thumb { background: rgba(125,211,252,0.22); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(125,211,252,0.40); }
 
 /* --- Animations --- */
 @keyframes fadeInUp {
@@ -128,21 +159,33 @@ input, select, textarea, button {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
+@keyframes flow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(125,211,252,0.0); }
+  50% { box-shadow: 0 0 22px 2px rgba(125,211,252,0.18); }
+}
+@keyframes drift {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 -600px; }
+}
 
 /* --- Form Elements --- */
 .select, .input {
   padding: 7px 12px;
-  border: 1px solid var(--neutral-200);
+  border: 1px solid var(--border-soft);
   border-radius: 8px;
   font-size: 13px;
   color: var(--neutral-700);
-  background: #fff;
+  background: rgba(12, 20, 36, 0.6);
   outline: none;
   transition: all var(--transition-fast);
 }
 .select:focus, .input:focus {
   border-color: var(--brand-primary);
-  box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+  box-shadow: 0 0 0 3px rgba(56,189,248,0.16);
 }
 
 /* --- Reusable Components --- */
@@ -153,7 +196,7 @@ input, select, textarea, button {
   align-items: center;
   gap: 4px;
   padding: 6px 14px;
-  border-radius: 7px;
+  border-radius: 8px;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -165,21 +208,22 @@ input, select, textarea, button {
   line-height: 1.4;
 }
 .btn-primary {
-  background: var(--brand-primary);
-  color: #fff;
-  box-shadow: 0 1px 3px rgba(99,102,241,0.2);
+  background: var(--brand-gradient);
+  color: #061018;
+  font-weight: 600;
+  box-shadow: 0 2px 10px rgba(56,189,248,0.28);
 }
-.btn-primary:hover { background: var(--brand-primary-dark); transform: translateY(-1px); box-shadow: var(--shadow-brand); }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: var(--shadow-brand); }
 .btn-outline {
-  background: #fff;
-  color: var(--neutral-600);
-  border-color: var(--neutral-200);
+  background: rgba(12, 20, 36, 0.6);
+  color: var(--neutral-500);
+  border-color: var(--border-soft);
 }
-.btn-outline:hover { background: var(--neutral-50); color: var(--neutral-800); }
+.btn-outline:hover { background: rgba(125,211,252,0.08); color: var(--neutral-700); }
 .btn-danger-outline {
-  background: #fff;
-  color: var(--color-danger);
-  border-color: #fecaca;
+  background: rgba(248, 113, 113, 0.06);
+  color: var(--red);
+  border-color: rgba(248,113,113,0.30);
 }
 .btn-danger-outline:hover { background: var(--color-danger-bg); }
 .btn-sm { padding: 4px 10px; font-size: 12px; border-radius: 6px; }
@@ -194,14 +238,14 @@ input, select, textarea, button {
   font-weight: 500;
   line-height: 1.4;
 }
-.tag-active { background: var(--color-success-bg); color: #059669; }
-.tag-disabled { background: var(--color-danger-bg); color: #dc2626; }
-.tag-pending { background: var(--color-warning-bg); color: #d97706; }
-.tag-info { background: var(--color-info-bg); color: #2563eb; }
-.tag-purple { background: rgba(139,92,246,0.08); color: #7c3aed; }
+.tag-active { background: var(--color-success-bg); color: #34d399; }
+.tag-disabled { background: var(--color-danger-bg); color: #f87171; }
+.tag-pending { background: var(--color-warning-bg); color: #fbbf24; }
+.tag-info { background: var(--color-info-bg); color: #60a5fa; }
+.tag-purple { background: rgba(167,139,250,0.14); color: #c4b5fd; }
 
 /* Star Rating */
-.stars { color: #f59e0b; letter-spacing: 1px; }
+.stars { color: var(--amber); letter-spacing: 1px; }
 
 /* --- Utility Classes --- */
 .animate-fade-in-up {
@@ -218,14 +262,23 @@ input, select, textarea, button {
 .delay-6 { animation-delay: 0.3s; }
 .delay-7 { animation-delay: 0.35s; }
 
+/* --- 玻璃拟态通用类 --- */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+}
+
 /* ============================================
-   统一确认弹窗（替换浏览器原生 confirm）— 对齐后台设计系统
+   统一确认弹窗（深空暗色版）— 替换浏览器原生 confirm
    ============================================ */
 .pf-confirm.el-message-box {
   border-radius: 16px;
   padding: 4px 4px 8px;
-  border: 1px solid rgba(99, 102, 241, 0.12);
-  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+  border: 1px solid var(--glass-border);
+  background: linear-gradient(160deg, #0f1a2e 0%, #0d1526 100%);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(125,211,252,0.06);
   overflow: hidden;
 }
 .pf-confirm .el-message-box__header {
@@ -234,16 +287,18 @@ input, select, textarea, button {
 .pf-confirm .el-message-box__title {
   font-weight: 700;
   font-size: 16px;
-  color: var(--brand-primary-dark);
+  color: var(--ice-bright);
   letter-spacing: 0.2px;
 }
 .pf-confirm .el-message-box__headerbtn {
   top: 14px;
   right: 16px;
 }
+.pf-confirm .el-message-box__headerbtn .el-icon { color: var(--neutral-400); }
+.pf-confirm .el-message-box__headerbtn:hover .el-icon { color: var(--neutral-700); }
 .pf-confirm .el-message-box__content {
   padding: 14px 24px 6px;
-  color: var(--neutral-600);
+  color: var(--neutral-500);
   font-size: 14px;
   line-height: 1.6;
 }
@@ -256,7 +311,6 @@ input, select, textarea, button {
   justify-content: flex-end;
   gap: 10px;
 }
-/* 圆角按钮 + 轻微入场动画 */
 .pf-confirm .el-button {
   border-radius: 10px;
   padding: 9px 20px;
@@ -266,26 +320,33 @@ input, select, textarea, button {
 .pf-confirm .el-button--primary {
   background: var(--brand-gradient);
   border: none;
-  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.28);
+  color: #061018;
+  box-shadow: 0 6px 16px rgba(56,189,248,0.30);
 }
 .pf-confirm .el-button--primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 10px 22px rgba(99, 102, 241, 0.36);
+  box-shadow: 0 10px 22px rgba(56,189,248,0.40);
+}
+.pf-confirm .el-button--default {
+  background: rgba(12, 20, 36, 0.6);
+  border: 1px solid var(--border-soft);
+  color: var(--neutral-500);
 }
 .pf-confirm .el-button--default:hover {
-  color: var(--brand-primary);
-  border-color: var(--brand-primary-light);
+  color: var(--ice);
+  border-color: var(--ice);
 }
 
 /* 删除 / 危险操作：确认按钮用危险红，标题强调危险色 */
 .pf-confirm--danger .el-message-box__title {
-  color: var(--color-danger);
+  color: var(--red);
 }
 .pf-confirm--danger .el-message-box__btns .el-button--primary {
-  background: var(--color-danger);
-  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.28);
+  background: linear-gradient(135deg, #f87171, #ef4444);
+  color: #1a0606;
+  box-shadow: 0 6px 16px rgba(248, 113, 113, 0.30);
 }
 .pf-confirm--danger .el-message-box__btns .el-button--primary:hover {
-  background: #dc2626;
-  box-shadow: 0 10px 22px rgba(239, 68, 68, 0.36);
+  background: linear-gradient(135deg, #fca5a5, #dc2626);
+  box-shadow: 0 10px 22px rgba(239, 68, 68, 0.42);
 }
