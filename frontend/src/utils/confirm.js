@@ -25,7 +25,8 @@ export async function confirmAction(message, title = '操作确认') {
       customClass: 'pf-confirm',
     })
     return true
-  } catch {
+  } catch (e) {
+    if (e !== 'cancel' && e !== 'close') console.error('[confirmAction]', e)
     return false
   }
 }
@@ -44,7 +45,8 @@ export async function confirmDanger(message, title = '删除确认') {
       customClass: 'pf-confirm pf-confirm--danger',
     })
     return true
-  } catch {
+  } catch (e) {
+    if (e !== 'cancel' && e !== 'close') console.error('[confirmDanger]', e)
     return false
   }
 }
