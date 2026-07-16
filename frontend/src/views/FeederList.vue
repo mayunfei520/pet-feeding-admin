@@ -62,6 +62,7 @@ import { ref, computed, onMounted } from 'vue'
 import { feederApi } from '@/utils/api'
 import PageTable from '@/components/PageTable.vue'
 import { ElMessage } from 'element-plus'
+import { confirmDanger, confirmAction } from '../utils/confirm'
 
 const loading = ref(false)
 const activeTab = ref('pending')
@@ -109,7 +110,7 @@ async function handleApprove(id) {
 }
 
 async function handleReject(id) {
-  if (!confirm('确定拒绝该申请吗？')) return
+  if (!(await confirmAction('确定拒绝该申请吗？', '审核'))) return
   try {
     await feederApi.reject(id)
     ElMessage.success('已拒绝')
@@ -118,7 +119,7 @@ async function handleReject(id) {
 }
 
 async function handleDelete(f) {
-  if (!confirm(`确定删除喂养员「${f.realName}」吗？删除后不可恢复。`)) return
+  if (!(await confirmDanger(`确定删除喂养员「${f.realName}」吗？删除后不可恢复。`))) return
   try {
     await feederApi.remove(f.id)
     ElMessage.success('删除成功')

@@ -64,6 +64,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { userApi } from '@/utils/api'
 import PageTable from '@/components/PageTable.vue'
 import { ElMessage } from 'element-plus'
+import { confirmDanger, confirmAction } from '../utils/confirm'
 
 const admins = ref([])
 const loading = ref(false)
@@ -112,7 +113,7 @@ async function handleAdd() {
 }
 
 async function handleDelete(u) {
-  if (!confirm(`确定删除管理员「${u.username}」吗？删除后不可恢复。`)) return
+  if (!(await confirmDanger(`确定删除管理员「${u.username}」吗？删除后不可恢复。`))) return
   try {
     await userApi.remove(u.id)
     admins.value = admins.value.filter(a => a.id !== u.id)
@@ -121,7 +122,7 @@ async function handleDelete(u) {
 }
 
 async function handleReset(u) {
-  if (!confirm(`确定重置管理员「${u.username}」的密码吗？`)) return
+  if (!(await confirmAction(`确定重置管理员「${u.username}」的密码吗？`, '重置密码'))) return
   try {
     const res = await userApi.resetPassword(u.id)
     ElMessage.success(`密码已重置\n账号：${u.username}\n新密码：${res.data}`)
@@ -133,7 +134,7 @@ async function handleReset(u) {
 async function toggleStatus(u) {
   const newStatus = u.status === 'ACTIVE' ? 'DISABLED' : 'ACTIVE'
   const action = newStatus === 'DISABLED' ? '禁用' : '启用'
-  if (!confirm(`确定${action}该管理员吗？`)) return
+  if (!(await confirmAction(`确定${action}该管理员吗？`, `${action}管理员`))) return
   try {
     await userApi.updateStatus(u.id, newStatus)
     u.status = newStatus

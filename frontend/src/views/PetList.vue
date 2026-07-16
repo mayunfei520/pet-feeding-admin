@@ -21,6 +21,7 @@ import { ref, onMounted } from 'vue'
 import { petApi } from '@/utils/api'
 import PageTable from '@/components/PageTable.vue'
 import { ElMessage } from 'element-plus'
+import { confirmDanger } from '../utils/confirm'
 
 const pets = ref([])
 const loading = ref(false)
@@ -52,7 +53,7 @@ async function fetchPets() {
 }
 
 async function handleDelete(id) {
-  if (!confirm('确定删除该宠物吗？')) return
+  if (!(await confirmDanger('确定删除该宠物吗？'))) return
   try {
     await petApi.remove(id)
     pets.value = pets.value.filter(p => p.id !== id)

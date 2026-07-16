@@ -68,6 +68,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { userApi } from '@/utils/api'
 import PageTable from '@/components/PageTable.vue'
 import { ElMessage } from 'element-plus'
+import { confirmDanger, confirmAction } from '../utils/confirm'
 
 const users = ref([])
 const loading = ref(false)
@@ -124,7 +125,7 @@ async function saveEdit() {
 
 async function toggleStatus(u) {
   const action = u.status === 'ACTIVE' ? '禁用' : '启用'
-  if (!confirm(`确定${action}客户「${u.username}」吗？`)) return
+  if (!(await confirmAction(`确定${action}客户「${u.username}」吗？`))) return
   try {
     await userApi.updateStatus(u.id, u.status === 'ACTIVE' ? 'DISABLED' : 'ACTIVE')
     u.status = u.status === 'ACTIVE' ? 'DISABLED' : 'ACTIVE'
@@ -133,7 +134,7 @@ async function toggleStatus(u) {
 }
 
 async function handleDelete(u) {
-  if (!confirm(`确定删除客户「${u.username}」吗？删除后不可恢复。`)) return
+  if (!(await confirmDanger(`确定删除客户「${u.username}」吗？删除后不可恢复。`))) return
   try {
     await userApi.remove(u.id)
     users.value = users.value.filter(item => item.id !== u.id)

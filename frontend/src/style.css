@@ -217,3 +217,75 @@ input, select, textarea, button {
 .delay-5 { animation-delay: 0.25s; }
 .delay-6 { animation-delay: 0.3s; }
 .delay-7 { animation-delay: 0.35s; }
+
+/* ============================================
+   统一确认弹窗（替换浏览器原生 confirm）— 对齐后台设计系统
+   ============================================ */
+.pf-confirm.el-message-box {
+  border-radius: 16px;
+  padding: 4px 4px 8px;
+  border: 1px solid rgba(99, 102, 241, 0.12);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+  overflow: hidden;
+}
+.pf-confirm .el-message-box__header {
+  padding: 22px 24px 0;
+}
+.pf-confirm .el-message-box__title {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--brand-primary-dark);
+  letter-spacing: 0.2px;
+}
+.pf-confirm .el-message-box__headerbtn {
+  top: 14px;
+  right: 16px;
+}
+.pf-confirm .el-message-box__content {
+  padding: 14px 24px 6px;
+  color: var(--neutral-600);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.pf-confirm .el-message-box__message {
+  justify-content: flex-start;
+}
+.pf-confirm .el-message-box__btns {
+  padding: 14px 24px 18px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+/* 圆角按钮 + 轻微入场动画 */
+.pf-confirm .el-button {
+  border-radius: 10px;
+  padding: 9px 20px;
+  font-weight: 600;
+  transition: all 0.2s var(--transition-base, ease);
+}
+.pf-confirm .el-button--primary {
+  background: var(--brand-gradient);
+  border: none;
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.28);
+}
+.pf-confirm .el-button--primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(99, 102, 241, 0.36);
+}
+.pf-confirm .el-button--default:hover {
+  color: var(--brand-primary);
+  border-color: var(--brand-primary-light);
+}
+
+/* 删除 / 危险操作：确认按钮用危险红，标题强调危险色 */
+.pf-confirm--danger .el-message-box__title {
+  color: var(--color-danger);
+}
+.pf-confirm--danger .el-message-box__btns .el-button--primary {
+  background: var(--color-danger);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.28);
+}
+.pf-confirm--danger .el-message-box__btns .el-button--primary:hover {
+  background: #dc2626;
+  box-shadow: 0 10px 22px rgba(239, 68, 68, 0.36);
+}

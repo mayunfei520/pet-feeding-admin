@@ -23,6 +23,7 @@ import { ref, onMounted } from 'vue'
 import { reviewApi } from '@/utils/api'
 import PageTable from '@/components/PageTable.vue'
 import { ElMessage } from 'element-plus'
+import { confirmDanger } from '../utils/confirm'
 
 const reviews = ref([])
 const loading = ref(false)
@@ -47,7 +48,7 @@ async function fetchReviews() {
 }
 
 async function handleDelete(id) {
-  if (!confirm('确定删除该评价吗？')) return
+  if (!(await confirmDanger('确定删除该评价吗？'))) return
   try {
     await reviewApi.remove(id)
     reviews.value = reviews.value.filter(r => r.id !== id)

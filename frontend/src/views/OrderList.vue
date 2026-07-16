@@ -80,6 +80,7 @@ import { ref, computed, onMounted } from 'vue'
 import { orderApi, feederApi } from '@/utils/api'
 import PageTable from '@/components/PageTable.vue'
 import { ElMessage } from 'element-plus'
+import { confirmDanger, confirmAction } from '../utils/confirm'
 
 const orders = ref([])
 const feeders = ref([])
@@ -139,13 +140,13 @@ async function fetchFeeders() {
 }
 
 async function handleCancel(id) {
-  if (!confirm('确定取消该订单吗？')) return
+  if (!(await confirmAction('确定取消该订单吗？', '取消订单'))) return
   try { await orderApi.cancel(id); await fetchOrders(); ElMessage.success('订单已取消') }
   catch (e) { /* */ }
 }
 
 async function handleDelete(order) {
-  if (!confirm(`确定删除订单「${order.orderNo}」吗？`)) return
+  if (!(await confirmDanger(`确定删除订单「${order.orderNo}」吗？`))) return
   try { await orderApi.remove(order.id); await fetchOrders(); ElMessage.success('删除成功') }
   catch (e) { /* */ }
 }
