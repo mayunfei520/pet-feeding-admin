@@ -3,6 +3,7 @@ package com.petfeeding.platform.module.user.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.petfeeding.platform.common.exception.BusinessException;
+import com.petfeeding.platform.common.util.PasswordPolicyUtil;
 import com.petfeeding.platform.module.order.entity.Order;
 import com.petfeeding.platform.module.order.mapper.OrderMapper;
 import com.petfeeding.platform.module.pet.entity.Pet;
@@ -41,6 +42,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     @Transactional
     public User register(RegisterDTO dto) {
+        // 密码复杂度校验（后端兜底，防止公开注册接口被直接调用绕过）
+        PasswordPolicyUtil.validate(dto.getPassword());
+
         // 检查用户名是否已存在
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(User::getUsername, dto.getUsername());

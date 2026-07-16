@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petfeeding.platform.common.exception.BusinessException;
+import com.petfeeding.platform.common.util.PasswordPolicyUtil;
 import com.petfeeding.platform.module.user.dto.LoginResultDTO;
 import com.petfeeding.platform.module.user.entity.User;
 import com.petfeeding.platform.module.user.mapper.UserMapper;
@@ -81,9 +82,12 @@ public class MiniAppUserService {
             log.warn("小程序注册失败: 手机号={}, 原因=验证码错误", maskPhone(phone));
             throw new BusinessException("验证码错误或已过期");
         }
-        if (password == null || password.length() < 6) {
-            log.warn("小程序注册失败: 手机号={}, 原因=密码长度不足", maskPhone(phone));
-            throw new BusinessException("密码至少6位");
+        // 密码复杂度校验（后端兜底，前端校验可被直接调用绕过）
+        try {
+            PasswordPolicyUtil.validate(password);
+        } catch (BusinessException e) {
+            log.warn("小程序注册失败: 手机号={}, 原因=密码复杂度不达标", maskPhone(phone));
+            throw e;
         }
         LambdaQueryWrapper<User> query = new LambdaQueryWrapper<>();
         query.eq(User::getPhone, phone);
