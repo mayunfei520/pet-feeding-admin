@@ -192,24 +192,28 @@ async function handleAssign() {
 
 /* Modal */
 .modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  position: fixed; inset: 0; background: rgba(0,0,0,0.55);
   display: flex; align-items: center; justify-content: center; z-index: 200;
   backdrop-filter: blur(4px);
 }
 .modal {
-  width: 540px; background: #fff; border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-xl); overflow: hidden;
+  width: 540px;
+  background: linear-gradient(160deg, #0f1a2e 0%, #0d1526 100%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl), 0 0 0 1px rgba(125, 211, 252, 0.06);
+  overflow: hidden;
 }
 .modal-header {
-  padding: 18px 24px; border-bottom: 1px solid var(--neutral-100);
+  padding: 18px 24px; border-bottom: 1px solid var(--border-soft);
   display: flex; align-items: center; justify-content: space-between;
 }
 .modal-title { font-size: 16px; font-weight: 600; color: var(--neutral-900); }
 .modal-close { border: none; background: none; font-size: 18px; color: var(--neutral-400); cursor: pointer; }
-.modal-close:hover { color: var(--neutral-700); }
+.modal-close:hover { color: var(--ice); }
 .modal-body { padding: 20px 24px; max-height: 70vh; overflow-y: auto; }
 .modal-footer {
-  padding: 14px 24px; border-top: 1px solid var(--neutral-100);
+  padding: 14px 24px; border-top: 1px solid var(--border-soft);
   display: flex; justify-content: flex-end; gap: 8px;
 }
 .form-group label { display: block; margin-bottom: 5px; font-size: 13px; color: var(--neutral-600); font-weight: 500; }

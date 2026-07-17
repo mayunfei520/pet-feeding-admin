@@ -1,7 +1,7 @@
 <template>
   <PageTable
     title="喂养员管理"
-    desc="管理喂养员的审核与评价"
+    desc="管理喂养员的入驻审核"
     :data="tableData"
     :columns="tableColumns"
     :loading="loading"
@@ -24,6 +24,14 @@
           已通过
           <span class="tab-badge">{{ approved.length }}</span>
         </button>
+        <button
+          class="tab"
+          :class="{ active: activeTab === 'rejected' }"
+          @click="activeTab = 'rejected'"
+        >
+          已拒绝
+          <span class="tab-badge">{{ rejected.length }}</span>
+        </button>
       </div>
     </template>
 
@@ -32,7 +40,7 @@
     </template>
 
     <template #idCard="{ item }">
-      <span class="mono">{{ maskId(item.idCard) }}</span>
+      <span class="mono">{{ item.idCard || '-' }}</span>
     </template>
 
     <template #experience="{ item }">
@@ -43,40 +51,85 @@
       <span class="truncate">{{ item.description || '-' }}</span>
     </template>
 
-    <template #rating="{ item }">
-      <span class="stars">★ {{ item.rating || '5.0' }}</span>
+    <template #rejectReason="{ item }">
+      <span class="reason">{{ item.rejectReason || '-' }}</span>
     </template>
 
     <template #row-actions="{ item }">
+      <button class="btn btn-sm btn-outline" @click="openDetail(item)">详情</button>
       <template v-if="activeTab === 'pending'">
-        <button class="btn btn-sm btn-primary" @click="handleApprove(item.id)">通过</button>
+        <button class="btn btn-sm btn-primary" @click="handleApprove(item.id)" style="margin-left:4px">通过</button>
         <button class="btn btn-sm btn-danger-outline" @click="handleReject(item.id)" style="margin-left:4px">拒绝</button>
         <button class="btn btn-sm btn-danger-outline" @click="handleDelete(item)" style="margin-left:4px">删除</button>
       </template>
+      <template v-else-if="activeTab === 'approved'">
+        <router-link :to="`/feeders/${item.id}/reviews`" class="btn btn-sm btn-outline" style="margin-left:4px">查看评价</router-link>
+        <button class="btn btn-sm btn-danger-outline" @click="handleDelete(item)" style="margin-left:4px">删除</button>
+      </template>
       <template v-else>
-        <router-link :to="`/feeders/${item.id}/reviews`" class="btn btn-sm btn-outline">查看评价</router-link>
         <button class="btn btn-sm btn-danger-outline" @click="handleDelete(item)" style="margin-left:4px">删除</button>
       </template>
     </template>
   </PageTable>
+
+  <el-drawer
+    v-model="drawerVisible"
+    :title="detailTitle"
+    direction="rtl"
+    size="420px"
+    class="feeder-drawer"
+  >
+    <div class="fd-body" v-if="detail">
+      <div class="fd-hero">
+        <div class="fd-avatar">{{ (detail.realName || '?').slice(0, 1) }}</div>
+        <div class="fd-hero-info">
+          <div class="fd-name">{{ detail.realName }}</div>
+          <span class="fd-badge" :class="'fd-' + statusKey(detail.status)">{{ statusLabel(detail.status) }}</span>
+        </div>
+      </div>
+
+      <div class="fd-section">
+        <div class="fd-row"><span class="fd-label">编号</span><span class="fd-value mono">{{ detail.id }}</span></div>
+        <div class="fd-row"><span class="fd-label">身份证号</span><span class="fd-value mono">{{ detail.idCard || '-' }}</span></div>
+        <div class="fd-row"><span class="fd-label">用户编号</span><span class="fd-value mono">{{ detail.userId || '-' }}</span></div>
+        <div class="fd-row"><span class="fd-label">服务区域</span><span class="fd-value">{{ detail.serviceArea || '-' }}</span></div>
+      </div>
+
+      <div class="fd-section">
+        <div class="fd-field"><span class="fd-label">经验</span><p class="fd-text">{{ detail.experience || '暂无' }}</p></div>
+        <div class="fd-field"><span class="fd-label">自我介绍</span><p class="fd-text">{{ detail.description || '暂无' }}</p></div>
+        <div class="fd-field">
+          <span class="fd-label">资质证书</span>
+          <p class="fd-text" v-if="detail.certification"><a :href="detail.certification" target="_blank" rel="noopener">{{ detail.certification }}</a></p>
+          <p class="fd-text" v-else>无</p>
+        </div>
+      </div>
+
+      <div class="fd-section fd-reject" v-if="detail.status === 'REJECTED'">
+        <span class="fd-label">拒绝原因</span>
+        <p class="fd-text">{{ detail.rejectReason || '（未填写）' }}</p>
+      </div>
+    </div>
+  </el-drawer>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { feederApi } from '@/utils/api'
 import PageTable from '@/components/PageTable.vue'
-import { ElMessage } from 'element-plus'
-import { confirmDanger, confirmAction } from '../utils/confirm'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { confirmDanger } from '../utils/confirm'
 
 const loading = ref(false)
 const activeTab = ref('pending')
 const pending = ref([])
 const approved = ref([])
+const rejected = ref([])
 
 const pendingColumns = [
   { key: 'id', label: '编号', style: 'width:60px' },
   { key: 'realName', label: '姓名' },
-  { key: 'idCard', label: '身份证号' },
+  { key: 'idCard', label: '身份证号', style: 'width:172px' },
   { key: 'userId', label: '用户编号' },
   { key: 'serviceArea', label: '服务区域' },
   { key: 'experience', label: '经验' },
@@ -86,32 +139,60 @@ const pendingColumns = [
 const approvedColumns = [
   { key: 'id', label: '编号', style: 'width:60px' },
   { key: 'realName', label: '姓名' },
-  { key: 'idCard', label: '身份证号' },
+  { key: 'idCard', label: '身份证号', style: 'width:172px' },
   { key: 'serviceArea', label: '服务区域' },
   { key: 'experience', label: '经验' },
-  { key: 'rating', label: '评分' },
 ]
 
-function maskId(id) {
-  if (!id) return '-'
-  const s = String(id)
-  if (s.length <= 8) return s
-  return s.slice(0, 4) + '**********' + s.slice(-4)
-}
+const rejectedColumns = [
+  { key: 'id', label: '编号', style: 'width:60px' },
+  { key: 'realName', label: '姓名' },
+  { key: 'idCard', label: '身份证号', style: 'width:172px' },
+  { key: 'serviceArea', label: '服务区域' },
+  { key: 'rejectReason', label: '拒绝原因' },
+]
 
-const tableData = computed(() => activeTab.value === 'pending' ? pending.value : approved.value)
-const tableColumns = computed(() => activeTab.value === 'pending' ? pendingColumns : approvedColumns)
+const tableData = computed(() => {
+  if (activeTab.value === 'pending') return pending.value
+  if (activeTab.value === 'rejected') return rejected.value
+  return approved.value
+})
+const tableColumns = computed(() => {
+  if (activeTab.value === 'pending') return pendingColumns
+  if (activeTab.value === 'rejected') return rejectedColumns
+  return approvedColumns
+})
 
 onMounted(() => fetchData())
 
 async function fetchData() {
   loading.value = true
   try {
-    const [pr, ar] = await Promise.all([feederApi.pending(), feederApi.list()])
+    const [pr, ar, rr] = await Promise.all([
+      feederApi.pending(),
+      feederApi.list(),
+      feederApi.rejected(),
+    ])
     pending.value = pr.data || []
-    approved.value = (ar.data || []).filter(f => f.status === 'APPROVED')
+    approved.value = (ar.data || []).filter((f) => f.status === 'APPROVED')
+    rejected.value = rr.data || []
   } catch (e) { /* */ }
   finally { loading.value = false }
+}
+
+/* 详情抽屉 */
+const drawerVisible = ref(false)
+const detail = ref(null)
+const detailTitle = computed(() => (detail.value ? `喂养员 #${detail.value.id}` : '喂养员详情'))
+function openDetail(item) {
+  detail.value = item
+  drawerVisible.value = true
+}
+function statusKey(s) {
+  return s === 'APPROVED' ? 'ok' : s === 'REJECTED' ? 'no' : 'wait'
+}
+function statusLabel(s) {
+  return s === 'APPROVED' ? '已通过' : s === 'REJECTED' ? '已拒绝' : '待审核'
 }
 
 async function handleApprove(id) {
@@ -123,10 +204,23 @@ async function handleApprove(id) {
 }
 
 async function handleReject(id) {
-  if (!(await confirmAction('确定拒绝该申请吗？', '审核'))) return
+  let reason
   try {
-    await feederApi.reject(id)
-    ElMessage.success('已拒绝')
+    const res = await ElMessageBox.prompt('请填写拒绝原因（将记录并告知申请人）', '拒绝申请', {
+      confirmButtonText: '确定拒绝',
+      cancelButtonText: '取消',
+      inputType: 'textarea',
+      inputPlaceholder: '例如：身份证信息不清晰 / 服务区域超出范围',
+      inputValidator: (v) => (v && v.trim()) ? true : '拒绝原因不能为空',
+      customClass: 'pf-confirm pf-confirm--danger',
+    })
+    reason = res.value.trim()
+  } catch (e) {
+    return // 用户取消
+  }
+  try {
+    await feederApi.reject(id, reason)
+    ElMessage.success('已拒绝并记录原因')
     await fetchData()
   } catch (e) { /* */ }
 }
@@ -145,14 +239,14 @@ async function handleDelete(f) {
 .tabs {
   display: flex;
   gap: 0;
-  border: 1px solid var(--neutral-200);
+  border: 1px solid var(--border-soft);
   border-radius: var(--radius-sm);
   overflow: hidden;
 }
 .tab {
   padding: 7px 16px;
-  border: none;
-  background: #fff;
+  border: 1px solid transparent;
+  background: rgba(12, 20, 36, 0.6);
   font-size: 13px;
   color: var(--neutral-500);
   cursor: pointer;
@@ -163,19 +257,21 @@ async function handleDelete(f) {
   position: relative;
 }
 .tab + .tab {
-  border-left: 1px solid var(--neutral-200);
+  border-left: 1px solid var(--border-soft);
 }
 .tab:hover {
-  background: var(--neutral-50);
+  background: rgba(125, 211, 252, 0.08);
   color: var(--neutral-700);
 }
 .tab.active {
-  background: var(--brand-primary);
-  color: #fff;
+  background: var(--brand-gradient);
+  color: #061018;
+  font-weight: 600;
+  border-color: transparent;
 }
 .tab.active .tab-badge {
-  background: rgba(255,255,255,0.25);
-  color: #fff;
+  background: rgba(255, 255, 255, 0.28);
+  color: #061018;
 }
 .tab-badge {
   display: inline-flex;
@@ -204,6 +300,11 @@ async function handleDelete(f) {
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
   font-size: 12px;
   letter-spacing: 0.5px;
-  color: var(--neutral-500);
+  color: var(--neutral-600);
+}
+
+.reason {
+  color: var(--color-danger);
+  font-size: 12px;
 }
 </style>

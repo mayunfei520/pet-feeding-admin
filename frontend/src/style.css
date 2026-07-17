@@ -6,6 +6,7 @@
 
 /* --- Custom Properties --- */
 :root {
+  color-scheme: dark;
   /* 品牌主色：冰蓝 → 淡紫 流光 */
   --brand-primary: #38bdf8;
   --brand-primary-light: #7dd3fc;
@@ -349,4 +350,242 @@ input, select, textarea, button {
 .pf-confirm--danger .el-message-box__btns .el-button--primary:hover {
   background: linear-gradient(135deg, #fca5a5, #dc2626);
   box-shadow: 0 10px 22px rgba(239, 68, 68, 0.42);
+}
+
+/* ============================================
+   Element Plus 深空暗色适配
+   让 el-select（输入框 + 下拉面板）在深空底色下配色统一，
+   不再出现浅色输入框 / 浅色下拉。
+   ============================================ */
+
+/* 选择器输入框 */
+.el-select__wrapper {
+  background-color: rgba(12, 20, 36, 0.6) !important;
+  box-shadow: 0 0 0 1px var(--border-soft) inset !important;
+  color: var(--neutral-700) !important;
+  border-radius: 8px !important;
+}
+.el-select__wrapper.is-focused {
+  box-shadow: 0 0 0 1px var(--brand-primary) inset, 0 0 0 3px rgba(56, 189, 248, 0.16) !important;
+}
+.el-select__wrapper .el-select__placeholder { color: var(--neutral-400) !important; }
+.el-select__wrapper .el-select__caret { color: var(--neutral-400) !important; }
+
+/* 下拉面板（teleport 到 body，用全局类覆盖） */
+.el-select__popper.el-popper {
+  background: var(--space-card) !important;
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: var(--shadow-lg) !important;
+  border-radius: 10px !important;
+}
+.el-select__popper .el-select-dropdown {
+  background: var(--space-card) !important;
+}
+.el-select__popper .el-select-dropdown__item {
+  color: var(--neutral-600) !important;
+}
+.el-select__popper .el-select-dropdown__item.is-hovering,
+.el-select__popper .el-select-dropdown__item:hover {
+  background: rgba(125, 211, 252, 0.10) !important;
+  color: var(--ice) !important;
+}
+.el-select__popper .el-select-dropdown__item.is-selected {
+  color: var(--ice-bright) !important;
+  font-weight: 600;
+  background: rgba(56, 189, 248, 0.08) !important;
+}
+.el-select__popper .el-popper__arrow::before {
+  background: var(--space-card) !important;
+  border-color: var(--glass-border) !important;
+}
+
+/* ============================================
+   Element Plus 对话框 / 输入框 / 按钮 深空暗色适配
+   让 el-dialog（客户管理编辑、以及其他对话框）及其内部
+   el-input、el-select、el-button 都融入深空主题，
+   不再出现浅色白底弹窗 / 白底输入框。
+   ============================================ */
+
+/* 对话框容器 */
+.el-dialog {
+  background: linear-gradient(160deg, #0f1a2e 0%, #0d1526 100%) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-xl), 0 0 0 1px rgba(125, 211, 252, 0.06) !important;
+}
+.el-dialog__header {
+  padding: 22px 24px 16px !important;
+  margin-right: 0 !important;
+  border-bottom: 1px solid var(--border-soft) !important;
+}
+.el-dialog__title {
+  color: var(--neutral-900) !important;
+  font-weight: 700;
+  font-size: 16px;
+}
+.el-dialog__headerbtn { top: 18px !important; }
+.el-dialog__headerbtn .el-dialog__close {
+  color: var(--neutral-500) !important;
+  font-size: 18px;
+}
+.el-dialog__headerbtn:hover .el-dialog__close { color: var(--ice) !important; }
+.el-dialog__body {
+  color: var(--neutral-700) !important;
+  padding: 20px 24px !important;
+}
+.el-dialog__footer {
+  padding: 14px 24px 20px !important;
+  border-top: 1px solid var(--border-soft) !important;
+}
+
+/* 表单标签 */
+.el-form-item__label {
+  color: var(--neutral-500) !important;
+  font-size: 13px;
+}
+
+/* 输入框（默认 / 聚焦 / 禁用） */
+.el-input__wrapper {
+  background-color: rgba(12, 20, 36, 0.6) !important;
+  box-shadow: 0 0 0 1px var(--border-soft) inset !important;
+  border-radius: 8px !important;
+  padding: 1px 12px !important;
+}
+.el-input__wrapper.is-focus {
+  box-shadow: 0 0 0 1px var(--brand-primary) inset, 0 0 0 3px rgba(56, 189, 248, 0.16) !important;
+}
+.el-input__wrapper .el-input__inner {
+  color: var(--neutral-800) !important;
+  font-size: 13px;
+}
+.el-input__wrapper .el-input__inner::placeholder { color: var(--neutral-400) !important; }
+.el-textarea__inner {
+  background-color: rgba(12, 20, 36, 0.6) !important;
+  box-shadow: 0 0 0 1px var(--border-soft) inset !important;
+  color: var(--neutral-800) !important;
+  border-radius: 8px !important;
+}
+.el-textarea__inner:focus {
+  box-shadow: 0 0 0 1px var(--brand-primary) inset, 0 0 0 3px rgba(56, 189, 248, 0.16) !important;
+}
+.el-input.is-disabled .el-input__wrapper {
+  background-color: rgba(12, 20, 36, 0.4) !important;
+  box-shadow: 0 0 0 1px var(--neutral-200) inset !important;
+}
+.el-input.is-disabled .el-input__inner { color: var(--neutral-400) !important; -webkit-text-fill-color: var(--neutral-400) !important; }
+
+/* 对话框内按钮 */
+.el-dialog .el-button {
+  background-color: rgba(12, 20, 36, 0.6) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--neutral-500) !important;
+  border-radius: 8px !important;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+}
+.el-dialog .el-button:hover {
+  background-color: rgba(125, 211, 252, 0.08) !important;
+  color: var(--neutral-700) !important;
+}
+.el-dialog .el-button--primary {
+  background: var(--brand-gradient) !important;
+  border: none !important;
+  color: #061018 !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 10px rgba(56, 189, 248, 0.28) !important;
+}
+.el-dialog .el-button--primary:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-brand) !important;
+}
+
+/* ============================================
+   喂养员详情抽屉（el-drawer 默认 teleport 到 body，需全局样式）
+   深空暗色 + 玻璃质感
+   ============================================ */
+.feeder-drawer.el-drawer {
+  background: var(--surface-card) !important;
+  border-left: 1px solid var(--border-soft) !important;
+  box-shadow: var(--shadow-xl) !important;
+}
+.feeder-drawer .el-drawer__header {
+  margin-bottom: 0;
+  padding: 18px 22px;
+  color: var(--neutral-900) !important;
+  border-bottom: 1px solid var(--border-soft);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+}
+.feeder-drawer .el-drawer__body { padding: 0; }
+.feeder-drawer .el-drawer__close-btn { color: var(--neutral-500) !important; }
+.feeder-drawer .el-drawer__close-btn:hover { color: var(--ice) !important; }
+
+/* 抽屉内容 */
+.fd-body { padding: 22px; }
+.fd-hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.fd-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: #061018;
+  background: var(--brand-gradient);
+  box-shadow: var(--shadow-glow-ice);
+}
+.fd-name { font-size: 16px; font-weight: 700; color: var(--neutral-900); margin-bottom: 6px; }
+.fd-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.fd-badge.fd-ok { color: var(--green); background: var(--color-success-bg); }
+.fd-badge.fd-no { color: var(--red); background: var(--color-danger-bg); }
+.fd-badge.fd-wait { color: var(--amber); background: var(--color-warning-bg); }
+
+.fd-section { margin-bottom: 20px; }
+.fd-section:last-child { margin-bottom: 0; }
+.fd-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 0;
+  border-bottom: 1px dashed var(--border-soft);
+}
+.fd-row:last-child { border-bottom: none; }
+.fd-label { color: var(--neutral-400); font-size: 13px; flex-shrink: 0; }
+.fd-value { color: var(--neutral-800); font-size: 13px; text-align: right; }
+
+.fd-field { margin-bottom: 14px; }
+.fd-field:last-child { margin-bottom: 0; }
+.fd-field .fd-label { display: block; margin-bottom: 6px; }
+.fd-text {
+  color: var(--neutral-700);
+  font-size: 13px;
+  line-height: 1.7;
+  background: rgba(12, 20, 36, 0.5);
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  padding: 10px 12px;
+  word-break: break-all;
+}
+.fd-text a { color: var(--ice); word-break: break-all; }
+
+.fd-reject .fd-text {
+  background: var(--color-danger-bg);
+  border-color: rgba(248, 113, 113, 0.3);
+  color: #fecaca;
 }

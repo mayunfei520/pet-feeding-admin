@@ -19,8 +19,9 @@ export const petApi = {
 export const feederApi = {
   list: () => request.get('/feeder'),
   pending: () => request.get('/feeder/pending'),
+  rejected: () => request.get('/feeder/rejected'),
   approve: (id) => request.put(`/feeder/${id}/approve`),
-  reject: (id) => request.put(`/feeder/${id}/reject`),
+  reject: (id, reason) => request.put(`/feeder/${id}/reject?reason=${encodeURIComponent(reason)}`),
   remove: (id) => request.delete(`/feeder/${id}`)
 }
 

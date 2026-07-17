@@ -42,12 +42,22 @@ public class FeederController {
         return R.ok(list);
     }
 
+    @GetMapping("/rejected")
+    @Operation(summary = "已拒绝喂养员列表")
+    public R<List<Feeder>> rejected() {
+        List<Feeder> list = feederService.lambdaQuery()
+                .eq(Feeder::getStatus, "REJECTED")
+                .list();
+        return R.ok(list);
+    }
+
     @PutMapping("/{id}/approve")
     @Operation(summary = "审核通过喂养员")
     public R<?> approve(@PathVariable Long id) {
         Feeder feeder = feederService.getById(id);
         if (feeder != null) {
             feeder.setStatus("APPROVED");
+            feeder.setRejectReason(null);
             feederService.updateById(feeder);
         }
         return R.ok("审核通过");
@@ -55,10 +65,11 @@ public class FeederController {
 
     @PutMapping("/{id}/reject")
     @Operation(summary = "拒绝喂养员申请")
-    public R<?> reject(@PathVariable Long id) {
+    public R<?> reject(@PathVariable Long id, @RequestParam String reason) {
         Feeder feeder = feederService.getById(id);
         if (feeder != null) {
             feeder.setStatus("REJECTED");
+            feeder.setRejectReason(reason);
             feederService.updateById(feeder);
         }
         return R.ok("已拒绝");

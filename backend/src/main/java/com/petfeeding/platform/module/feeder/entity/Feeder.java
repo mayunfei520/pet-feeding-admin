@@ -40,6 +40,9 @@ public class Feeder {
     /** 审核状态：PENDING-待审核, APPROVED-已通过, REJECTED-已拒绝 */
     private String status;
 
+    /** 拒绝原因（status=REJECTED 时记录） */
+    private String rejectReason;
+
     /** 评分（满分5.0） */
     private BigDecimal rating;
 
