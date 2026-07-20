@@ -286,13 +286,13 @@ function fmtRelative(iso) {
 }
 
 function orderStatusLabel(s) {
-  return { PENDING: '待接单', ACCEPTED: '已接单', IN_PROGRESS: '进行中', COMPLETED: '已完成', CANCELLED: '已取消' }[s] || s
+  return { PENDING: '待报价', QUOTED: '已报价', ACCEPTED: '客户已同意', IN_PROGRESS: '进行中', COMPLETED: '已完成', CANCELLED: '已取消' }[s] || s
 }
 function statusDotClass(s) {
-  return { PENDING: 'dot-amber', ACCEPTED: 'dot-blue', IN_PROGRESS: 'dot-purple', COMPLETED: 'dot-green', CANCELLED: 'dot-red' }[s] || ''
+  return { PENDING: 'dot-amber', QUOTED: 'dot-amber', ACCEPTED: 'dot-blue', IN_PROGRESS: 'dot-purple', COMPLETED: 'dot-green', CANCELLED: 'dot-red' }[s] || ''
 }
 function statusTagClass(s) {
-  return { PENDING: 'tag-amber', ACCEPTED: 'tag-blue', IN_PROGRESS: 'tag-purple', COMPLETED: 'tag-green', CANCELLED: 'tag-red' }[s] || ''
+  return { PENDING: 'tag-amber', QUOTED: 'tag-amber', ACCEPTED: 'tag-blue', IN_PROGRESS: 'tag-purple', COMPLETED: 'tag-green', CANCELLED: 'tag-red' }[s] || ''
 }
 
 function animateNumbers() {

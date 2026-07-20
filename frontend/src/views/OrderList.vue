@@ -7,10 +7,9 @@
     :loading="loading"
   >
     <template #filters>
-      <select class="select select-filter" v-model="filterStatus">
-        <option value="">全部状态</option>
-        <option v-for="(label, key) in statusLabels" :key="key" :value="key">{{ label }}</option>
-      </select>
+      <el-select v-model="filterStatus" placeholder="全部状态" clearable style="width:140px">
+        <el-option v-for="(label, key) in statusLabels" :key="key" :label="label" :value="key" />
+      </el-select>
     </template>
 
     <template #orderNo="{ item }">
@@ -50,12 +49,9 @@
         </div>
         <div class="form-group" style="margin-top:16px">
           <label>选择喂养员 <span class="req">*</span></label>
-          <select v-model="selectedFeederId" class="input" style="height:38px;width:100%">
-            <option value="">请选择喂养员</option>
-            <option v-for="f in feeders" :key="f.id" :value="f.id">
-              {{ f.realName }} - {{ f.serviceArea }} ⭐{{ f.rating || '5.0' }}
-            </option>
-          </select>
+          <el-select v-model="selectedFeederId" placeholder="请选择喂养员" clearable style="width:100%">
+            <el-option v-for="f in feeders" :key="f.id" :label="`${f.realName} - ${f.serviceArea} ⭐${f.rating || '5.0'}`" :value="f.id" />
+          </el-select>
         </div>
         <div v-if="selectedFeeder" class="sms-box">
           <div class="sms-label">📱 短信预览</div>
@@ -93,12 +89,12 @@ const assigning = ref(false)
 const error = ref('')
 
 const periodLabels = { AM: '上午', PM: '下午', EVENING: '晚上', MORNING: '上午', AFTERNOON: '下午' }
-const statusLabels = { PENDING: '待接单', ACCEPTED: '已接单', IN_PROGRESS: '进行中', CONFIRMED: '已确认', COMPLETED: '已完成', CANCELLED: '已取消' }
+const statusLabels = { PENDING: '待报价', QUOTED: '已报价', ACCEPTED: '客户已同意', IN_PROGRESS: '进行中', COMPLETED: '已完成', CANCELLED: '已取消' }
 const statusTagClass = {
   PENDING: 'tag-pending',
+  QUOTED: 'tag-pending',
   ACCEPTED: 'tag-info',
   IN_PROGRESS: 'tag-purple',
-  CONFIRMED: 'tag-active',
   COMPLETED: 'tag-active',
   CANCELLED: 'tag-disabled'
 }
@@ -175,9 +171,6 @@ async function handleAssign() {
 <style scoped>
 .mono { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; color: var(--brand-primary); font-weight: 500; }
 .price { font-weight: 600; color: var(--neutral-800); }
-
-/* Select filter — uses global .select styles */
-.select-filter { width: 130px; }
 
 /* Info Grid */
 .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
