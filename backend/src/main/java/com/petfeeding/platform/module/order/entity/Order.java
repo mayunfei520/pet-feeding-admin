@@ -35,7 +35,7 @@ public class Order {
     /** 服务时段：AM-上午, PM-下午, EVENING-晚上 */
     private String servicePeriod;
 
-    /** 订单状态：PENDING-待接单, ACCEPTED-已接单, IN_PROGRESS-进行中, COMPLETED-已完成, CANCELLED-已取消 */
+    /** 订单状态：PENDING-待报价, QUOTED-已报价待确认, ACCEPTED-客户已同意, IN_PROGRESS-进行中, COMPLETED-已完成, CANCELLED-已取消 */
     private String status;
 
     /** 服务地址 */

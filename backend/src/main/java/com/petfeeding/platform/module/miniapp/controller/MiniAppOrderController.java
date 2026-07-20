@@ -14,7 +14,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 小程序 — 订单
@@ -139,6 +141,69 @@ public class MiniAppOrderController {
         }
         orderService.cancelOrder(id, user.getId());
         return R.ok("订单已取消");
+    }
+
+    @PutMapping("/{id}/quote")
+    @Operation(summary = "喂养员报价")
+    public R<?> quote(@PathVariable Long id,
+                      @RequestBody Map<String, Object> body,
+                      @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        User user = getCurrentUser(authHeader);
+        if (user == null) {
+            return R.fail(401, "请先登录");
+        }
+        if (!"FEEDER".equals(user.getRole())) {
+            return R.fail(403, "只有喂养员可以报价");
+        }
+        Feeder feeder = feederService.lambdaQuery()
+                .eq(Feeder::getUserId, user.getId())
+                .eq(Feeder::getStatus, "APPROVED")
+                .one();
+        if (feeder == null) {
+            return R.fail(403, "只有审核通过的喂养员才能报价");
+        }
+        Object p = body.get("price");
+        if (p == null) {
+            return R.fail(400, "报价金额必填");
+        }
+        BigDecimal price;
+        try {
+            price = new BigDecimal(p.toString());
+        } catch (NumberFormatException e) {
+            return R.fail(400, "报价金额格式不正确");
+        }
+        orderService.quoteOrder(id, user.getId(), price);
+        return R.ok("报价成功");
+    }
+
+    @PutMapping("/{id}/confirm")
+    @Operation(summary = "宠物主人同意报价")
+    public R<?> confirm(@PathVariable Long id,
+                        @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        User user = getCurrentUser(authHeader);
+        if (user == null) {
+            return R.fail(401, "请先登录");
+        }
+        if (!"OWNER".equals(user.getRole())) {
+            return R.fail(403, "只有宠物主人可以确认报价");
+        }
+        orderService.confirmOrder(id, user.getId());
+        return R.ok("已同意报价");
+    }
+
+    @PutMapping("/{id}/reject")
+    @Operation(summary = "宠物主人拒绝报价")
+    public R<?> reject(@PathVariable Long id,
+                       @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        User user = getCurrentUser(authHeader);
+        if (user == null) {
+            return R.fail(401, "请先登录");
+        }
+        if (!"OWNER".equals(user.getRole())) {
+            return R.fail(403, "只有宠物主人可以拒绝报价");
+        }
+        orderService.rejectOrder(id, user.getId());
+        return R.ok("已拒绝报价");
     }
 
     private Long getUserIdOrNull(String authHeader) {

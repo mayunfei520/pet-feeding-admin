@@ -14,9 +14,24 @@ public interface OrderService extends IService<Order> {
     Order createOrder(Order order, Long ownerId);
 
     /**
-     * 喂养员接单
+     * 喂养员接单（旧流程，保留向后兼容）
      */
     void acceptOrder(Long orderId, Long feederId);
+
+    /**
+     * 喂养员报价：PENDING -> QUOTED，写入 price
+     */
+    void quoteOrder(Long orderId, Long feederId, java.math.BigDecimal price);
+
+    /**
+     * 客户同意报价：QUOTED -> ACCEPTED
+     */
+    void confirmOrder(Long orderId, Long ownerId);
+
+    /**
+     * 客户拒绝报价：QUOTED -> PENDING（保留 price 历史）
+     */
+    void rejectOrder(Long orderId, Long ownerId);
 
     /**
      * 完成订单

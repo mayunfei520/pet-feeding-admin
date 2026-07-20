@@ -64,7 +64,7 @@ public class DashboardController {
 
         // ---- 订单状态分布 ----
         Map<String, Long> orderStatusBreakdown = new LinkedHashMap<>();
-        String[] statuses = {"PENDING", "ACCEPTED", "IN_PROGRESS", "COMPLETED", "CANCELLED"};
+        String[] statuses = {"PENDING", "QUOTED", "ACCEPTED", "IN_PROGRESS", "COMPLETED", "CANCELLED"};
         for (String status : statuses) {
             long count = orderService.lambdaQuery().eq(Order::getStatus, status).count();
             orderStatusBreakdown.put(status, count);

@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ThreadLocalRandom;
@@ -42,6 +43,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         }
         order.setOwnerId(ownerId);
         order.setOrderNo(generateOrderNo());
+        // 新流程：价格由喂养员报价时写入，创建时不接受客户端传入的金额
+        order.setPrice(null);
         order.setStatus("PENDING");
         this.save(order);
         return order;
@@ -59,6 +62,62 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         }
         order.setFeederId(feederId);
         order.setStatus("ACCEPTED");
+        this.updateById(order);
+    }
+
+    @Override
+    @Transactional
+    public void quoteOrder(Long orderId, Long feederId, BigDecimal price) {
+        Order order = this.getById(orderId);
+        if (order == null) {
+            throw new BusinessException("订单不存在");
+        }
+        if (!"PENDING".equals(order.getStatus())) {
+            throw new BusinessException("只有待报价的订单才能报价");
+        }
+        if (order.getFeederId() == null || !order.getFeederId().equals(feederId)) {
+            throw new BusinessException("只有被指定的喂养员才能为该订单报价");
+        }
+        if (price == null || price.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessException("报价金额必须大于0");
+        }
+        order.setPrice(price);
+        order.setStatus("QUOTED");
+        this.updateById(order);
+    }
+
+    @Override
+    @Transactional
+    public void confirmOrder(Long orderId, Long ownerId) {
+        Order order = this.getById(orderId);
+        if (order == null) {
+            throw new BusinessException("订单不存在");
+        }
+        if (!order.getOwnerId().equals(ownerId)) {
+            throw new BusinessException("只有下单用户才能确认订单");
+        }
+        if (!"QUOTED".equals(order.getStatus())) {
+            throw new BusinessException("只有已报价的订单才能确认");
+        }
+        order.setStatus("ACCEPTED");
+        this.updateById(order);
+    }
+
+    @Override
+    @Transactional
+    public void rejectOrder(Long orderId, Long ownerId) {
+        Order order = this.getById(orderId);
+        if (order == null) {
+            throw new BusinessException("订单不存在");
+        }
+        if (!order.getOwnerId().equals(ownerId)) {
+            throw new BusinessException("只有下单用户才能拒绝报价");
+        }
+        if (!"QUOTED".equals(order.getStatus())) {
+            throw new BusinessException("只有已报价的订单才能拒绝");
+        }
+        // 退回待报价，保留 price 历史供喂养员重报参考
+        order.setStatus("PENDING");
         this.updateById(order);
     }
 
@@ -106,8 +165,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         if (!order.getOwnerId().equals(userId)) {
             throw new BusinessException("只有下单用户才能取消订单");
         }
-        if (!"PENDING".equals(order.getStatus())) {
-            throw new BusinessException("只能取消待接单的订单");
+        if (!"PENDING".equals(order.getStatus()) && !"QUOTED".equals(order.getStatus())) {
+            throw new BusinessException("只能取消待报价或已报价的订单");
         }
         order.setStatus("CANCELLED");
         this.updateById(order);
@@ -121,7 +180,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             throw new BusinessException("订单不存在");
         }
         if (!"PENDING".equals(order.getStatus())) {
-            throw new BusinessException("只能分配待接单的订单");
+            throw new BusinessException("只能分配待报价的订单");
         }
 
         Feeder feeder = feederService.getById(feederId);
@@ -133,8 +192,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         }
 
         // 订单统一存储喂养员对应的用户 ID，和小程序接单逻辑保持一致
+        // 新流程：后台分配仅指定喂养员，订单保持 PENDING，由喂养员随后报价
         order.setFeederId(feeder.getUserId());
-        order.setStatus("ACCEPTED");
         this.updateById(order);
 
         // 发送短信通知喂养员

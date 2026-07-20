@@ -188,6 +188,19 @@ input, select, textarea, button {
   border-color: var(--brand-primary);
   box-shadow: 0 0 0 3px rgba(56,189,248,0.16);
 }
+/* 原生 select 下拉选项：深空暗色（防浏览器用浅色弹层 + 浅字导致看不见） */
+.select option,
+.input option {
+  background: var(--space-card);
+  color: var(--neutral-700);
+}
+.select option:hover,
+.select option:checked,
+.input option:hover,
+.input option:checked {
+  background: var(--brand-primary-dark);
+  color: #ffffff;
+}
 
 /* --- Reusable Components --- */
 
