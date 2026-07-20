@@ -49,8 +49,9 @@ public class MiniAppAuthController {
         String nickname = body.getOrDefault("nickname", "");
         String code = body.get("code");
         String gender = body.get("gender");
-        log.info("小程序注册请求: phone={}, nickname={}, ip={}", maskPhone(phone), nickname, getClientIp(request));
-        LoginResultDTO result = miniAppUserService.register(phone, password, nickname, code, gender);
+        String realName = body.get("realName");
+        log.info("小程序注册请求: phone={}, nickname={}, realName={}, ip={}", maskPhone(phone), nickname, maskName(realName), getClientIp(request));
+        LoginResultDTO result = miniAppUserService.register(phone, password, nickname, code, gender, realName);
         log.info("小程序注册成功: userId={}, username={}, phone={}, role={}",
             result.getUserId(), result.getUsername(), maskPhone(phone), result.getRole());
         return R.ok(result);
@@ -153,6 +154,16 @@ public class MiniAppAuthController {
             return phone == null ? "" : phone;
         }
         return phone.substring(0, 3) + "****" + phone.substring(phone.length() - 4);
+    }
+
+    private String maskName(String name) {
+        if (name == null || name.isEmpty()) {
+            return "";
+        }
+        if (name.length() == 1) {
+            return name;
+        }
+        return name.charAt(0) + "**";
     }
 
     private String getClientIp(HttpServletRequest request) {

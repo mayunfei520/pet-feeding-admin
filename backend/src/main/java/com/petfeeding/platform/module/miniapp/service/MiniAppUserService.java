@@ -68,11 +68,11 @@ public class MiniAppUserService {
             log.info("创建微信登录新用户: userId={}, username={}, role={}", user.getId(), user.getUsername(), user.getRole());
         }
         String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
-        return new LoginResultDTO(token, user.getId(), user.getUsername(), user.getRole());
+        return new LoginResultDTO(token, user.getId(), user.getUsername(), user.getRole(), user.getRealName());
     }
 
     @Transactional
-    public LoginResultDTO register(String phone, String password, String nickname, String code, String gender) {
+    public LoginResultDTO register(String phone, String password, String nickname, String code, String gender, String realName) {
         if (phone == null || phone.trim().isEmpty()) {
             log.warn("小程序注册失败: 手机号为空");
             throw new BusinessException("手机号不能为空");
@@ -89,6 +89,12 @@ public class MiniAppUserService {
             log.warn("小程序注册失败: 手机号={}, 原因=密码复杂度不达标", maskPhone(phone));
             throw e;
         }
+        // 真实姓名校验：2-4 个汉字（与前端正则一致，后端兜底）
+        if (realName == null || !realName.trim().matches("^[一-龥]{2,4}$")) {
+            log.warn("小程序注册失败: 手机号={}, 原因=真实姓名格式不合法 realName={}", maskPhone(phone), realName);
+            throw new BusinessException("请输入真实姓名（2-4个汉字）");
+        }
+        realName = realName.trim();
         LambdaQueryWrapper<User> query = new LambdaQueryWrapper<>();
         query.eq(User::getPhone, phone);
         if (userMapper.selectCount(query) > 0) {
@@ -104,11 +110,12 @@ public class MiniAppUserService {
         if (gender != null && !gender.trim().isEmpty()) {
             user.setGender(gender.trim());
         }
+        user.setRealName(realName);
         userMapper.insert(user);
-        log.info("创建小程序注册用户: userId={}, username={}, phone={}, role={}",
-            user.getId(), user.getUsername(), maskPhone(phone), user.getRole());
+        log.info("创建小程序注册用户: userId={}, username={}, phone={}, realName={}, role={}",
+            user.getId(), user.getUsername(), maskPhone(phone), maskName(realName), user.getRole());
         String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
-        return new LoginResultDTO(token, user.getId(), user.getUsername(), user.getRole());
+        return new LoginResultDTO(token, user.getId(), user.getUsername(), user.getRole(), user.getRealName());
     }
 
     /**
@@ -182,7 +189,7 @@ public class MiniAppUserService {
         log.info("小程序密码登录校验通过: userId={}, username={}, role={}",
             user.getId(), user.getUsername(), user.getRole());
         String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
-        return new LoginResultDTO(token, user.getId(), user.getUsername(), user.getRole());
+        return new LoginResultDTO(token, user.getId(), user.getUsername(), user.getRole(), user.getRealName());
     }
 
     @Transactional
@@ -221,7 +228,7 @@ public class MiniAppUserService {
                 user.getId(), maskPhone(phone), user.getRole());
         }
         String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
-        return new LoginResultDTO(token, user.getId(), user.getUsername(), user.getRole());
+        return new LoginResultDTO(token, user.getId(), user.getUsername(), user.getRole(), user.getRealName());
     }
 
     /**
@@ -313,5 +320,15 @@ public class MiniAppUserService {
             return phone == null ? "" : phone;
         }
         return phone.substring(0, 3) + "****" + phone.substring(phone.length() - 4);
+    }
+
+    private String maskName(String name) {
+        if (name == null || name.isEmpty()) {
+            return "";
+        }
+        if (name.length() == 1) {
+            return name;
+        }
+        return name.charAt(0) + "**";
     }
 }

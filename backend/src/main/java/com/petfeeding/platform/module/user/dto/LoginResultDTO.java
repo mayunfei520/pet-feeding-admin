@@ -17,4 +17,7 @@ public class LoginResultDTO {
     private String username;
 
     private String role;
+
+    /** 真实姓名（注册实名，可能为空） */
+    private String realName;
 }

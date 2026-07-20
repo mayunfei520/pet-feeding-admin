@@ -30,6 +30,8 @@ public class DataSourceInitializer implements CommandLineRunner {
             "password VARCHAR(255) NOT NULL," +
             "phone VARCHAR(20)," +
             "email VARCHAR(100)," +
+            "gender VARCHAR(10)," +
+            "real_name VARCHAR(20)," +
             "role VARCHAR(20) NOT NULL DEFAULT 'OWNER'," +
             "avatar VARCHAR(500)," +
             "status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE'," +

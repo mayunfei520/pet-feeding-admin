@@ -88,7 +88,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 生成 JWT Token（写入角色，供权限控制使用）
         String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
 
-        return new LoginResultDTO(token, user.getId(), user.getUsername(), user.getRole());
+        return new LoginResultDTO(token, user.getId(), user.getUsername(), user.getRole(), user.getRealName());
     }
 
     @Override

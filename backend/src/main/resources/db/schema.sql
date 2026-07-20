@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS `users` (
     `password`    VARCHAR(255)  NOT NULL                COMMENT '密码（BCrypt加密）',
     `phone`       VARCHAR(20)   DEFAULT NULL            COMMENT '手机号',
     `email`       VARCHAR(100)  DEFAULT NULL            COMMENT '邮箱',
+    `gender`      VARCHAR(10)   DEFAULT NULL            COMMENT '性别：男 / 女',
+    `real_name`   VARCHAR(20)   DEFAULT NULL            COMMENT '真实姓名（注册实名，2-4个汉字）',
     `role`        VARCHAR(20)   NOT NULL DEFAULT 'OWNER' COMMENT '角色：OWNER-宠物主人, FEEDER-喂养员, ADMIN-管理员',
     `avatar`      VARCHAR(500)  DEFAULT NULL            COMMENT '头像URL',
     `status`      VARCHAR(20)   NOT NULL DEFAULT 'ACTIVE' COMMENT '状态：ACTIVE-正常, DISABLED-禁用',

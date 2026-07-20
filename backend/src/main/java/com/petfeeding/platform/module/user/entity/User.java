@@ -31,6 +31,10 @@ public class User {
     /** 性别：男 / 女（可空） */
     private String gender;
 
+    /** 真实姓名（注册实名，2-4 个汉字，可空） */
+    @TableField("real_name")
+    private String realName;
+
     /** 角色：OWNER-宠物主人, FEEDER-喂养员, ADMIN-管理员 */
     private String role;
 
