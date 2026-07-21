@@ -59,6 +59,12 @@ public class FeederController {
             feeder.setStatus("APPROVED");
             feeder.setRejectReason(null);
             feederService.updateById(feeder);
+            // 同步将用户角色置为 FEEDER，使小程序可切换喂养员模式 (#7)
+            User user = userService.getById(feeder.getUserId());
+            if (user != null) {
+                user.setRole("FEEDER");
+                userService.updateById(user);
+            }
         }
         return R.ok("审核通过");
     }
@@ -71,6 +77,12 @@ public class FeederController {
             feeder.setStatus("REJECTED");
             feeder.setRejectReason(reason);
             feederService.updateById(feeder);
+            // 回退用户角色为 OWNER（若此前已认证），避免残留 FEEDER (#7)
+            User user = userService.getById(feeder.getUserId());
+            if (user != null && "FEEDER".equals(user.getRole())) {
+                user.setRole("OWNER");
+                userService.updateById(user);
+            }
         }
         return R.ok("已拒绝");
     }
