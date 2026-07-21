@@ -37,7 +37,10 @@
         </div>
         <div class="form-group">
           <label>密码 <span class="req">*</span></label>
-          <input v-model="form.password" type="password" placeholder="至少6个字符" maxlength="20" class="input" />
+          <div class="input-wrap">
+            <input v-model="form.password" :type="showPwd ? 'text' : 'password'" placeholder="至少6个字符" maxlength="20" class="input" />
+            <button type="button" class="pwd-toggle" @click="showPwd = !showPwd">{{ showPwd ? '隐藏' : '显示' }}</button>
+          </div>
         </div>
         <div class="error" v-if="error">{{ error }}</div>
       </div>
@@ -62,6 +65,7 @@ const admins = ref([])
 const loading = ref(false)
 const showAdd = ref(false)
 const adding = ref(false)
+const showPwd = ref(false)
 const error = ref('')
 const form = reactive({ username: '', password: '' })
 
@@ -165,4 +169,12 @@ async function toggleStatus(u) {
 .form-group { margin-bottom: 14px; }
 .form-group label { display: block; margin-bottom: 5px; font-size: 13px; color: var(--neutral-600); font-weight: 500; }
 .form-group .input { width: 100%; height: 38px; padding: 0 12px; }
+.input-wrap { position: relative; }
+.input-wrap .input { padding-right: 56px; }
+.pwd-toggle {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  border: none; background: none; cursor: pointer; padding: 4px 6px;
+  font-size: 13px; color: var(--ice); line-height: 1;
+}
+.pwd-toggle:hover { color: #a5e9ff; }
 </style>
