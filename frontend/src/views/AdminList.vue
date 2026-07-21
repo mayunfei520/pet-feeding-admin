@@ -39,14 +39,6 @@
           <label>密码 <span class="req">*</span></label>
           <input v-model="form.password" type="password" placeholder="至少6个字符" maxlength="20" class="input" />
         </div>
-        <div class="form-group">
-          <label>手机号</label>
-          <input v-model="form.phone" type="text" placeholder="选填" class="input" />
-        </div>
-        <div class="form-group">
-          <label>邮箱</label>
-          <input v-model="form.email" type="text" placeholder="选填" class="input" />
-        </div>
         <div class="error" v-if="error">{{ error }}</div>
       </div>
       <div class="modal-footer">
@@ -71,13 +63,11 @@ const loading = ref(false)
 const showAdd = ref(false)
 const adding = ref(false)
 const error = ref('')
-const form = reactive({ username: '', password: '', phone: '', email: '' })
+const form = reactive({ username: '', password: '' })
 
 const columns = [
   { key: 'id', label: '编号', style: 'width:60px' },
   { key: 'username', label: '用户名' },
-  { key: 'phone', label: '手机号' },
-  { key: 'email', label: '邮箱' },
   { key: 'status', label: '状态' },
   { key: 'createdAt', label: '注册时间', format: v => v ? v.replace('T', ' ') : '-' },
 ]
@@ -104,7 +94,7 @@ async function handleAdd() {
     const pwd = form.password
     await userApi.register({ ...form, role: 'ADMIN' })
     showAdd.value = false
-    Object.assign(form, { username: '', password: '', phone: '', email: '' })
+    Object.assign(form, { username: '', password: '' })
     await fetchAdmins()
     ElMessage.success(`管理员创建成功\n账号：${uname}  密码：${pwd}`)
   } catch (e) {
