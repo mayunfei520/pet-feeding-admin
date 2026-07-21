@@ -1,7 +1,6 @@
 package com.petfeeding.platform.module.miniapp.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.petfeeding.platform.common.exception.BusinessException;
 import com.petfeeding.platform.common.result.R;
 import com.petfeeding.platform.module.feeder.entity.Feeder;
 import com.petfeeding.platform.module.feeder.service.FeederService;
@@ -51,11 +50,34 @@ public class MiniAppFeederController {
             return R.fail(403, "管理员不能提交喂养员申请");
         }
 
+        // 判重：按登录用户 userId 查询（与登录态一致，匿名请求已在上方被 401 拦截）
         LambdaQueryWrapper<Feeder> query = new LambdaQueryWrapper<>();
         query.eq(Feeder::getUserId, user.getId());
-        long count = feederService.count(query);
-        if (count > 0) {
-            throw new BusinessException("您已提交过申请，请等待审核");
+        List<Feeder> existList = feederService.list(query);
+        Feeder existing = existList.isEmpty() ? null : existList.get(0);
+
+        if (existing != null) {
+            String st = existing.getStatus();
+            if ("PENDING".equals(st)) {
+                // 已有待审核申请：避免重复提交，提示审核中
+                return R.fail(409, "您已提交申请，正在审核中");
+            }
+            if ("APPROVED".equals(st)) {
+                // 已是认证喂养员：无需重复申请
+                return R.fail(409, "您已是认证喂养员，无需重复申请");
+            }
+            // REJECTED 或历史脏数据（status 为空/异常值）：允许重新申请，覆盖更新为 PENDING，
+            // 既不堆积重复 userId 脏数据，又解除「提交被拒却无法再申请」的死锁。
+            // 仅用本次提交的非空字段更新，避免把原有已填信息误清空。
+            if (body.get("realName") != null) existing.setRealName(body.get("realName"));
+            if (body.get("idCard") != null) existing.setIdCard(body.get("idCard"));
+            if (body.get("serviceArea") != null) existing.setServiceArea(body.get("serviceArea"));
+            if (body.get("experience") != null) existing.setExperience(body.get("experience"));
+            if (body.get("description") != null) existing.setDescription(body.get("description"));
+            existing.setStatus("PENDING");
+            existing.setRejectReason(null);
+            feederService.updateById(existing);
+            return R.ok(existing);
         }
 
         Feeder feeder = new Feeder();
