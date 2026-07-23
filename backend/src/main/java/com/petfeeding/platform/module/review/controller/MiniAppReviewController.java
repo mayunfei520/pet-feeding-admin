@@ -1,4 +1,4 @@
-package com.petfeeding.platform.module.miniapp.controller;
+package com.petfeeding.platform.module.review.controller;
 
 import com.petfeeding.platform.common.result.R;
 import com.petfeeding.platform.module.review.entity.Review;

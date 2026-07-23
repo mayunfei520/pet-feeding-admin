@@ -1,4 +1,4 @@
-package com.petfeeding.platform.module.miniapp.service;
+package com.petfeeding.platform.module.user.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.JsonNode;

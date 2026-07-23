@@ -1,4 +1,4 @@
-package com.petfeeding.platform.module.miniapp.controller;
+package com.petfeeding.platform.module.order.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.petfeeding.platform.common.result.R;

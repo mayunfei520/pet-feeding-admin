@@ -1,7 +1,7 @@
-package com.petfeeding.platform.module.miniapp.controller;
+package com.petfeeding.platform.module.user.controller;
 
 import com.petfeeding.platform.common.result.R;
-import com.petfeeding.platform.module.miniapp.service.MiniAppUserService;
+import com.petfeeding.platform.module.user.service.MiniAppUserService;
 import com.petfeeding.platform.module.user.dto.LoginResultDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

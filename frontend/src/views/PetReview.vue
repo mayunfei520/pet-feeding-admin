@@ -125,7 +125,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { adminPetApi, userApi } from '@/utils/api'
 import PageTable from '@/components/PageTable.vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -208,15 +208,6 @@ async function fetchData() {
   } catch (e) { /* */ }
   finally { loading.value = false }
 }
-
-// 待审核队列轻轮询（每 20s 静默刷新）
-let pollTimer = null
-onMounted(() => {
-  pollTimer = setInterval(() => {
-    if (activeTab.value === 'pending' && !loading.value) reload()
-  }, 20000)
-})
-onUnmounted(() => { if (pollTimer) clearInterval(pollTimer) })
 
 /* 详情抽屉 */
 const drawerVisible = ref(false)
@@ -463,4 +454,55 @@ async function handleReject(id) {
 }
 .pd-reject .pd-label { color: var(--color-danger); }
 .pd-reject .pd-text { color: var(--color-danger); }
+</style>
+
+<style>
+/* 宠物审核详情抽屉暗色适配：el-drawer 默认 teleport 到 body，根节点不继承组件 scoped，需全局非 scoped 样式。
+   用 .pet-drawer 专属 class 限定，避免污染其他组件 */
+.pet-drawer {
+  background: var(--space-card) !important;
+  border-left: 1px solid var(--border-soft);
+}
+.pet-drawer .el-drawer__header {
+  margin-bottom: 0;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-soft);
+  color: var(--neutral-900);
+}
+.pet-drawer .el-drawer__title {
+  color: var(--neutral-900);
+  font-weight: 600;
+}
+.pet-drawer .el-drawer__close {
+  color: var(--neutral-500);
+}
+.pet-drawer .el-drawer__close:hover {
+  color: var(--brand-primary);
+}
+.pet-drawer .el-drawer__body {
+  background: var(--space-card);
+  padding: 20px;
+}
+
+/* 驳回原因输入框弹窗（ElMessageBox.prompt）暗色适配，仅作用于本页专用 customClass */
+.pf-confirm.el-message-box {
+  background: var(--space-card);
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-lg);
+}
+.pf-confirm .el-message-box__title,
+.pf-confirm .el-message-box__content {
+  color: var(--neutral-700);
+}
+.pf-confirm .el-message-box__container .el-icon {
+  color: var(--color-danger);
+}
+.pf-confirm .el-textarea__inner {
+  background: var(--space-bg);
+  color: var(--neutral-700);
+  border-color: var(--border-soft);
+}
+.pf-confirm .el-textarea__inner::placeholder {
+  color: var(--neutral-400);
+}
 </style>
