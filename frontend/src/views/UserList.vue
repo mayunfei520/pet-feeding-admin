@@ -52,9 +52,6 @@
       <el-form-item label="手机号">
         <el-input v-model="form.phone" placeholder="手机号" />
       </el-form-item>
-      <el-form-item label="邮箱">
-        <el-input v-model="form.email" placeholder="邮箱" />
-      </el-form-item>
     </el-form>
     <template #footer>
       <el-button @click="editVisible = false">取消</el-button>
@@ -64,7 +61,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { userApi } from '@/utils/api'
 import PageTable from '@/components/PageTable.vue'
 import { ElMessage } from 'element-plus'
@@ -73,12 +70,12 @@ import { confirmDanger, confirmAction } from '../utils/confirm'
 const users = ref([])
 const loading = ref(false)
 const genderFilter = ref('')
+let pollTimer = null
 
 const columns = [
   { key: 'id', label: '编号', style: 'width:60px' },
   { key: 'username', label: '用户名' },
   { key: 'phone', label: '手机号' },
-  { key: 'email', label: '邮箱' },
   { key: 'gender', label: '性别' },
   { key: 'status', label: '状态' },
   { key: 'createdAt', label: '注册时间', format: v => v ? v.replace('T', ' ') : '-' },
@@ -86,9 +83,14 @@ const columns = [
 
 const editVisible = ref(false)
 const saving = ref(false)
-const form = reactive({ id: null, username: '', gender: '', phone: '', email: '' })
+const form = reactive({ id: null, username: '', gender: '', phone: '' })
 
-onMounted(() => fetchUsers())
+onMounted(() => {
+  fetchUsers()
+  // 轻轮询：静默刷新客户列表，新增/状态变更无需手动刷新（#8）
+  pollTimer = setInterval(() => { if (!loading.value) fetchUsers() }, 20000)
+})
+onUnmounted(() => { if (pollTimer) clearInterval(pollTimer) })
 
 async function fetchUsers() {
   loading.value = true
@@ -104,7 +106,6 @@ function openEdit(u) {
   form.username = u.username
   form.gender = u.gender || ''
   form.phone = u.phone || ''
-  form.email = u.email || ''
   editVisible.value = true
 }
 
@@ -113,8 +114,7 @@ async function saveEdit() {
   try {
     await userApi.update(form.id, {
       gender: form.gender || null,
-      phone: form.phone,
-      email: form.email
+      phone: form.phone
     })
     ElMessage.success('保存成功')
     editVisible.value = false
@@ -128,8 +128,8 @@ async function toggleStatus(u) {
   if (!(await confirmAction(`确定${action}客户「${u.username}」吗？`))) return
   try {
     await userApi.updateStatus(u.id, u.status === 'ACTIVE' ? 'DISABLED' : 'ACTIVE')
-    u.status = u.status === 'ACTIVE' ? 'DISABLED' : 'ACTIVE'
     ElMessage.success(`${action}成功`)
+    await fetchUsers()
   } catch (e) { /* */ }
 }
 

@@ -5,8 +5,12 @@
     :data="tableData"
     :columns="tableColumns"
     :loading="loading"
+    :empty-text="emptyText"
   >
     <template #header-actions>
+      <button class="btn btn-sm btn-outline refresh-btn" @click="fetchData" :disabled="loading">
+        <span class="refresh-icon" :class="{ spinning: loading }">↻</span> 刷新
+      </button>
       <div class="tabs">
         <button
           class="tab"
@@ -91,6 +95,7 @@
       <div class="fd-section">
         <div class="fd-row"><span class="fd-label">编号</span><span class="fd-value mono">{{ detail.id }}</span></div>
         <div class="fd-row"><span class="fd-label">身份证号</span><span class="fd-value mono">{{ detail.idCard || '-' }}</span></div>
+        <div class="fd-row"><span class="fd-label">手机号</span><span class="fd-value mono">{{ detail.phone || '-' }}</span></div>
         <div class="fd-row"><span class="fd-label">用户编号</span><span class="fd-value mono">{{ detail.userId || '-' }}</span></div>
         <div class="fd-row"><span class="fd-label">服务区域</span><span class="fd-value">{{ detail.serviceArea || '-' }}</span></div>
       </div>
@@ -114,7 +119,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { feederApi } from '@/utils/api'
 import PageTable from '@/components/PageTable.vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -130,6 +135,7 @@ const pendingColumns = [
   { key: 'id', label: '编号', style: 'width:60px' },
   { key: 'realName', label: '姓名' },
   { key: 'idCard', label: '身份证号', style: 'width:172px' },
+  { key: 'phone', label: '手机号' },
   { key: 'userId', label: '用户编号' },
   { key: 'serviceArea', label: '服务区域' },
   { key: 'experience', label: '经验' },
@@ -140,6 +146,7 @@ const approvedColumns = [
   { key: 'id', label: '编号', style: 'width:60px' },
   { key: 'realName', label: '姓名' },
   { key: 'idCard', label: '身份证号', style: 'width:172px' },
+  { key: 'phone', label: '手机号' },
   { key: 'serviceArea', label: '服务区域' },
   { key: 'experience', label: '经验' },
 ]
@@ -148,6 +155,7 @@ const rejectedColumns = [
   { key: 'id', label: '编号', style: 'width:60px' },
   { key: 'realName', label: '姓名' },
   { key: 'idCard', label: '身份证号', style: 'width:172px' },
+  { key: 'phone', label: '手机号' },
   { key: 'serviceArea', label: '服务区域' },
   { key: 'rejectReason', label: '拒绝原因' },
 ]
@@ -162,23 +170,44 @@ const tableColumns = computed(() => {
   if (activeTab.value === 'rejected') return rejectedColumns
   return approvedColumns
 })
+const emptyText = computed(() => {
+  if (activeTab.value === 'pending') return '暂无待审核记录'
+  if (activeTab.value === 'rejected') return '暂无已拒绝记录'
+  return '暂无已通过记录'
+})
 
 onMounted(() => fetchData())
+
+// 切 Tab 立即 re-fetch 当前列表（不残留上一 Tab 的旧数据）
+watch(activeTab, () => fetchData())
+
+async function reload() {
+  const [pr, ar, rr] = await Promise.all([
+    feederApi.pending(),
+    feederApi.list(),
+    feederApi.rejected(),
+  ])
+  pending.value = pr.data || []
+  approved.value = (ar.data || []).filter((f) => f.status === 'APPROVED')
+  rejected.value = rr.data || []
+}
 
 async function fetchData() {
   loading.value = true
   try {
-    const [pr, ar, rr] = await Promise.all([
-      feederApi.pending(),
-      feederApi.list(),
-      feederApi.rejected(),
-    ])
-    pending.value = pr.data || []
-    approved.value = (ar.data || []).filter((f) => f.status === 'APPROVED')
-    rejected.value = rr.data || []
+    await reload()
   } catch (e) { /* */ }
   finally { loading.value = false }
 }
+
+// 待审核队列轻轮询（每 20s 静默刷新，不打扰操作）
+let pollTimer = null
+onMounted(() => {
+  pollTimer = setInterval(() => {
+    if (activeTab.value === 'pending' && !loading.value) reload()
+  }, 20000)
+})
+onUnmounted(() => { if (pollTimer) clearInterval(pollTimer) })
 
 /* 详情抽屉 */
 const drawerVisible = ref(false)
@@ -196,11 +225,13 @@ function statusLabel(s) {
 }
 
 async function handleApprove(id) {
+  loading.value = true
   try {
     await feederApi.approve(id)
     ElMessage.success('审核通过')
-    await fetchData()
+    await reload()
   } catch (e) { /* */ }
+  finally { loading.value = false }
 }
 
 async function handleReject(id) {
@@ -218,20 +249,24 @@ async function handleReject(id) {
   } catch (e) {
     return // 用户取消
   }
+  loading.value = true
   try {
     await feederApi.reject(id, reason)
     ElMessage.success('已拒绝并记录原因')
-    await fetchData()
+    await reload()
   } catch (e) { /* */ }
+  finally { loading.value = false }
 }
 
 async function handleDelete(f) {
   if (!(await confirmDanger(`确定删除喂养员「${f.realName}」吗？删除后不可恢复。`))) return
+  loading.value = true
   try {
     await feederApi.remove(f.id)
     ElMessage.success('删除成功')
-    await fetchData()
+    await reload()
   } catch (e) { /* */ }
+  finally { loading.value = false }
 }
 </script>
 
@@ -302,6 +337,23 @@ async function handleDelete(f) {
   letter-spacing: 0.5px;
   color: var(--neutral-600);
 }
+
+/* 刷新按钮 */
+.refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.refresh-icon {
+  display: inline-block;
+  font-size: 15px;
+  line-height: 1;
+  transition: transform 0.3s ease;
+}
+.refresh-icon.spinning {
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 .reason {
   color: var(--color-danger);

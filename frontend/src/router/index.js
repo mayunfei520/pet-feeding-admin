@@ -15,11 +15,13 @@ const routes = [
       { path: 'users', name: 'Users', component: () => import('@/views/UserList.vue'), meta: { title: '客户管理', group: '业务管理' } },
       { path: 'admins', name: 'Admins', component: () => import('@/views/AdminList.vue'), meta: { title: '管理员管理', group: '系统管理' } },
       { path: 'pets', name: 'Pets', component: () => import('@/views/PetList.vue'), meta: { title: '宠物管理', group: '业务管理' } },
+      { path: 'pet-review', name: 'PetReview', component: () => import('@/views/PetReview.vue'), meta: { title: '宠物审核', group: '业务管理' } },
       { path: 'feeders', name: 'Feeders', component: () => import('@/views/FeederList.vue'), meta: { title: '喂养员管理', group: '业务管理' } },
       { path: 'feeders/:id/reviews', name: 'FeederReviews', component: () => import('@/views/ReviewList.vue'), meta: { title: '喂养员评价', group: '业务管理' } },
       { path: 'orders', name: 'Orders', component: () => import('@/views/OrderList.vue'), meta: { title: '订单管理', group: '业务管理' } },
       { path: 'reviews', name: 'Reviews', component: () => import('@/views/ReviewManage.vue'), meta: { title: '评价管理', group: '业务管理' } },
-      { path: 'payments', name: 'Payments', component: () => import('@/views/PaymentList.vue'), meta: { title: '支付记录', group: '业务管理' } }
+      { path: 'payments', name: 'Payments', component: () => import('@/views/PaymentList.vue'), meta: { title: '支付记录', group: '业务管理' } },
+      { path: 'conversations', name: 'Conversations', component: () => import('@/views/ImManage.vue'), meta: { title: '会话管理', group: '业务管理' } }
     ]
   }
 ]

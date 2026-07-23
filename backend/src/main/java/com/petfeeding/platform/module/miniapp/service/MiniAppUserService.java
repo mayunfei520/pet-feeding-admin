@@ -103,7 +103,8 @@ public class MiniAppUserService {
         }
         User user = new User();
         user.setPhone(phone);
-        user.setUsername(buildUsername(phone, nickname));
+        // 用户名：直接用真实姓名（注册必填），不含手机号；微信登录兜底用 u<自增id>
+        user.setUsername("u_" + phone); // 临时占位，保证 insert 不空且唯一
         user.setPassword(passwordEncoder.encode(password));
         user.setRole("OWNER");
         user.setStatus("ACTIVE");
@@ -112,6 +113,9 @@ public class MiniAppUserService {
         }
         user.setRealName(realName);
         userMapper.insert(user);
+        // 注册用户直接用真实姓名作用户名
+        user.setUsername(realName);
+        userMapper.updateById(user);
         log.info("创建小程序注册用户: userId={}, username={}, phone={}, realName={}, role={}",
             user.getId(), user.getUsername(), maskPhone(phone), maskName(realName), user.getRole());
         String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
@@ -216,11 +220,13 @@ public class MiniAppUserService {
         if (user == null) {
             user = new User();
             user.setPhone(phone);
-            user.setUsername("wx_" + phone.substring(phone.length() - 4));
+            user.setUsername("wx_" + phone); // 临时占位，insert 后改为 wx+id
             user.setPassword(passwordEncoder.encode("wx_" + System.currentTimeMillis()));
             user.setRole("OWNER");
             user.setStatus("ACTIVE");
             userMapper.insert(user);
+            user.setUsername("wx" + user.getId());
+            userMapper.updateById(user);
             log.info("微信手机号登录-创建新用户: userId={}, phone={}, role={}",
                 user.getId(), maskPhone(phone), user.getRole());
         } else {
@@ -303,16 +309,6 @@ public class MiniAppUserService {
             log.error("微信access_token响应解析失败: body={}", response.getBody(), e);
             throw new BusinessException("微信服务响应异常");
         }
-    }
-
-    private String buildUsername(String phone, String nickname) {
-        String base = nickname == null || nickname.trim().isEmpty() ? phone : nickname.trim();
-        LambdaQueryWrapper<User> query = new LambdaQueryWrapper<>();
-        query.eq(User::getUsername, base);
-        if (userMapper.selectCount(query) == 0) {
-            return base;
-        }
-        return base + "_" + phone.substring(Math.max(0, phone.length() - 4));
     }
 
     private String maskPhone(String phone) {

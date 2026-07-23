@@ -46,6 +46,10 @@ public class Feeder {
     /** 评分（满分5.0） */
     private BigDecimal rating;
 
+    /** 手机号（来自关联用户表，非 feeders 表字段） */
+    @TableField(exist = false)
+    private String phone;
+
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
 }

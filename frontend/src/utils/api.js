@@ -44,3 +44,14 @@ export const paymentApi = {
 export const dashboardApi = {
   stats: () => request.get('/dashboard/stats')
 }
+
+export const adminImApi = {
+  list: (params) => request.get('/admin/im/conversations', { params }),
+  messages: (id, params) => request.get(`/admin/im/conversations/${id}/messages`, { params })
+}
+
+export const adminPetApi = {
+  reviewQueue: (status) => request.get('/admin/pets', { params: status ? { status } : {} }),
+  approve: (id) => request.post(`/admin/pets/${id}/approve`),
+  reject: (id, reason) => request.post(`/admin/pets/${id}/reject`, { reason })
+}

@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 喂养员控制器
@@ -30,6 +33,7 @@ public class FeederController {
         List<Feeder> list = feederService.lambdaQuery()
                 .eq(Feeder::getStatus, "APPROVED")
                 .list();
+        enrichPhone(list);
         return R.ok(list);
     }
 
@@ -39,6 +43,7 @@ public class FeederController {
         List<Feeder> list = feederService.lambdaQuery()
                 .eq(Feeder::getStatus, "PENDING")
                 .list();
+        enrichPhone(list);
         return R.ok(list);
     }
 
@@ -48,7 +53,20 @@ public class FeederController {
         List<Feeder> list = feederService.lambdaQuery()
                 .eq(Feeder::getStatus, "REJECTED")
                 .list();
+        enrichPhone(list);
         return R.ok(list);
+    }
+
+    /** 把关联用户的手机号填充到 Feeder.phone（feeders 表无 phone 字段） */
+    private void enrichPhone(List<Feeder> list) {
+        if (list == null || list.isEmpty()) return;
+        Set<Long> userIds = list.stream().map(Feeder::getUserId).collect(Collectors.toSet());
+        Map<Long, User> userMap = userService.listByIds(userIds).stream()
+                .collect(Collectors.toMap(User::getId, u -> u));
+        for (Feeder f : list) {
+            User u = userMap.get(f.getUserId());
+            f.setPhone(u != null ? u.getPhone() : null);
+        }
     }
 
     @PutMapping("/{id}/approve")

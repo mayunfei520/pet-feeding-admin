@@ -40,7 +40,7 @@
                 <rect x="3" y="3" width="18" height="18" rx="2"/>
                 <path d="M3 9h18M9 3v18"/>
               </svg>
-              <span>暂无数据</span>
+              <span>{{ emptyText }}</span>
             </td>
           </tr>
           <tr v-else v-for="(item, idx) in data" :key="item.id" :class="{ 'row-alt': idx % 2 === 0 }">
@@ -67,6 +67,7 @@ const props = defineProps({
   columns: { type: Array, default: () => [] },
   loading: { type: Boolean, default: false },
   showActions: { type: Boolean, default: true },
+  emptyText: { type: String, default: '暂无数据' },
 })
 
 const columnSpan = computed(() => props.columns.length + (props.showActions ? 1 : 0))
