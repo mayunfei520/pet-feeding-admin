@@ -1,6 +1,7 @@
 package com.petfeeding.platform.module.feeder.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.petfeeding.platform.common.handler.IdCardTypeHandler;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
  * 喂养员表
  */
 @Data
-@TableName("feeders")
+@TableName(value = "feeders", autoResultMap = true)
 public class Feeder {
 
     @TableId(type = IdType.AUTO)
@@ -22,7 +23,8 @@ public class Feeder {
     /** 真实姓名 */
     private String realName;
 
-    /** 身份证号 */
+    /** 身份证号（库内 SM4 加密存储，TypeHandler 透明解密） */
+    @TableField(typeHandler = IdCardTypeHandler.class)
     private String idCard;
 
     /** 服务区域（如：朝阳区） */

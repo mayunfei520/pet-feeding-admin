@@ -46,6 +46,7 @@ services:
       MYSQL_DATABASE: pet_feeding
       MYSQL_USERNAME: petfeeder
       MYSQL_PASSWORD: PetFeeding2024!
+      SM4_KEY: 9eb9423dc25e7484b46188226a3ba101
     volumes:
       - backend_data:/app/data
     expose:

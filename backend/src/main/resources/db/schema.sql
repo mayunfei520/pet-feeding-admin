@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS `feeders` (
     `id`            BIGINT        NOT NULL AUTO_INCREMENT COMMENT '主键',
     `user_id`       BIGINT        NOT NULL                COMMENT '关联用户ID',
     `real_name`     VARCHAR(20)   NOT NULL                COMMENT '真实姓名',
-    `id_card`       VARCHAR(18)   NOT NULL                COMMENT '身份证号',
+    `id_card`       VARCHAR(256)  NOT NULL                COMMENT '身份证号（SM4加密存储）',
     `service_area`  VARCHAR(100)  NOT NULL                COMMENT '服务区域（如：朝阳区）',
     `experience`    VARCHAR(500)  DEFAULT NULL            COMMENT '经验描述',
     `description`   VARCHAR(500)  DEFAULT NULL            COMMENT '自我介绍',

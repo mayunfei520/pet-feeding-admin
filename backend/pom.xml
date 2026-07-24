@@ -79,6 +79,20 @@
             <version>${knife4j.version}</version>
         </dependency>
 
+        <!-- 国密 SM4 加密（身份证号等敏感字段） -->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-crypto</artifactId>
+            <version>5.8.27</version>
+        </dependency>
+
+        <!-- Bouncy Castle：提供 SM4 国密算法实现（标准 JDK 不内置） -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>1.78.1</version>
+        </dependency>
+
         <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>

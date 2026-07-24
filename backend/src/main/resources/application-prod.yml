@@ -28,3 +28,7 @@ wx:
   miniapp:
     app-id: wx1ad1b47d97fb0e04
     app-secret: c3b8f0aa9e3206de00e0af6490795a44
+
+# 国密 SM4 密钥（16 字节 hex），生产环境由 docker-compose 环境变量 SM4_KEY 注入
+sm4:
+  key: ${SM4_KEY:9eb9423dc25e7484b46188226a3ba101}

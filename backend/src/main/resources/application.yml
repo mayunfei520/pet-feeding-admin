@@ -15,6 +15,10 @@ knife4j:
   setting:
     language: zh_cn
 
+# 国密 SM4 密钥（开发环境默认值，生产由 SM4_KEY 环境变量覆盖）
+sm4:
+  key: 9eb9423dc25e7484b46188226a3ba101
+
 # springdoc:
 #   swagger-ui:
 #     path: /swagger-ui.html

@@ -57,7 +57,7 @@ public class DataSourceInitializer implements CommandLineRunner {
             "id BIGINT AUTO_INCREMENT PRIMARY KEY," +
             "user_id BIGINT NOT NULL UNIQUE," +
             "real_name VARCHAR(20) NOT NULL," +
-            "id_card VARCHAR(18) NOT NULL," +
+            "id_card VARCHAR(256) NOT NULL," +
             "service_area VARCHAR(100) NOT NULL," +
             "experience VARCHAR(500)," +
             "description VARCHAR(500)," +
