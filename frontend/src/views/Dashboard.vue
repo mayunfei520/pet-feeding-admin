@@ -535,14 +535,14 @@ onUnmounted(() => { destroyCharts() })
 .soft-alert {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 16px;
-  padding: 10px 14px;
+  gap: 0.71rem;
+  margin-bottom: 1.14rem;
+  padding: 0.71rem 1rem;
   border: 1px solid rgba(251, 191, 36, 0.25);
   background: rgba(251, 191, 36, 0.10);
   color: #fcd34d;
-  border-radius: 10px;
-  font-size: 13px;
+  border-radius: 0.71rem;
+  font-size: 0.93rem;
 }
 .soft-link {
   border: none;
@@ -556,16 +556,16 @@ onUnmounted(() => { destroyCharts() })
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-bottom: 24px;
+  gap: 1.14rem;
+  margin-bottom: 1.71rem;
 }
 
 .kpi-card {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 20px 22px;
+  gap: 1.14rem;
+  padding: 1.43rem 1.57rem;
   border-radius: var(--radius-md);
   transition: transform 0.25s ease, box-shadow var(--transition-base), border-color var(--transition-base);
   cursor: default;
@@ -579,9 +579,9 @@ onUnmounted(() => { destroyCharts() })
 }
 
 .kpi-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+  width: 3.43rem;
+  height: 3.43rem;
+  border-radius: 0.86rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -596,16 +596,16 @@ onUnmounted(() => { destroyCharts() })
 
 .kpi-body { min-width: 0; transform: translateZ(20px); }
 .kpi-label {
-  font-size: 12px;
+  font-size: 0.86rem;
   font-weight: 500;
   color: var(--neutral-400);
   text-transform: uppercase;
   letter-spacing: 0.4px;
-  margin-bottom: 4px;
+  margin-bottom: 0.29rem;
 }
 .kpi-value {
   font-family: var(--font-display);
-  font-size: 28px;
+  font-size: 2rem;
   font-weight: 700;
   color: var(--neutral-800);
   letter-spacing: -0.5px;
@@ -615,23 +615,23 @@ onUnmounted(() => { destroyCharts() })
 }
 .count-up { display: inline-block; }
 .kpi-suffix {
-  font-size: 14px;
+  font-size: 1rem;
   font-weight: 500;
   color: var(--neutral-400);
-  margin-left: 2px;
+  margin-left: 0.14rem;
 }
 .kpi-sub {
-  font-size: 11px;
+  font-size: 0.79rem;
   color: var(--neutral-400);
-  margin-top: 2px;
+  margin-top: 0.14rem;
 }
 
 .kpi-alert-dot {
   position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 8px;
-  height: 8px;
+  top: 1rem;
+  right: 1rem;
+  width: 0.57rem;
+  height: 0.57rem;
   border-radius: 50%;
   background: #f87171;
   box-shadow: 0 0 0 4px rgba(248, 113, 113, 0.2);
@@ -645,14 +645,14 @@ onUnmounted(() => { destroyCharts() })
 .charts-row {
   display: grid;
   grid-template-columns: 1.5fr 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 24px;
+  gap: 1.14rem;
+  margin-bottom: 1.71rem;
 }
 
 .chart-card {
   position: relative;
   border-radius: var(--radius-md);
-  padding: 22px 24px;
+  padding: 1.57rem 1.71rem;
   overflow: hidden;
 }
 /* 顶部流光 */
@@ -660,7 +660,7 @@ onUnmounted(() => { destroyCharts() })
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 2px;
+  height: 0.14rem;
   background: linear-gradient(90deg, transparent, #7dd3fc, #a78bfa, transparent);
   background-size: 200% 100%;
   animation: slideGlow 4.5s linear infinite;
@@ -675,30 +675,30 @@ onUnmounted(() => { destroyCharts() })
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: 1.14rem;
 }
 .chart-title {
-  font-size: 15px;
+  font-size: 1.07rem;
   font-weight: 600;
   color: var(--neutral-800);
 }
 .chart-legend {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
+  gap: 0.43rem;
+  font-size: 0.86rem;
   color: var(--neutral-400);
 }
 .legend-dot {
-  width: 8px;
-  height: 8px;
+  width: 0.57rem;
+  height: 0.57rem;
   border-radius: 50%;
   background: #38bdf8;
 }
 
 .chart-body {
   position: relative;
-  height: 240px;
+  height: 17.14rem;
 }
 .donut-body {
   display: flex;
@@ -716,16 +716,16 @@ onUnmounted(() => { destroyCharts() })
 }
 .dc-val {
   font-family: var(--font-display);
-  font-size: 30px;
+  font-size: 2.14rem;
   font-weight: 700;
   color: var(--ice-bright);
   text-shadow: 0 0 18px rgba(56, 189, 248, 0.35);
   line-height: 1;
 }
 .dc-label {
-  font-size: 12px;
+  font-size: 0.86rem;
   color: var(--neutral-400);
-  margin-top: 4px;
+  margin-top: 0.29rem;
 }
 
 .chart-empty {
@@ -735,24 +735,24 @@ onUnmounted(() => { destroyCharts() })
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 0.71rem;
   color: var(--neutral-300);
-  font-size: 13px;
+  font-size: 0.93rem;
 }
 
 .feeds-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 28px;
+  gap: 1.14rem;
+  margin-bottom: 2rem;
 }
 
 .feed-card {
   border-radius: var(--radius-md);
-  padding: 22px 24px;
+  padding: 1.57rem 1.71rem;
 }
 .feed-more {
-  font-size: 12px;
+  font-size: 0.86rem;
   font-weight: 500;
   color: var(--ice-bright);
   text-decoration: none;
@@ -763,16 +763,16 @@ onUnmounted(() => { destroyCharts() })
 .feed-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 0;
+  gap: 0.86rem;
+  padding: 0.86rem 0;
   border-bottom: 1px solid rgba(125, 211, 252, 0.08);
 }
 .feed-item:last-child { border-bottom: none; padding-bottom: 0; }
 .feed-item:first-child { padding-top: 0; }
 
 .feed-dot {
-  width: 9px;
-  height: 9px;
+  width: 0.64rem;
+  height: 0.64rem;
   border-radius: 50%;
   flex-shrink: 0;
   box-shadow: 0 0 10px currentColor;
@@ -784,14 +784,14 @@ onUnmounted(() => { destroyCharts() })
 .dot-red    { background: #f87171; color: #f87171; }
 
 .feed-avatar {
-  width: 32px; height: 32px;
+  width: 2.29rem; height: 2.29rem;
   border-radius: 50%;
   background: rgba(56,189,248,0.14);
   color: #7dd3fc;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: 0.93rem;
   font-weight: 600;
   flex-shrink: 0;
 }
@@ -804,10 +804,10 @@ onUnmounted(() => { destroyCharts() })
   flex: 1; min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 0.21rem;
 }
 .feed-name {
-  font-size: 13px;
+  font-size: 0.93rem;
   font-weight: 500;
   color: var(--neutral-700);
   white-space: nowrap;
@@ -817,9 +817,9 @@ onUnmounted(() => { destroyCharts() })
 .feed-tag {
   display: inline-block;
   width: fit-content;
-  font-size: 11px;
-  padding: 1px 8px;
-  border-radius: 10px;
+  font-size: 0.79rem;
+  padding: 0.07rem 0.57rem;
+  border-radius: 0.71rem;
   font-weight: 500;
 }
 .tag-amber  { background: rgba(251,191,36,0.14); color: #fcd34d; }
@@ -834,37 +834,37 @@ onUnmounted(() => { destroyCharts() })
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 2px;
+  gap: 0.14rem;
   flex-shrink: 0;
 }
 .feed-price {
-  font-size: 13px;
+  font-size: 0.93rem;
   font-weight: 600;
   color: var(--ice-bright);
 }
 .feed-time {
-  font-size: 11px;
+  font-size: 0.79rem;
   color: var(--neutral-400);
 }
 
 .feed-empty {
-  padding: 28px 0 8px;
+  padding: 2rem 0 0.57rem;
   text-align: center;
-  font-size: 13px;
+  font-size: 0.93rem;
   color: var(--neutral-400);
 }
 
 .quick-bar {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
+  gap: 1rem;
 }
 .quick-card {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 18px 20px;
+  gap: 1rem;
+  padding: 1.29rem 1.43rem;
   border-radius: var(--radius-md);
   text-decoration: none;
   color: inherit;
@@ -876,8 +876,8 @@ onUnmounted(() => { destroyCharts() })
   transform: translateY(-2px);
 }
 .quick-icon {
-  width: 40px; height: 40px;
-  border-radius: 10px;
+  width: 2.86rem; height: 2.86rem;
+  border-radius: 0.71rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -891,42 +891,42 @@ onUnmounted(() => { destroyCharts() })
 .quick-text { min-width: 0; }
 .quick-title {
   display: block;
-  font-size: 14px;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--neutral-800);
 }
 .quick-desc {
-  font-size: 12px;
+  font-size: 0.86rem;
   color: var(--neutral-400);
-  margin-top: 1px;
+  margin-top: 0.07rem;
 }
 .quick-arrow {
   margin-left: auto;
   color: var(--ice-bright);
-  font-size: 18px;
+  font-size: 1.29rem;
   transition: transform var(--transition-base);
 }
 .quick-card:hover .quick-arrow { transform: translateX(6px); }
 
 .kpi-card.skeleton { pointer-events: none; }
 .kpi-icon-sk {
-  width: 48px; height: 48px;
-  border-radius: 12px;
+  width: 3.43rem; height: 3.43rem;
+  border-radius: 0.86rem;
   background: var(--neutral-100);
 }
-.kpi-body-sk { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+.kpi-body-sk { flex: 1; display: flex; flex-direction: column; gap: 0.71rem; }
 .kpi-value-sk {
-  height: 28px; width: 80%;
-  border-radius: 6px;
+  height: 2rem; width: 80%;
+  border-radius: 0.43rem;
   background: var(--neutral-100);
 }
 .kpi-label-sk {
-  height: 14px; width: 50%;
-  border-radius: 4px;
+  height: 1rem; width: 50%;
+  border-radius: 0.29rem;
   background: var(--neutral-100);
 }
 .skeleton-card { pointer-events: none; }
-.chart-sk { border-radius: 8px; background: var(--neutral-100); }
+.chart-sk { border-radius: 0.57rem; background: var(--neutral-100); }
 
 .shimmer {
   background: linear-gradient(90deg, var(--neutral-100) 25%, var(--neutral-200) 50%, var(--neutral-100) 75%);
@@ -940,16 +940,16 @@ onUnmounted(() => { destroyCharts() })
 
 .error-block {
   text-align: center;
-  padding: 80px 20px;
+  padding: 5.71rem 1.43rem;
   color: var(--neutral-400);
 }
 .error-icon {
-  margin-bottom: 16px;
+  margin-bottom: 1.14rem;
   color: var(--neutral-300);
 }
 .error-msg {
-  font-size: 15px;
-  margin-bottom: 20px;
+  font-size: 1.07rem;
+  margin-bottom: 1.43rem;
   color: var(--neutral-500);
 }
 
@@ -962,7 +962,7 @@ onUnmounted(() => { destroyCharts() })
   .kpi-grid { grid-template-columns: 1fr; }
   .feeds-row { grid-template-columns: 1fr; }
   .quick-bar { grid-template-columns: 1fr; }
-  .kpi-value { font-size: 24px; }
-  .kpi-icon { width: 40px; height: 40px; border-radius: 10px; }
+  .kpi-value { font-size: 1.71rem; }
+  .kpi-icon { width: 2.86rem; height: 2.86rem; border-radius: 0.71rem; }
 }
 </style>

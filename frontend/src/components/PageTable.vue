@@ -87,31 +87,31 @@ function renderCell(col, item) {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 1.43rem;
 }
 .header-left { min-width: 0; }
 .page-title {
   font-family: var(--font-display);
-  font-size: 20px;
+  font-size: 1.43rem;
   font-weight: 700;
   color: var(--neutral-900);
   letter-spacing: -0.3px;
-  margin-bottom: 2px;
+  margin-bottom: 0.14rem;
 }
 .page-desc {
-  font-size: 13px;
+  font-size: 0.93rem;
   color: var(--neutral-400);
 }
 .header-actions {
   display: flex;
-  gap: 8px;
+  gap: 0.57rem;
   flex-shrink: 0;
 }
 
 .filters {
   display: flex;
-  gap: 10px;
-  margin-bottom: 16px;
+  gap: 0.71rem;
+  margin-bottom: 1.14rem;
   flex-wrap: wrap;
   align-items: center;
 }
@@ -128,10 +128,10 @@ function renderCell(col, item) {
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 0.93rem;
 }
 .table th, .table td {
-  padding: 12px 14px;
+  padding: 0.86rem 1rem;
   text-align: left;
   border-bottom: 1px solid var(--neutral-100);
   white-space: nowrap;
@@ -140,7 +140,7 @@ function renderCell(col, item) {
   background: var(--neutral-50);
   color: var(--neutral-500);
   font-weight: 600;
-  font-size: 12px;
+  font-size: 0.86rem;
   letter-spacing: 0.3px;
   text-transform: uppercase;
   position: sticky;
@@ -162,13 +162,13 @@ function renderCell(col, item) {
 
 .loading-cell, .empty-cell {
   text-align: center !important;
-  padding: 48px 24px !important;
+  padding: 3.43rem 1.71rem !important;
   color: var(--neutral-400);
-  font-size: 14px;
+  font-size: 1rem;
 }
 .empty-cell svg {
   display: block;
-  margin: 0 auto 12px;
+  margin: 0 auto 0.86rem;
   color: var(--neutral-300);
 }
 
@@ -177,11 +177,11 @@ function renderCell(col, item) {
   display: flex !important;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 0.71rem;
 }
 .loading-spinner {
-  width: 18px;
-  height: 18px;
+  width: 1.29rem;
+  height: 1.29rem;
   border: 2px solid var(--neutral-200);
   border-top-color: var(--brand-primary);
   border-radius: 50%;

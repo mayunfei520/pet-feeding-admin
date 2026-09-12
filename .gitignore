@@ -28,3 +28,11 @@ backend/data/
 
 # Local data
 data/
+
+# 根目录临时 / 含密码脚本（绝不入库）
+/*.py
+/*.sh
+/*.bat
+# 截图
+/*.jpg
+/*.png

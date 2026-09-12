@@ -92,14 +92,15 @@
 }
 
 html {
-  font-size: 14px;
+  /* 根字号随视口连续缩放：1280px≈13px / 1440px≈14px / 1818px+→16px */
+  font-size: clamp(13px, 0.55vw + 6px, 16px);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 body {
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: 1rem;
   color: var(--neutral-700);
   background-color: var(--space-bg);
   /* 深空星点 + 冰蓝/淡紫光晕 */
@@ -175,10 +176,10 @@ input, select, textarea, button {
 
 /* --- Form Elements --- */
 .select, .input {
-  padding: 7px 12px;
+  padding: 0.5rem 0.86rem;
   border: 1px solid var(--border-soft);
-  border-radius: 8px;
-  font-size: 13px;
+  border-radius: 0.57rem;
+  font-size: 0.93rem;
   color: var(--neutral-700);
   background: rgba(12, 20, 36, 0.6);
   outline: none;
@@ -208,10 +209,10 @@ input, select, textarea, button {
 .btn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 6px 14px;
-  border-radius: 8px;
-  font-size: 13px;
+  gap: 0.29rem;
+  padding: 0.43rem 1rem;
+  border-radius: 0.57rem;
+  font-size: 0.93rem;
   font-weight: 500;
   cursor: pointer;
   transition: all var(--transition-fast);
@@ -240,15 +241,15 @@ input, select, textarea, button {
   border-color: rgba(248,113,113,0.30);
 }
 .btn-danger-outline:hover { background: var(--color-danger-bg); }
-.btn-sm { padding: 4px 10px; font-size: 12px; border-radius: 6px; }
+.btn-sm { padding: 0.29rem 0.71rem; font-size: 0.86rem; border-radius: 0.43rem; }
 
 /* Tags */
 .tag {
   display: inline-flex;
   align-items: center;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 12px;
+  padding: 0.21rem 0.71rem;
+  border-radius: 1.43rem;
+  font-size: 0.86rem;
   font-weight: 500;
   line-height: 1.4;
 }
@@ -535,64 +536,64 @@ input, select, textarea, button {
 .feeder-drawer .el-drawer__close-btn:hover { color: var(--ice) !important; }
 
 /* 抽屉内容 */
-.fd-body { padding: 22px; }
+.fd-body { padding: 1.57rem; }
 .fd-hero {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding-bottom: 18px;
-  margin-bottom: 18px;
+  gap: 1rem;
+  padding-bottom: 1.29rem;
+  margin-bottom: 1.29rem;
   border-bottom: 1px solid var(--border-soft);
 }
 .fd-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
+  width: 3.43rem;
+  height: 3.43rem;
+  border-radius: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: 1.43rem;
   font-weight: 700;
   color: #061018;
   background: var(--brand-gradient);
   box-shadow: var(--shadow-glow-ice);
 }
-.fd-name { font-size: 16px; font-weight: 700; color: var(--neutral-900); margin-bottom: 6px; }
+.fd-name { font-size: 1.14rem; font-weight: 700; color: var(--neutral-900); margin-bottom: 0.43rem; }
 .fd-badge {
   display: inline-block;
-  padding: 2px 10px;
+  padding: 0.14rem 0.71rem;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 0.86rem;
   font-weight: 600;
 }
 .fd-badge.fd-ok { color: var(--green); background: var(--color-success-bg); }
 .fd-badge.fd-no { color: var(--red); background: var(--color-danger-bg); }
 .fd-badge.fd-wait { color: var(--amber); background: var(--color-warning-bg); }
 
-.fd-section { margin-bottom: 20px; }
+.fd-section { margin-bottom: 1.43rem; }
 .fd-section:last-child { margin-bottom: 0; }
 .fd-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 9px 0;
+  padding: 0.64rem 0;
   border-bottom: 1px dashed var(--border-soft);
 }
 .fd-row:last-child { border-bottom: none; }
-.fd-label { color: var(--neutral-400); font-size: 13px; flex-shrink: 0; }
-.fd-value { color: var(--neutral-800); font-size: 13px; text-align: right; }
+.fd-label { color: var(--neutral-400); font-size: 0.93rem; flex-shrink: 0; }
+.fd-value { color: var(--neutral-800); font-size: 0.93rem; text-align: right; }
 
-.fd-field { margin-bottom: 14px; }
+.fd-field { margin-bottom: 1rem; }
 .fd-field:last-child { margin-bottom: 0; }
-.fd-field .fd-label { display: block; margin-bottom: 6px; }
+.fd-field .fd-label { display: block; margin-bottom: 0.43rem; }
 .fd-text {
   color: var(--neutral-700);
-  font-size: 13px;
+  font-size: 0.93rem;
   line-height: 1.7;
   background: rgba(12, 20, 36, 0.5);
   border: 1px solid var(--border-soft);
-  border-radius: 10px;
-  padding: 10px 12px;
+  border-radius: 0.71rem;
+  padding: 0.71rem 0.86rem;
   word-break: break-all;
 }
 .fd-text a { color: var(--ice); word-break: break-all; }
