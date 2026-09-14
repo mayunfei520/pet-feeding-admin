@@ -21,7 +21,7 @@ services:
     restart: unless-stopped
     environment:
       TZ: Asia/Shanghai
-      MYSQL_ROOT_PASSWORD: PetFeed_DB_R00t_2026!
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: pet_feeding
     command:
       - --default-authentication-plugin=mysql_native_password
@@ -45,8 +45,9 @@ services:
       MYSQL_PORT: 3306
       MYSQL_DATABASE: pet_feeding
       MYSQL_USERNAME: petfeeder
-      MYSQL_PASSWORD: PetFeeding2024!
-      SM4_KEY: 9eb9423dc25e7484b46188226a3ba101
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      SM4_KEY: ${SM4_KEY}
+      JWT_SECRET: ${JWT_SECRET}
     volumes:
       - backend_data:/app/data
     expose:

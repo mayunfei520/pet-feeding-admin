@@ -49,10 +49,7 @@ public class MiniAppUserService {
     private final Map<String, CodeEntry> codeStore = new ConcurrentHashMap<>();
 
     @Transactional
-    public LoginResultDTO loginByWechat(String code, String role) {
-        if (role == null || role.isEmpty()) {
-            role = "OWNER";
-        }
+    public LoginResultDTO loginByWechat(String code) {
         String mockOpenId = "wx_" + (code != null ? code.hashCode() : System.currentTimeMillis());
         LambdaQueryWrapper<User> query = new LambdaQueryWrapper<>();
         query.eq(User::getPhone, mockOpenId);
@@ -62,7 +59,8 @@ public class MiniAppUserService {
             user.setUsername("wx_" + (code != null ? Integer.toHexString(code.hashCode()) : System.currentTimeMillis() % 100000));
             user.setPassword("$2a$10$N/A");
             user.setPhone(mockOpenId);
-            user.setRole(role);
+            // 小程序登录一律为宠物主人，禁止客户端指定角色（防提权：否则传 role=ADMIN 即可越权）
+            user.setRole("OWNER");
             user.setStatus("ACTIVE");
             userMapper.insert(user);
             log.info("创建微信登录新用户: userId={}, username={}, role={}", user.getId(), user.getUsername(), user.getRole());

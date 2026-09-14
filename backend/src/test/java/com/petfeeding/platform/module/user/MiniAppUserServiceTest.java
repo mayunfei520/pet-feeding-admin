@@ -99,7 +99,7 @@ class MiniAppUserServiceTest {
         when(userMapper.insert(any())).thenReturn(1);
         when(jwtUtil.generateToken(anyLong(), anyString(), anyString())).thenReturn("wx-token");
 
-        var result = miniAppUserService.loginByWechat("wx-code", "OWNER");
+        var result = miniAppUserService.loginByWechat("wx-code");
 
         assertNotNull(result);
         assertEquals("wx-token", result.getToken());
@@ -116,7 +116,7 @@ class MiniAppUserServiceTest {
         when(userMapper.selectOne(any())).thenReturn(existingUser);
         when(jwtUtil.generateToken(10L, "wx_user", "OWNER")).thenReturn("existing-token");
 
-        var result = miniAppUserService.loginByWechat("wx-code", "OWNER");
+        var result = miniAppUserService.loginByWechat("wx-code");
 
         assertNotNull(result);
         assertEquals(10L, result.getUserId());

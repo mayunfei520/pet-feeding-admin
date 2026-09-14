@@ -16,7 +16,7 @@ import java.util.Map;
 @Component
 public class JwtUtil {
 
-    @Value("${jwt.secret:pet-feeding-platform-secret-key-default}")
+    @Value("${jwt.secret}")
     private String secret;
 
     @Value("${jwt.expiration:86400}")

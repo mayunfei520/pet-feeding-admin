@@ -33,9 +33,8 @@ public class MiniAppAuthController {
     public R<LoginResultDTO> login(HttpServletRequest request) {
         Map<String, String> body = normalizeBody(request);
         String code = body.get("code");
-        String role = body.getOrDefault("role", "OWNER");
-        log.info("小程序微信登录请求: role={}, codeHash={}, ip={}", role, safeHash(code), getClientIp(request));
-        LoginResultDTO result = miniAppUserService.loginByWechat(code, role);
+        log.info("小程序微信登录请求: codeHash={}, ip={}", safeHash(code), getClientIp(request));
+        LoginResultDTO result = miniAppUserService.loginByWechat(code);
         log.info("小程序微信登录成功: userId={}, username={}, role={}", result.getUserId(), result.getUsername(), result.getRole());
         return R.ok(result);
     }
@@ -129,7 +128,6 @@ public class MiniAppAuthController {
         putIfAbsent(result, "password", request.getParameter("password"));
         putIfAbsent(result, "nickname", request.getParameter("nickname"));
         putIfAbsent(result, "code", request.getParameter("code"));
-        putIfAbsent(result, "role", request.getParameter("role"));
         return result;
     }
 
