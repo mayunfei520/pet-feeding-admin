@@ -57,6 +57,12 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- Flyway 数据库版本迁移（application-dev.yml 已启用，需此依赖才激活自动配置；否则建表静默失效） -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+
         <!-- MySQL 生产环境 -->
         <dependency>
             <groupId>mysql</groupId>

@@ -1,5 +1,7 @@
 -- =====================================================
 -- V1 初始化脚本：宠物喂养服务平台
+-- 注：H2 索引名需全局唯一（不同于 MySQL 表内唯一），
+--      故所有二级索引名均带表前缀，避免跨表重名冲突。
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS users (
@@ -34,7 +36,7 @@ CREATE TABLE IF NOT EXISTS pets (
     reject_reason VARCHAR(200)  DEFAULT NULL            COMMENT '驳回原因',
     created_at    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     PRIMARY KEY (id),
-    KEY idx_user_id (user_id)
+    KEY idx_pets_user_id (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='宠物表';
 
 CREATE TABLE IF NOT EXISTS feeders (
@@ -50,9 +52,9 @@ CREATE TABLE IF NOT EXISTS feeders (
     rating        DECIMAL(3,2)  DEFAULT 5.00            COMMENT '评分',
     created_at    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     PRIMARY KEY (id),
-    UNIQUE KEY uk_user_id (user_id),
-    KEY idx_status (status),
-    KEY idx_service_area (service_area)
+    UNIQUE KEY uk_feeders_user_id (user_id),
+    KEY idx_feeders_status (status),
+    KEY idx_feeders_service_area (service_area)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='喂养员表';
 
 CREATE TABLE IF NOT EXISTS orders (
@@ -70,11 +72,11 @@ CREATE TABLE IF NOT EXISTS orders (
     created_at     DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     updated_at     DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (id),
-    UNIQUE KEY uk_order_no (order_no),
-    KEY idx_owner_id (owner_id),
-    KEY idx_feeder_id (feeder_id),
-    KEY idx_status (status),
-    KEY idx_service_date (service_date)
+    UNIQUE KEY uk_orders_order_no (order_no),
+    KEY idx_orders_owner_id (owner_id),
+    KEY idx_orders_feeder_id (feeder_id),
+    KEY idx_orders_status (status),
+    KEY idx_orders_service_date (service_date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='订单表';
 
 CREATE TABLE IF NOT EXISTS reviews (
@@ -87,9 +89,9 @@ CREATE TABLE IF NOT EXISTS reviews (
     images     VARCHAR(2000) DEFAULT NULL           COMMENT '评价图片',
     created_at DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     PRIMARY KEY (id),
-    UNIQUE KEY uk_order_id (order_id),
-    KEY idx_feeder_id (feeder_id),
-    KEY idx_owner_id (owner_id)
+    UNIQUE KEY uk_reviews_order_id (order_id),
+    KEY idx_reviews_feeder_id (feeder_id),
+    KEY idx_reviews_owner_id (owner_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='评价表';
 
 CREATE TABLE IF NOT EXISTS payments (
@@ -102,8 +104,8 @@ CREATE TABLE IF NOT EXISTS payments (
     transaction_id VARCHAR(100)  DEFAULT NULL           COMMENT '第三方交易号',
     created_at     DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     PRIMARY KEY (id),
-    KEY idx_order_id (order_id),
-    KEY idx_user_id (user_id)
+    KEY idx_payments_order_id (order_id),
+    KEY idx_payments_user_id (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='支付记录表';
 
 CREATE TABLE IF NOT EXISTS sms_logs (

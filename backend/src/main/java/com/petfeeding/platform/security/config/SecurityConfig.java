@@ -39,6 +39,7 @@ public class SecurityConfig {
             // 放行登录、小程序所有API、API 文档
             .antMatchers(
                     "/api/user/login",
+                    "/api/user/register",
                     "/api/miniapp/**",            // 小程序全部接口放行（Token 校验在 Controller 层处理）
                     "/doc.html",
                     "/webjars/**",
