@@ -71,8 +71,8 @@
     <template #row-actions="{ item }">
       <button class="btn btn-sm btn-outline" @click="openDetail(item)">详情</button>
       <template v-if="activeTab === 'pending'">
-        <button class="btn btn-sm btn-primary" @click="handleApprove(item.id)" style="margin-left:4px">通过</button>
-        <button class="btn btn-sm btn-danger-outline" @click="handleReject(item.id)" style="margin-left:4px">驳回</button>
+        <button class="btn btn-sm btn-primary" @click="handleApprove(item.id)" style="margin-left:0.29rem">通过</button>
+        <button class="btn btn-sm btn-danger-outline" @click="handleReject(item.id)" style="margin-left:0.29rem">驳回</button>
       </template>
     </template>
   </PageTable>
@@ -81,7 +81,7 @@
     v-model="drawerVisible"
     :title="detailTitle"
     direction="rtl"
-    size="440px"
+    size="31.43rem"
     class="pet-drawer"
   >
     <div class="pd-body" v-if="detail">
@@ -138,8 +138,8 @@ const rejected = ref([])
 const usersMap = ref({})
 
 const pendingColumns = [
-  { key: 'id', label: '编号', style: 'width:60px' },
-  { key: 'image', label: '照片', style: 'width:64px' },
+  { key: 'id', label: '编号', style: 'width:4.29rem' },
+  { key: 'image', label: '照片', style: 'width:4.57rem' },
   { key: 'name', label: '宠物名' },
   { key: 'species', label: '种类' },
   { key: 'breed', label: '品种' },
@@ -148,8 +148,8 @@ const pendingColumns = [
   { key: 'status', label: '状态' },
 ]
 const approvedColumns = [
-  { key: 'id', label: '编号', style: 'width:60px' },
-  { key: 'image', label: '照片', style: 'width:64px' },
+  { key: 'id', label: '编号', style: 'width:4.29rem' },
+  { key: 'image', label: '照片', style: 'width:4.57rem' },
   { key: 'name', label: '宠物名' },
   { key: 'species', label: '种类' },
   { key: 'breed', label: '品种' },
@@ -157,8 +157,8 @@ const approvedColumns = [
   { key: 'createdAt', label: '提交时间' },
 ]
 const rejectedColumns = [
-  { key: 'id', label: '编号', style: 'width:60px' },
-  { key: 'image', label: '照片', style: 'width:64px' },
+  { key: 'id', label: '编号', style: 'width:4.29rem' },
+  { key: 'image', label: '照片', style: 'width:4.57rem' },
   { key: 'name', label: '宠物名' },
   { key: 'species', label: '种类' },
   { key: 'breed', label: '品种' },
@@ -289,20 +289,20 @@ async function handleReject(id) {
   overflow: hidden;
 }
 .tab {
-  padding: 7px 16px;
+  padding: 0.5rem 1.14rem;
   border: 1px solid transparent;
   background: rgba(12, 20, 36, 0.6);
-  font-size: 13px;
+  font-size: 0.93rem;
   color: var(--neutral-500);
   cursor: pointer;
   transition: all var(--transition-fast);
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.43rem;
   position: relative;
 }
 .tab + .tab {
-  border-left: 1px solid var(--border-soft);
+  border-left: 0.07rem solid var(--border-soft);
 }
 .tab:hover {
   background: rgba(125, 211, 252, 0.08);
@@ -322,43 +322,43 @@ async function handleReject(id) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border-radius: 9px;
+  min-width: 1.29rem;
+  height: 1.29rem;
+  padding: 0 0.36rem;
+  border-radius: 0.64rem;
   background: var(--neutral-100);
   color: var(--neutral-400);
-  font-size: 11px;
+  font-size: 0.79rem;
   font-weight: 600;
   transition: all var(--transition-fast);
 }
 
 .mono {
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-  font-size: 12px;
+  font-size: 0.86rem;
   letter-spacing: 0.5px;
   color: var(--neutral-600);
 }
 .muted {
   color: var(--neutral-400);
-  font-size: 12px;
+  font-size: 0.86rem;
 }
 
 .tag {
   display: inline-flex;
   align-items: center;
-  padding: 2px 10px;
+  padding: 0.14rem 0.71rem;
   border-radius: 999px;
   background: rgba(125, 211, 252, 0.14);
   color: var(--ice-bright);
-  font-size: 12px;
+  font-size: 0.86rem;
   font-weight: 600;
 }
 
 .pet-thumb {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
+  width: 3.14rem;
+  height: 3.14rem;
+  border-radius: 0.71rem;
   object-fit: cover;
   border: 1px solid var(--border-soft);
 }
@@ -366,9 +366,9 @@ async function handleReject(id) {
 .pet-badge {
   display: inline-flex;
   align-items: center;
-  padding: 2px 10px;
+  padding: 0.14rem 0.71rem;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 0.86rem;
   font-weight: 600;
 }
 .pet-ok { background: rgba(52, 211, 153, 0.16); color: #34d399; }
@@ -377,18 +377,18 @@ async function handleReject(id) {
 
 .reason {
   color: var(--color-danger);
-  font-size: 12px;
+  font-size: 0.86rem;
 }
 
 /* 刷新按钮 */
 .refresh-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.43rem;
 }
 .refresh-icon {
   display: inline-block;
-  font-size: 15px;
+  font-size: 1.07rem;
   line-height: 1;
   transition: transform 0.3s ease;
 }
@@ -402,15 +402,15 @@ async function handleReject(id) {
 .pd-hero {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--border-soft);
-  margin-bottom: 16px;
+  gap: 1rem;
+  padding-bottom: 1.14rem;
+  border-bottom: 0.07rem solid var(--border-soft);
+  margin-bottom: 1.14rem;
 }
 .pd-avatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 14px;
+  width: 4.57rem;
+  height: 4.57rem;
+  border-radius: 1rem;
   object-fit: cover;
   border: 1px solid var(--border-soft);
 }
@@ -418,31 +418,31 @@ async function handleReject(id) {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
+  font-size: 2rem;
   background: rgba(125, 211, 252, 0.1);
 }
-.pd-hero-info { display: flex; flex-direction: column; gap: 6px; }
-.pd-name { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--neutral-900); }
+.pd-hero-info { display: flex; flex-direction: column; gap: 0.43rem; }
+.pd-name { font-family: var(--font-display); font-size: 1.29rem; font-weight: 700; color: var(--neutral-900); }
 
-.pd-section { margin-bottom: 18px; }
+.pd-section { margin-bottom: 1.29rem; }
 .pd-row {
   display: flex;
   justify-content: space-between;
-  padding: 7px 0;
-  border-bottom: 1px dashed var(--border-soft);
-  font-size: 13px;
+  padding: 0.5rem 0;
+  border-bottom: 0.07rem dashed var(--border-soft);
+  font-size: 0.93rem;
 }
 .pd-label { color: var(--neutral-400); }
 .pd-value { color: var(--neutral-700); font-weight: 500; }
-.pd-field { margin-top: 8px; }
-.pd-field .pd-label { display: block; margin-bottom: 4px; }
-.pd-text { margin: 0; font-size: 13px; line-height: 1.6; color: var(--neutral-700); }
+.pd-field { margin-top: 0.57rem; }
+.pd-field .pd-label { display: block; margin-bottom: 0.29rem; }
+.pd-text { margin: 0; font-size: 0.93rem; line-height: 1.6; color: var(--neutral-700); }
 
-.pd-gallery { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.pd-gallery { display: flex; flex-wrap: wrap; gap: 0.57rem; margin-top: 0.57rem; }
 .pd-photo {
-  width: 88px;
-  height: 88px;
-  border-radius: 10px;
+  width: 6.29rem;
+  height: 6.29rem;
+  border-radius: 0.71rem;
   object-fit: cover;
   border: 1px solid var(--border-soft);
 }
@@ -450,7 +450,7 @@ async function handleReject(id) {
 .pd-reject {
   background: var(--color-danger-bg);
   border-radius: var(--radius-sm);
-  padding: 12px 14px;
+  padding: 0.86rem 1rem;
 }
 .pd-reject .pd-label { color: var(--color-danger); }
 .pd-reject .pd-text { color: var(--color-danger); }
@@ -461,12 +461,12 @@ async function handleReject(id) {
    用 .pet-drawer 专属 class 限定，避免污染其他组件 */
 .pet-drawer {
   background: var(--space-card) !important;
-  border-left: 1px solid var(--border-soft);
+  border-left: 0.07rem solid var(--border-soft);
 }
 .pet-drawer .el-drawer__header {
   margin-bottom: 0;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border-soft);
+  padding: 1.14rem 1.43rem;
+  border-bottom: 0.07rem solid var(--border-soft);
   color: var(--neutral-900);
 }
 .pet-drawer .el-drawer__title {
@@ -481,7 +481,7 @@ async function handleReject(id) {
 }
 .pet-drawer .el-drawer__body {
   background: var(--space-card);
-  padding: 20px;
+  padding: 1.43rem;
 }
 
 /* 驳回原因输入框弹窗（ElMessageBox.prompt）暗色适配，仅作用于本页专用 customClass */

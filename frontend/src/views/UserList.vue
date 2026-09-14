@@ -7,7 +7,7 @@
     :loading="loading"
   >
     <template #filters>
-      <el-select v-model="genderFilter" placeholder="性别筛选" clearable style="width:150px" @change="fetchUsers">
+      <el-select v-model="genderFilter" placeholder="性别筛选" clearable style="width:10.71rem" @change="fetchUsers">
         <el-option label="全部性别" value="" />
         <el-option label="男" value="男" />
         <el-option label="女" value="女" />
@@ -31,15 +31,15 @@
     </template>
     <template #row-actions="{ item }">
       <button class="btn btn-sm btn-outline" @click="openEdit(item)">编辑</button>
-      <button class="btn btn-sm btn-outline" @click="toggleStatus(item)" style="margin-left:4px">
+      <button class="btn btn-sm btn-outline" @click="toggleStatus(item)" style="margin-left:0.29rem">
         {{ item.status === 'ACTIVE' ? '禁用' : '启用' }}
       </button>
-      <button class="btn btn-sm btn-danger-outline" @click="handleDelete(item)" style="margin-left:4px">删除</button>
+      <button class="btn btn-sm btn-danger-outline" @click="handleDelete(item)" style="margin-left:0.29rem">删除</button>
     </template>
   </PageTable>
 
-  <el-dialog v-model="editVisible" title="编辑客户" width="420px">
-    <el-form :model="form" label-width="80px">
+  <el-dialog v-model="editVisible" title="编辑客户" width="30rem">
+    <el-form :model="form" label-width="5.71rem">
       <el-form-item label="用户名">
         <el-input :model-value="form.username" disabled />
       </el-form-item>
@@ -73,7 +73,7 @@ const genderFilter = ref('')
 let pollTimer = null
 
 const columns = [
-  { key: 'id', label: '编号', style: 'width:60px' },
+  { key: 'id', label: '编号', style: 'width:4.29rem' },
   { key: 'username', label: '用户名' },
   { key: 'phone', label: '手机号' },
   { key: 'gender', label: '性别' },
@@ -144,12 +144,12 @@ async function handleDelete(u) {
 </script>
 
 <style scoped>
-.user-cell { display: flex; align-items: center; gap: 8px; }
+.user-cell { display: flex; align-items: center; gap: 0.57rem; }
 .user-avatar-sm {
-  width: 26px; height: 26px; border-radius: 50%;
+  width: 1.86rem; height: 1.86rem; border-radius: 50%;
   background: linear-gradient(135deg, #6366f1, #8b5cf6);
   color: #fff; display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 600; flex-shrink: 0;
+  font-size: 0.79rem; font-weight: 600; flex-shrink: 0;
 }
 .text-muted { color: #9ca3af; }
 </style>

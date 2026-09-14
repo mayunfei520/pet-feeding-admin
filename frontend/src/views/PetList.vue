@@ -30,9 +30,9 @@ const speciesEmoji = { CAT: '🐱', DOG: '🐶', OTHER: '🐹' }
 const speciesLabel = { CAT: '猫', DOG: '狗', OTHER: '其他' }
 
 const columns = [
-  { key: 'id', label: '编号', style: 'width:50px' },
+  { key: 'id', label: '编号', style: 'width:3.57rem' },
   { key: 'name', label: '名字' },
-  { key: 'userId', label: '主人编号', style: 'width:70px' },
+  { key: 'userId', label: '主人编号', style: 'width:5rem' },
   { key: 'species', label: '种类' },
   { key: 'breed', label: '品种' },
   { key: 'age', label: '年龄', format: v => v != null ? `${v}岁` : '-' },
@@ -65,7 +65,7 @@ async function handleDelete(id) {
 <style scoped>
 .species-badge {
   display: inline-block;
-  margin-right: 4px;
-  font-size: 15px;
+  margin-right: 0.29rem;
+  font-size: 1.07rem;
 }
 </style>

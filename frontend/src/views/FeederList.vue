@@ -62,16 +62,16 @@
     <template #row-actions="{ item }">
       <button class="btn btn-sm btn-outline" @click="openDetail(item)">详情</button>
       <template v-if="activeTab === 'pending'">
-        <button class="btn btn-sm btn-primary" @click="handleApprove(item.id)" style="margin-left:4px">通过</button>
-        <button class="btn btn-sm btn-danger-outline" @click="handleReject(item.id)" style="margin-left:4px">拒绝</button>
-        <button class="btn btn-sm btn-danger-outline" @click="handleDelete(item)" style="margin-left:4px">删除</button>
+        <button class="btn btn-sm btn-primary" @click="handleApprove(item.id)" style="margin-left:0.29rem">通过</button>
+        <button class="btn btn-sm btn-danger-outline" @click="handleReject(item.id)" style="margin-left:0.29rem">拒绝</button>
+        <button class="btn btn-sm btn-danger-outline" @click="handleDelete(item)" style="margin-left:0.29rem">删除</button>
       </template>
       <template v-else-if="activeTab === 'approved'">
-        <router-link :to="`/feeders/${item.id}/reviews`" class="btn btn-sm btn-outline" style="margin-left:4px">查看评价</router-link>
-        <button class="btn btn-sm btn-danger-outline" @click="handleDelete(item)" style="margin-left:4px">删除</button>
+        <router-link :to="`/feeders/${item.id}/reviews`" class="btn btn-sm btn-outline" style="margin-left:0.29rem">查看评价</router-link>
+        <button class="btn btn-sm btn-danger-outline" @click="handleDelete(item)" style="margin-left:0.29rem">删除</button>
       </template>
       <template v-else>
-        <button class="btn btn-sm btn-danger-outline" @click="handleDelete(item)" style="margin-left:4px">删除</button>
+        <button class="btn btn-sm btn-danger-outline" @click="handleDelete(item)" style="margin-left:0.29rem">删除</button>
       </template>
     </template>
   </PageTable>
@@ -80,7 +80,7 @@
     v-model="drawerVisible"
     :title="detailTitle"
     direction="rtl"
-    size="420px"
+    size="30rem"
     class="feeder-drawer"
   >
     <div class="fd-body" v-if="detail">
@@ -132,9 +132,9 @@ const approved = ref([])
 const rejected = ref([])
 
 const pendingColumns = [
-  { key: 'id', label: '编号', style: 'width:60px' },
+  { key: 'id', label: '编号', style: 'width:4.29rem' },
   { key: 'realName', label: '姓名' },
-  { key: 'idCard', label: '身份证号', style: 'width:172px' },
+  { key: 'idCard', label: '身份证号', style: 'width:12.29rem' },
   { key: 'phone', label: '手机号' },
   { key: 'userId', label: '用户编号' },
   { key: 'serviceArea', label: '服务区域' },
@@ -143,18 +143,18 @@ const pendingColumns = [
 ]
 
 const approvedColumns = [
-  { key: 'id', label: '编号', style: 'width:60px' },
+  { key: 'id', label: '编号', style: 'width:4.29rem' },
   { key: 'realName', label: '姓名' },
-  { key: 'idCard', label: '身份证号', style: 'width:172px' },
+  { key: 'idCard', label: '身份证号', style: 'width:12.29rem' },
   { key: 'phone', label: '手机号' },
   { key: 'serviceArea', label: '服务区域' },
   { key: 'experience', label: '经验' },
 ]
 
 const rejectedColumns = [
-  { key: 'id', label: '编号', style: 'width:60px' },
+  { key: 'id', label: '编号', style: 'width:4.29rem' },
   { key: 'realName', label: '姓名' },
-  { key: 'idCard', label: '身份证号', style: 'width:172px' },
+  { key: 'idCard', label: '身份证号', style: 'width:12.29rem' },
   { key: 'phone', label: '手机号' },
   { key: 'serviceArea', label: '服务区域' },
   { key: 'rejectReason', label: '拒绝原因' },
@@ -279,20 +279,20 @@ async function handleDelete(f) {
   overflow: hidden;
 }
 .tab {
-  padding: 7px 16px;
+  padding: 0.5rem 1.14rem;
   border: 1px solid transparent;
   background: rgba(12, 20, 36, 0.6);
-  font-size: 13px;
+  font-size: 0.93rem;
   color: var(--neutral-500);
   cursor: pointer;
   transition: all var(--transition-fast);
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.43rem;
   position: relative;
 }
 .tab + .tab {
-  border-left: 1px solid var(--border-soft);
+  border-left: 0.07rem solid var(--border-soft);
 }
 .tab:hover {
   background: rgba(125, 211, 252, 0.08);
@@ -312,20 +312,20 @@ async function handleDelete(f) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border-radius: 9px;
+  min-width: 1.29rem;
+  height: 1.29rem;
+  padding: 0 0.36rem;
+  border-radius: 0.64rem;
   background: var(--neutral-100);
   color: var(--neutral-400);
-  font-size: 11px;
+  font-size: 0.79rem;
   font-weight: 600;
   transition: all var(--transition-fast);
 }
 
 .truncate {
   display: inline-block;
-  max-width: 160px;
+  max-width: 11.43rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -333,7 +333,7 @@ async function handleDelete(f) {
 
 .mono {
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-  font-size: 12px;
+  font-size: 0.86rem;
   letter-spacing: 0.5px;
   color: var(--neutral-600);
 }
@@ -342,11 +342,11 @@ async function handleDelete(f) {
 .refresh-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.43rem;
 }
 .refresh-icon {
   display: inline-block;
-  font-size: 15px;
+  font-size: 1.07rem;
   line-height: 1;
   transition: transform 0.3s ease;
 }
@@ -357,6 +357,6 @@ async function handleDelete(f) {
 
 .reason {
   color: var(--color-danger);
-  font-size: 12px;
+  font-size: 0.86rem;
 }
 </style>

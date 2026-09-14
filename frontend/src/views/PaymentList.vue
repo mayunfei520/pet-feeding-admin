@@ -28,9 +28,9 @@ const statusLabels = { UNPAID: '未支付', PAID: '已支付', REFUNDED: '已退
 const statusClasses = { UNPAID: 'tag-pending', PAID: 'tag-active', REFUNDED: 'tag-disabled' }
 
 const columns = [
-  { key: 'id', label: '编号', style: 'width:50px' },
-  { key: 'orderId', label: '订单编号', style: 'width:80px' },
-  { key: 'userId', label: '用户编号', style: 'width:70px' },
+  { key: 'id', label: '编号', style: 'width:3.57rem' },
+  { key: 'orderId', label: '订单编号', style: 'width:5.71rem' },
+  { key: 'userId', label: '用户编号', style: 'width:5rem' },
   { key: 'amount', label: '金额', format: v => `¥${v}` },
   { key: 'payMethod', label: '支付方式', format: v => methodLabels[v] || v },
   { key: 'payStatus', label: '状态' },

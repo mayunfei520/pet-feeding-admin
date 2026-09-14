@@ -38,7 +38,7 @@
     v-model="drawerVisible"
     :title="drawerTitle"
     direction="rtl"
-    size="460px"
+    size="32.86rem"
     class="im-drawer"
   >
     <div class="im-body" v-if="conv">
@@ -82,7 +82,7 @@ const tableData = ref([])
 let pollTimer = null
 
 const tableColumns = [
-  { key: 'id', label: '编号', style: 'width:70px' },
+  { key: 'id', label: '编号', style: 'width:5rem' },
   { key: 'orderNo', label: '订单号' },
   { key: 'ownerName', label: '客户' },
   { key: 'feederName', label: '喂养员' },
@@ -169,16 +169,16 @@ function fmtTime(v) {
 /* 搜索框 */
 .search-box {
   display: flex;
-  gap: 6px;
+  gap: 0.43rem;
 }
 .search-input {
-  width: 220px;
-  padding: 7px 12px;
+  width: 15.71rem;
+  padding: 0.5rem 0.86rem;
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-sm);
   background: rgba(12, 20, 36, 0.6);
   color: var(--neutral-700);
-  font-size: 13px;
+  font-size: 0.93rem;
   outline: none;
   transition: border-color var(--transition-fast);
 }
@@ -192,11 +192,11 @@ function fmtTime(v) {
 .unread-badge {
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
-  border-radius: 10px;
+  padding: 0.14rem 0.57rem;
+  border-radius: 0.71rem;
   background: rgba(248, 113, 113, 0.14);
   color: var(--color-danger);
-  font-size: 11px;
+  font-size: 0.79rem;
   font-weight: 600;
 }
 .muted { color: var(--neutral-400); }
@@ -205,11 +205,11 @@ function fmtTime(v) {
 .refresh-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.43rem;
 }
 .refresh-icon {
   display: inline-block;
-  font-size: 15px;
+  font-size: 1.07rem;
   line-height: 1;
   transition: transform 0.3s ease;
 }
@@ -221,18 +221,18 @@ function fmtTime(v) {
   background: rgba(12, 20, 36, 0.5);
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-md);
-  padding: 12px 14px;
-  margin-bottom: 14px;
+  padding: 0.86rem 1rem;
+  margin-bottom: 1rem;
 }
 .im-meta-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 5px 0;
-  font-size: 13px;
+  gap: 0.71rem;
+  padding: 0.36rem 0;
+  font-size: 0.93rem;
 }
 .im-k {
-  width: 52px;
+  width: 3.71rem;
   color: var(--neutral-400);
   flex-shrink: 0;
 }
@@ -241,28 +241,28 @@ function fmtTime(v) {
   font-weight: 500;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.57rem;
 }
 .mono {
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-  font-size: 12px;
+  font-size: 0.86rem;
   color: var(--neutral-600);
 }
 .dot-owner, .dot-feeder {
-  font-size: 10px;
-  padding: 1px 6px;
-  border-radius: 8px;
+  font-size: 0.71rem;
+  padding: 0.07rem 0.43rem;
+  border-radius: 0.57rem;
 }
 .dot-owner { background: rgba(56, 189, 248, 0.16); color: var(--ice-bright); }
 .dot-feeder { background: rgba(167, 139, 250, 0.16); color: var(--violet); }
 
 .im-load-earlier {
   text-align: center;
-  margin-bottom: 10px;
+  margin-bottom: 0.71rem;
 }
 .btn-xs {
-  padding: 4px 12px;
-  font-size: 12px;
+  padding: 0.29rem 0.86rem;
+  font-size: 0.86rem;
   border-radius: var(--radius-sm);
 }
 .btn-ghost {
@@ -277,25 +277,25 @@ function fmtTime(v) {
 .im-chat {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  min-height: 200px;
+  gap: 1rem;
+  min-height: 14.29rem;
 }
 .im-msg { display: flex; flex-direction: column; max-width: 82%; }
 .im-msg.left { align-self: flex-start; align-items: flex-start; }
 .im-msg.right { align-self: flex-end; align-items: flex-end; }
 .im-msg-head {
   display: flex;
-  gap: 8px;
+  gap: 0.57rem;
   align-items: baseline;
-  margin-bottom: 4px;
-  font-size: 11px;
+  margin-bottom: 0.29rem;
+  font-size: 0.79rem;
 }
 .im-sender { color: var(--neutral-500); font-weight: 600; }
 .im-time { color: var(--neutral-400); }
 .im-bubble {
-  padding: 9px 13px;
-  border-radius: 12px;
-  font-size: 13px;
+  padding: 0.64rem 0.93rem;
+  border-radius: 0.86rem;
+  font-size: 0.93rem;
   line-height: 1.55;
   white-space: pre-wrap;
   word-break: break-word;
@@ -304,17 +304,17 @@ function fmtTime(v) {
 .im-msg.left .im-bubble {
   background: var(--surface-card);
   border: 1px solid var(--neutral-200);
-  border-top-left-radius: 3px;
+  border-top-left-radius: 0.21rem;
 }
 .im-msg.right .im-bubble {
   background: var(--brand-gradient);
   color: #061018;
-  border-top-right-radius: 3px;
+  border-top-right-radius: 0.21rem;
 }
 .im-empty {
   text-align: center;
   color: var(--neutral-400);
-  font-size: 13px;
-  padding: 40px 0;
+  font-size: 0.93rem;
+  padding: 2.86rem 0;
 }
 </style>

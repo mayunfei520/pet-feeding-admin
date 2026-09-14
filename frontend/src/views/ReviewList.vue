@@ -55,13 +55,13 @@ function renderStars(n) {
 </script>
 
 <style scoped>
-.reviews-list { display: flex; flex-direction: column; gap: 12px; }
+.reviews-list { display: flex; flex-direction: column; gap: 0.86rem; }
 
 .review-card {
   background: var(--surface-card);
   border: 1px solid var(--neutral-200);
   border-radius: var(--radius-md);
-  padding: 18px 20px;
+  padding: 1.29rem 1.43rem;
   transition: all var(--transition-base);
 }
 .review-card:hover {
@@ -73,24 +73,24 @@ function renderStars(n) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 0.71rem;
 }
-.review-meta { display: flex; align-items: center; gap: 12px; }
-.stars { color: #f59e0b; font-size: 14px; letter-spacing: 2px; }
-.date { font-size: 12px; color: var(--neutral-400); }
-.order-ref { font-size: 12px; color: var(--neutral-400); font-family: 'SF Mono', monospace; }
+.review-meta { display: flex; align-items: center; gap: 0.86rem; }
+.stars { color: #f59e0b; font-size: 1rem; letter-spacing: 2px; }
+.date { font-size: 0.86rem; color: var(--neutral-400); }
+.order-ref { font-size: 0.86rem; color: var(--neutral-400); font-family: 'SF Mono', monospace; }
 
 .review-content {
-  font-size: 14px;
+  font-size: 1rem;
   line-height: 1.7;
   color: var(--neutral-700);
 }
 
 .empty-state {
   text-align: center;
-  padding: 60px 24px;
+  padding: 4.29rem 1.71rem;
   color: var(--neutral-400);
 }
-.empty-state svg { color: var(--neutral-200); margin-bottom: 12px; }
-.empty-state p { font-size: 14px; }
+.empty-state svg { color: var(--neutral-200); margin-bottom: 0.86rem; }
+.empty-state p { font-size: 1rem; }
 </style>

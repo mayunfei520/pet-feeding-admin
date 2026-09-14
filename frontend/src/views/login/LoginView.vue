@@ -116,19 +116,19 @@ async function handleLogin() {
   animation: float 8s ease-in-out infinite;
 }
 .blob-1 {
-  width: 400px; height: 400px;
+  width: 28.57rem; height: 28.57rem;
   background: #6366f1;
   top: -10%; left: -5%;
   animation-delay: 0s;
 }
 .blob-2 {
-  width: 350px; height: 350px;
+  width: 25rem; height: 25rem;
   background: #8b5cf6;
   bottom: -10%; right: -5%;
   animation-delay: -3s;
 }
 .blob-3 {
-  width: 300px; height: 300px;
+  width: 21.43rem; height: 21.43rem;
   background: #a78bfa;
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
@@ -146,56 +146,56 @@ async function handleLogin() {
 .login-card {
   position: relative;
   z-index: 1;
-  width: 400px;
-  padding: 40px;
+  width: 28.57rem;
+  padding: 2.86rem;
   background: rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
+  border-radius: 1.43rem;
   color: #fff;
 }
 
 .card-header {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 2.29rem;
 }
 .card-logo {
-  width: 52px;
-  height: 52px;
-  margin: 0 auto 16px;
+  width: 3.71rem;
+  height: 3.71rem;
+  margin: 0 auto 1.14rem;
   background: var(--brand-gradient);
-  border-radius: 14px;
+  border-radius: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .logo-paw {
-  width: 26px;
-  height: 26px;
+  width: 1.86rem;
+  height: 1.86rem;
   color: #fff;
 }
 .card-header h1 {
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: 1.57rem;
   font-weight: 700;
   letter-spacing: -0.3px;
-  margin-bottom: 4px;
+  margin-bottom: 0.29rem;
 }
 .card-subtitle {
-  font-size: 13px;
+  font-size: 0.93rem;
   color: rgba(255, 255, 255, 0.45);
 }
 
 /* Form */
-.form { margin-bottom: 24px; }
-.form-item { margin-bottom: 16px; }
+.form { margin-bottom: 1.71rem; }
+.form-item { margin-bottom: 1.14rem; }
 .form-item label {
   display: block;
-  font-size: 12px;
+  font-size: 0.86rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.6);
-  margin-bottom: 6px;
+  margin-bottom: 0.43rem;
 }
 .input-wrapper {
   position: relative;
@@ -204,20 +204,20 @@ async function handleLogin() {
 }
 .input-icon {
   position: absolute;
-  left: 12px;
+  left: 0.86rem;
   color: rgba(255, 255, 255, 0.3);
   pointer-events: none;
   transition: color var(--transition-fast);
 }
 .input-wrapper input {
   width: 100%;
-  height: 42px;
-  padding: 0 12px 0 38px;
+  height: 3rem;
+  padding: 0 0.86rem 0 2.71rem;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 10px;
+  border-radius: 0.71rem;
   color: #fff;
-  font-size: 14px;
+  font-size: 1rem;
   outline: none;
   transition: all var(--transition-fast);
 }
@@ -234,28 +234,28 @@ async function handleLogin() {
 
 .error {
   color: #fca5a5;
-  font-size: 13px;
-  margin-bottom: 12px;
-  padding: 8px 12px;
+  font-size: 0.93rem;
+  margin-bottom: 0.86rem;
+  padding: 0.57rem 0.86rem;
   background: rgba(239, 68, 68, 0.1);
-  border-radius: 8px;
+  border-radius: 0.57rem;
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 .btn-submit {
   width: 100%;
-  height: 44px;
+  height: 3.14rem;
   border: none;
-  border-radius: 10px;
+  border-radius: 0.71rem;
   background: var(--brand-gradient);
   color: #fff;
-  font-size: 15px;
+  font-size: 1.07rem;
   font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 0.57rem;
   transition: all var(--transition-fast);
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }

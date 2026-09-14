@@ -12,9 +12,9 @@
         </div>
       </div>
       <div class="charts-row">
-        <div class="chart-card skeleton-card glass"><div class="chart-sk shimmer" style="height:220px"></div></div>
-        <div class="chart-card skeleton-card glass"><div class="chart-sk shimmer" style="height:220px"></div></div>
-        <div class="chart-card skeleton-card glass"><div class="chart-sk shimmer" style="height:220px"></div></div>
+        <div class="chart-card skeleton-card glass"><div class="chart-sk shimmer" style="height:15.71rem"></div></div>
+        <div class="chart-card skeleton-card glass"><div class="chart-sk shimmer" style="height:15.71rem"></div></div>
+        <div class="chart-card skeleton-card glass"><div class="chart-sk shimmer" style="height:15.71rem"></div></div>
       </div>
     </template>
 

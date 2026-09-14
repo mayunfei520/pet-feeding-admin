@@ -18,8 +18,8 @@
       <button class="btn btn-sm btn-outline" @click="toggleStatus(item)">
         {{ item.status === 'ACTIVE' ? '禁用' : '启用' }}
       </button>
-      <button class="btn btn-sm btn-outline" @click="handleReset(item)" style="margin-left:4px">重置密码</button>
-      <button class="btn btn-sm btn-danger-outline" @click="handleDelete(item)" style="margin-left:4px">删除</button>
+      <button class="btn btn-sm btn-outline" @click="handleReset(item)" style="margin-left:0.29rem">重置密码</button>
+      <button class="btn btn-sm btn-danger-outline" @click="handleDelete(item)" style="margin-left:0.29rem">删除</button>
     </template>
   </PageTable>
 
@@ -70,7 +70,7 @@ const error = ref('')
 const form = reactive({ username: '', password: '' })
 
 const columns = [
-  { key: 'id', label: '编号', style: 'width:60px' },
+  { key: 'id', label: '编号', style: 'width:4.29rem' },
   { key: 'username', label: '用户名' },
   { key: 'status', label: '状态' },
   { key: 'createdAt', label: '注册时间', format: v => v ? v.replace('T', ' ') : '-' },
@@ -139,7 +139,7 @@ async function toggleStatus(u) {
 
 <style scoped>
 .req { color: var(--color-danger); }
-.error { color: var(--color-danger); font-size: 13px; margin-top: 12px; padding: 8px 12px; background: var(--color-danger-bg); border-radius: 6px; border: 1px solid rgba(239,68,68,0.15); }
+.error { color: var(--color-danger); font-size: 0.93rem; margin-top: 0.86rem; padding: 0.57rem 0.86rem; background: var(--color-danger-bg); border-radius: 0.43rem; border: 1px solid rgba(239,68,68,0.15); }
 
 .modal-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.55);
@@ -147,7 +147,7 @@ async function toggleStatus(u) {
   backdrop-filter: blur(4px);
 }
 .modal {
-  width: 420px;
+  width: 30rem;
   background: linear-gradient(160deg, #0f1a2e 0%, #0d1526 100%);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
@@ -155,26 +155,26 @@ async function toggleStatus(u) {
   overflow: hidden;
 }
 .modal-header {
-  padding: 18px 24px; border-bottom: 1px solid var(--border-soft);
+  padding: 1.29rem 1.71rem; border-bottom: 0.07rem solid var(--border-soft);
   display: flex; align-items: center; justify-content: space-between;
 }
-.modal-title { font-size: 16px; font-weight: 600; color: var(--neutral-900); }
-.modal-close { border: none; background: none; font-size: 18px; color: var(--neutral-400); cursor: pointer; padding: 4px; }
+.modal-title { font-size: 1.14rem; font-weight: 600; color: var(--neutral-900); }
+.modal-close { border: none; background: none; font-size: 1.29rem; color: var(--neutral-400); cursor: pointer; padding: 0.29rem; }
 .modal-close:hover { color: var(--ice); }
-.modal-body { padding: 20px 24px; }
+.modal-body { padding: 1.43rem 1.71rem; }
 .modal-footer {
-  padding: 14px 24px; border-top: 1px solid var(--border-soft);
-  display: flex; justify-content: flex-end; gap: 8px;
+  padding: 1rem 1.71rem; border-top: 0.07rem solid var(--border-soft);
+  display: flex; justify-content: flex-end; gap: 0.57rem;
 }
-.form-group { margin-bottom: 14px; }
-.form-group label { display: block; margin-bottom: 5px; font-size: 13px; color: var(--neutral-600); font-weight: 500; }
-.form-group .input { width: 100%; height: 38px; padding: 0 12px; }
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; margin-bottom: 0.36rem; font-size: 0.93rem; color: var(--neutral-600); font-weight: 500; }
+.form-group .input { width: 100%; height: 2.71rem; padding: 0 0.86rem; }
 .input-wrap { position: relative; }
-.input-wrap .input { padding-right: 56px; }
+.input-wrap .input { padding-right: 4rem; }
 .pwd-toggle {
-  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
-  border: none; background: none; cursor: pointer; padding: 4px 6px;
-  font-size: 13px; color: var(--ice); line-height: 1;
+  position: absolute; right: 0.57rem; top: 50%; transform: translateY(-50%);
+  border: none; background: none; cursor: pointer; padding: 0.29rem 0.43rem;
+  font-size: 0.93rem; color: var(--ice); line-height: 1;
 }
 .pwd-toggle:hover { color: #a5e9ff; }
 </style>

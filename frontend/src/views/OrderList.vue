@@ -7,7 +7,7 @@
     :loading="loading"
   >
     <template #filters>
-      <el-select v-model="filterStatus" placeholder="全部状态" clearable style="width:140px">
+      <el-select v-model="filterStatus" placeholder="全部状态" clearable style="width:10rem">
         <el-option v-for="(label, key) in statusLabels" :key="key" :label="label" :value="key" />
       </el-select>
     </template>
@@ -29,8 +29,8 @@
     </template>
     <template #row-actions="{ item }">
       <button v-if="item.status === 'PENDING'" class="btn btn-sm btn-primary" @click="showAssign(item)">分配</button>
-      <button v-if="item.status === 'PENDING'" class="btn btn-sm btn-danger-outline" @click="handleCancel(item.id)" style="margin-left:4px">取消</button>
-      <button class="btn btn-sm btn-danger-outline" @click="handleDelete(item)" style="margin-left:4px">删除</button>
+      <button v-if="item.status === 'PENDING'" class="btn btn-sm btn-danger-outline" @click="handleCancel(item.id)" style="margin-left:0.29rem">取消</button>
+      <button class="btn btn-sm btn-danger-outline" @click="handleDelete(item)" style="margin-left:0.29rem">删除</button>
     </template>
   </PageTable>
 
@@ -47,7 +47,7 @@
           <div class="info-item"><span class="info-label">服务日期</span><span class="info-val">{{ assignOrder?.serviceDate }} {{ periodLabels[assignOrder?.servicePeriod] }}</span></div>
           <div class="info-item"><span class="info-label">服务地址</span><span class="info-val">{{ assignOrder?.address }}</span></div>
         </div>
-        <div class="form-group" style="margin-top:16px">
+        <div class="form-group" style="margin-top:1.14rem">
           <label>选择喂养员 <span class="req">*</span></label>
           <el-select v-model="selectedFeederId" placeholder="请选择喂养员" clearable style="width:100%">
             <el-option v-for="f in feeders" :key="f.id" :label="`${f.realName} - ${f.serviceArea} ⭐${f.rating || '5.0'}`" :value="f.id" />
@@ -101,9 +101,9 @@ const statusTagClass = {
 
 const columns = [
   { key: 'orderNo', label: '订单编号' },
-  { key: 'ownerId', label: '主人编号', style: 'width:70px' },
+  { key: 'ownerId', label: '主人编号', style: 'width:5rem' },
   { key: 'feederId', label: '喂养员编号', format: v => v || '-' },
-  { key: 'petId', label: '宠物编号', style: 'width:70px' },
+  { key: 'petId', label: '宠物编号', style: 'width:5rem' },
   { key: 'serviceDate', label: '服务日期' },
   { key: 'servicePeriod', label: '时段' },
   { key: 'address', label: '地址' },
@@ -169,19 +169,19 @@ async function handleAssign() {
 </script>
 
 <style scoped>
-.mono { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; color: var(--brand-primary); font-weight: 500; }
+.mono { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.86rem; color: var(--brand-primary); font-weight: 500; }
 .price { font-weight: 600; color: var(--neutral-800); }
 
 /* Info Grid */
-.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
-.info-item { display: flex; flex-direction: column; gap: 2px; }
-.info-label { font-size: 11px; color: var(--neutral-400); text-transform: uppercase; letter-spacing: 0.5px; }
-.info-val { font-size: 14px; color: var(--neutral-800); font-weight: 500; }
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.71rem 1.14rem; }
+.info-item { display: flex; flex-direction: column; gap: 0.14rem; }
+.info-label { font-size: 0.79rem; color: var(--neutral-400); text-transform: uppercase; letter-spacing: 0.5px; }
+.info-val { font-size: 1rem; color: var(--neutral-800); font-weight: 500; }
 
 /* SMS Box */
-.sms-box { margin-top: 16px; background: var(--brand-gradient-subtle); border: 1px solid rgba(99,102,241,0.15); border-radius: var(--radius-sm); padding: 12px; }
-.sms-label { font-size: 12px; color: var(--brand-primary); font-weight: 500; margin-bottom: 6px; }
-.sms-content { font-size: 13px; line-height: 1.7; color: var(--neutral-700); }
+.sms-box { margin-top: 1.14rem; background: var(--brand-gradient-subtle); border: 1px solid rgba(99,102,241,0.15); border-radius: var(--radius-sm); padding: 0.86rem; }
+.sms-label { font-size: 0.86rem; color: var(--brand-primary); font-weight: 500; margin-bottom: 0.43rem; }
+.sms-content { font-size: 0.93rem; line-height: 1.7; color: var(--neutral-700); }
 
 /* Modal */
 .modal-overlay {
@@ -190,7 +190,7 @@ async function handleAssign() {
   backdrop-filter: blur(4px);
 }
 .modal {
-  width: 540px;
+  width: 38.57rem;
   background: linear-gradient(160deg, #0f1a2e 0%, #0d1526 100%);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
@@ -198,18 +198,18 @@ async function handleAssign() {
   overflow: hidden;
 }
 .modal-header {
-  padding: 18px 24px; border-bottom: 1px solid var(--border-soft);
+  padding: 1.29rem 1.71rem; border-bottom: 0.07rem solid var(--border-soft);
   display: flex; align-items: center; justify-content: space-between;
 }
-.modal-title { font-size: 16px; font-weight: 600; color: var(--neutral-900); }
-.modal-close { border: none; background: none; font-size: 18px; color: var(--neutral-400); cursor: pointer; }
+.modal-title { font-size: 1.14rem; font-weight: 600; color: var(--neutral-900); }
+.modal-close { border: none; background: none; font-size: 1.29rem; color: var(--neutral-400); cursor: pointer; }
 .modal-close:hover { color: var(--ice); }
-.modal-body { padding: 20px 24px; max-height: 70vh; overflow-y: auto; }
+.modal-body { padding: 1.43rem 1.71rem; max-height: 70vh; overflow-y: auto; }
 .modal-footer {
-  padding: 14px 24px; border-top: 1px solid var(--border-soft);
-  display: flex; justify-content: flex-end; gap: 8px;
+  padding: 1rem 1.71rem; border-top: 0.07rem solid var(--border-soft);
+  display: flex; justify-content: flex-end; gap: 0.57rem;
 }
-.form-group label { display: block; margin-bottom: 5px; font-size: 13px; color: var(--neutral-600); font-weight: 500; }
+.form-group label { display: block; margin-bottom: 0.36rem; font-size: 0.93rem; color: var(--neutral-600); font-weight: 500; }
 .req { color: var(--color-danger); }
-.error { color: var(--color-danger); font-size: 13px; margin-top: 12px; padding: 8px 12px; background: var(--color-danger-bg); border-radius: 6px; }
+.error { color: var(--color-danger); font-size: 0.93rem; margin-top: 0.86rem; padding: 0.57rem 0.86rem; background: var(--color-danger-bg); border-radius: 0.43rem; }
 </style>
