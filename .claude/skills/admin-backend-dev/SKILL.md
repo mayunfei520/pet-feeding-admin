@@ -12,7 +12,7 @@ description: 宠物喂养管理后台后端开发规范 — Spring Boot + MyBati
 - **Java 1.8**：不可使用 9+ 特性
 - **Spring Boot 2.7.18**：不是 3.x
 - **MyBatis-Plus 3.5.3.1**：`ServiceImpl` 继承模式
-- **数据库**：H2 文件数据库（MySQL 兼容模式），DDL 在 `db/schema.sql`
+- **数据库**：H2 文件数据库（MySQL 兼容模式），Flyway 管理建表（`db/migration/`，V1__init / V2__add_im...）
 - **JWT**：`jjwt 0.9.1`（旧 API）
 
 ## 三层 Controller 模式
@@ -23,9 +23,9 @@ description: 宠物喂养管理后台后端开发规范 — Spring Boot + MyBati
 - 所有接口需 JWT（SecurityConfig 默认认证）
 
 ### 2. 小程序 Controller（`/api/miniapp/*`）
-- 文件位置：`module/miniapp/controller/MiniApp<Domain>Controller.java`
+- 文件位置：`module/<domain>/controller/MiniApp<Domain>Controller.java`（已归位到各业务模块，非 module/miniapp）
 - 从 `Authorization` header 手动提取 token：`jwtUtil.getUserIdFromToken(token)`
-- GET 请求公开（SecurityConfig 放行），POST/PUT/DELETE 需 JWT
+- SecurityConfig 全放行 `/api/miniapp/**`，鉴权在 Controller 层手写（GET/POST 均如此，待重构）
 
 ## 统一响应
 
@@ -56,7 +56,8 @@ public class XxxServiceImpl extends ServiceImpl<XxxMapper, Xxx> implements XxxSe
 ```java
 // SecurityConfig.java
 .antMatchers("/api/xxx").permitAll()  // 完全放行
-.antMatchers(HttpMethod.GET, "/api/miniapp/xxx/**").permitAll()  // 小程序读放行
+.antMatchers("/api/miniapp/**").permitAll()  // 小程序全部放行（鉴权在 Controller 层）
+.antMatchers("/api/user/**").hasRole("ADMIN")  // 管理接口需 ADMIN
 ```
 
 ## API 文档访问

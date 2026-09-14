@@ -16,11 +16,11 @@ pet-feeding-admin/
 │       ├── resources/
 │       │   ├── application.yml       # 主配置 (port 8080, knife4j)
 │       │   ├── application-dev.yml   # 开发配置 (H2, JWT, MyBatis-Plus)
-│       │   └── db/schema.sql         # 数据库建表脚本
+│       │   └── db/migration/         # Flyway 迁移脚本 (V1__init, V2__add_im...)
 │       └── java/com/petfeeding/platform/
 │           ├── PetFeedingApplication.java
 │           ├── common/               # 通用组件
-│           │   ├── config/           # CorsConfig, MybatisPlusConfig, MetaObjectHandler, DataSourceInitializer
+│           │   ├── config/           # CorsConfig, MybatisPlusConfig, MetaObjectHandlerConfig, IdCardMigrationRunner
 │           │   ├── exception/        # BusinessException, GlobalExceptionHandler
 │           │   └── result/R.java     # 统一响应 {code, message, data}
 │           ├── security/             # Spring Security + JWT
@@ -36,9 +36,8 @@ pet-feeding-admin/
 │               ├── payment/          # 支付模块
 │               ├── dashboard/        # 仪表盘统计
 │               ├── sms/              # 短信服务
-│               └── miniapp/          # ⚡ 小程序专属 API（5个Controller）
-│                   ├── controller/   # MiniAppAuth/Pet/Order/Feeder/ReviewController
-│                   └── service/      # MiniAppUserService（Mock微信登录）
+│               └── im/               # IM 模块 (MiniAppImController)
+│               # 小程序 Controller 已归位到各业务模块（MiniAppAuthController 在 user/，MiniAppPetController 在 pet/，依此类推）
 │
 └── frontend/                         # Vue 3 + Vite 管理后台
     ├── index.html
@@ -133,25 +132,33 @@ pet-feeding-admin/
 
 ```java
 // 放行（无需JWT）
-"/api/user/login"
-"/api/user/register"
-"/api/miniapp/auth/login"
+"/api/user/login", "/api/user/register"
+"/api/miniapp/**"            // 小程序全部放行，鉴权在 Controller 层手写（待重构）
 "/doc.html", "/webjars/**", "/v3/api-docs/**"
 
-// 小程序读操作公开，写操作需JWT
-.antMatchers(HttpMethod.GET, "/api/miniapp/**").permitAll()
-.anyRequest().authenticated()  // 其他全部需要认证
+// 管理接口需 ADMIN 角色
+.antMatchers("/api/user/**", "/api/feeder/**", "/api/order/**",
+             "/api/review/**", "/api/payment/**", "/api/dashboard/**", "/api/pet/**").hasRole("ADMIN")
+.anyRequest().authenticated()  // 其余需认证
 ```
 
 ## 数据库
 
-使用 H2 文件数据库（开发环境），DDL 在 `src/main/resources/db/schema.sql`：
+使用 H2 文件数据库（开发环境），由 **Flyway** 管理建表与版本迁移（`src/main/resources/db/migration/`）：
+- `V1__init.sql` — 初始化 7 张核心表
+- `V2__add_im_tables_and_feeder_reject_reason.sql` — IM 会话/消息表 + 喂养员驳回原因列
+
+数据表：
 - **users** — 用户表（username, password, role, status）
 - **pets** — 宠物表（user_id, name, species, breed, age, weight）
 - **feeders** — 喂养员表（user_id, real_name, service_area, status, rating）
 - **orders** — 订单表（order_no, owner_id, feeder_id, pet_id, service_date, service_period, status, price）
 - **reviews** — 评价表（order_id, owner_id, feeder_id, rating, content）
 - **payments** — 支付表（order_id, user_id, amount, pay_method, pay_status）
+- **conversations** / **messages** — IM 会话与消息表（V2 新增）
+- **sms_logs** — 短信日志表
+
+> ⚠️ 索引命名：H2 要求索引名全局唯一（不同于 MySQL 仅要求表内唯一），migration 中的二级索引须带表前缀。
 
 H2 Web Console：`http://localhost:8080/h2-console`（JDBC URL: `jdbc:h2:file:./data/pet_feeding`）
 
@@ -165,7 +172,8 @@ H2 Web Console：`http://localhost:8080/h2-console`（JDBC URL: `jdbc:h2:file:./
 ### 后端
 ```bash
 cd backend
-mvn spring-boot:run -Dfile.encoding=UTF-8
+mvn spring-boot:run -Dfile.encoding=UTF-8 -Dmaven.test.skip=true
+# ⚠️ 必须加 -Dmaven.test.skip=true：测试代码用了 Java 10+ 的 var，但项目是 Java 1.8，编译测试会失败
 # 启动后访问: http://localhost:8080
 # API 文档: http://localhost:8080/doc.html
 ```
