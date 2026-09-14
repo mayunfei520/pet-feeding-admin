@@ -1,4 +1,4 @@
-﻿package com.petfeeding.platform.module.im.controller;
+package com.petfeeding.platform.module.im.controller;
 
 import com.petfeeding.platform.common.result.R;
 import com.petfeeding.platform.module.im.dto.AdminConversationVO;

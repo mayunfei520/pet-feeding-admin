@@ -3,7 +3,7 @@ FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /build
 COPY pom.xml .
 COPY src ./src
-RUN mvn -q -B clean package -DskipTests
+RUN mvn -q -B clean package -Dmaven.test.skip=true
 
 # ---- 运行阶段 ----
 FROM eclipse-temurin:17-jre-jammy
