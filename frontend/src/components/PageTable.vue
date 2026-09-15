@@ -81,7 +81,7 @@ function renderCell(col, item) {
 </script>
 
 <style scoped>
-.page { max-width: 100rem; }
+.page { width: 100%; }
 
 .page-header {
   display: flex;

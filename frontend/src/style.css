@@ -92,8 +92,10 @@
 }
 
 html {
-  /* 根字号随视口连续缩放：1280px≈13px / 1440px≈14px / 1818px+→16px */
-  font-size: clamp(13px, 0.55vw + 6px, 16px);
+  /* 根字号随视口窄幅缩放（以 1440px=14px 为锚点）：
+     1280px≈13.5px / 1440px≈14px / 1680px≈14.9px / 1920px≈15.7px / 2560px+→15px(封顶)
+     落差仅2px，温和可感知，不显大 */
+  font-size: clamp(13px, 0.35vw + 9px, 15px);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
