@@ -14,7 +14,9 @@ spring:
     init:
       mode: never
   flyway:
-    enabled: true
+    # 生产禁用：Flyway 社区版 8.x 不支持 MySQL 8.0（报 Unsupported Database: MySQL 8.0），
+    # MySQL 8.0 支持属于付费版能力。生产 schema 由 db/migration 人工确认后执行。
+    enabled: false
     locations: classpath:db/migration
     baseline-on-migrate: true
 

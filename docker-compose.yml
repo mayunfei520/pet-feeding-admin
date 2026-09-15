@@ -48,6 +48,9 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       SM4_KEY: ${SM4_KEY}
       JWT_SECRET: ${JWT_SECRET}
+      # Flyway 社区版不支持 MySQL 8.0（Unsupported Database），生产禁用；
+      # schema 由 db/migration 人工确认后执行，V2 需的 reject_reason 列已手动补齐
+      SPRING_FLYWAY_ENABLED: "false"
     volumes:
       - backend_data:/app/data
     expose:
