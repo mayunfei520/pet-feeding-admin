@@ -179,7 +179,7 @@ function logout() {
 
 /* ===== Sidebar ===== */
 .sidebar {
-  width: 240px;
+  width: 17.14rem;
   background: var(--surface-sidebar);
   color: #fff;
   flex-shrink: 0;
@@ -193,7 +193,7 @@ function logout() {
 }
 
 .sidebar-header {
-  height: 64px;
+  height: 4.57rem;
   display: flex;
   align-items: center;
   gap: 0.86rem;
@@ -337,7 +337,7 @@ function logout() {
 /* ===== Main ===== */
 .main {
   flex: 1;
-  margin-left: 240px;
+  margin-left: 17.14rem;
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -345,7 +345,7 @@ function logout() {
 
 /* Header */
 .header {
-  height: 64px;
+  height: 4.57rem;
   padding: 0 2rem;
   background: var(--surface-header);
   backdrop-filter: blur(12px);
@@ -459,7 +459,7 @@ function logout() {
 /* ===== Responsive ===== */
 @media (max-width: 1024px) {
   .sidebar {
-    width: 72px;
+    width: 5.14rem;
   }
   .sidebar-header {
     justify-content: center;
@@ -474,7 +474,7 @@ function logout() {
   }
   .nav-label { display: none; }
   .main {
-    margin-left: 72px;
+    margin-left: 5.14rem;
   }
 }
 
@@ -483,7 +483,7 @@ function logout() {
     display: flex;
   }
   .sidebar {
-    width: 240px;
+    width: 17.14rem;
     transform: translateX(-100%);
     transition: transform 0.25s ease;
   }

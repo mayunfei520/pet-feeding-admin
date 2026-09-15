@@ -24,7 +24,7 @@
             <th v-for="col in columns" :key="col.key" :style="col.style">
               {{ col.label }}
             </th>
-            <th v-if="showActions" style="width:200px">操作</th>
+            <th v-if="showActions" style="width:14.29rem">操作</th>
           </tr>
         </thead>
         <tbody>
@@ -81,7 +81,7 @@ function renderCell(col, item) {
 </script>
 
 <style scoped>
-.page { max-width: 1400px; }
+.page { max-width: 100rem; }
 
 .page-header {
   display: flex;
